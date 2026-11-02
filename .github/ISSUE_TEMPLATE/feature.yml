@@ -7,7 +7,7 @@ body:
       value: |
         Thanks for the idea! Rough ideas are welcome too: you don't need to know how it would work.
 
-        Already asked? Search the [open feature ideas](https://github.com/VysseCodes/HMG-Leafia-Plus/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) first, and add a 👍 to the ones you'd use. That's how we see what people want most.
+        Already asked? Search the [open feature ideas](https://github.com/zpoon/HMG-Leafia-Plus/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) first, and add a 👍 to the ones you'd use. That's how we see what people want most.
   - type: textarea
     id: idea
     attributes:

@@ -37,6 +37,12 @@ jobs:
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
             echo "$GITHUB_REF_NAME is not on main; releases are only made from main"; exit 1; }
 
+      - name: Tag must match the package version
+        run: |
+          v=$(sed -n 's/^package-version=//p' packages/wireless-carplay-aa/NEMESIS.data | tr -d '"')
+          [ "$GITHUB_REF_NAME" = "v$v" ] || {
+            echo "tag $GITHUB_REF_NAME does not match package-version $v in packages/wireless-carplay-aa/NEMESIS.data"; exit 1; }
+
       - name: Build the package and the kit
         run: |
           mkdir -p release
@@ -63,7 +69,7 @@ jobs:
 
           See **Known quirks** in the README if something doesn't connect at first.
 
-          Check your car first on the [compatibility page](https://vyssecodes.github.io/HMG-Leafia-Plus/). Something wrong? Run **leafia-kit-$GITHUB_REF_NAME.zip** and open an issue with the problem form. (Other kit sizes: **quick** to check a car, **port** to add a new car, **full** for every crash record.) Uninstall any time from NEMESIS Manager; every file goes back to stock.
+          Check your car first on the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/). Something wrong? Run **leafia-kit-$GITHUB_REF_NAME.zip** and open an issue with the problem form. (Other kit sizes: **quick** to check a car, **port** to add a new car, **full** for every crash record.) Uninstall any time from NEMESIS Manager; every file goes back to stock.
 
           Verify downloads with \`sha256sum -c SHA256SUMS\`.
           EOF

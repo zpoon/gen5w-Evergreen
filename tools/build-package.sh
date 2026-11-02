@@ -14,6 +14,7 @@ if grep -rn --include='*.sh' 'printf' "$ROOT/packages/wireless-carplay-aa" \
     echo "build-package: printf in package scripts (not on the head unit) - use echo or putline" >&2
     exit 1
 fi
+python3 "$ROOT/tools/check-descriptor.py" >&2
 STAGE=$(mktemp -d)
 cp -R "$ROOT/packages/wireless-carplay-aa/." "$STAGE/inner"
 rm -f "$STAGE/inner/README.md"

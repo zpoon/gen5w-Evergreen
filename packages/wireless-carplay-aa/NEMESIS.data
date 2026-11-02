@@ -1,8 +1,14 @@
 [nemesis]
-version=1.0
+version=1.1
 id=wireless.carplay.aa
 name=HMG Leafia Plus - Wireless CarPlay/AA
-types=application
+type=application
+package-version=1.1.0
+short-desc="Wireless CarPlay and Android Auto, turn-by-turn on the cluster"
+detailed-desc="Community fork of HMG Leafia Plus. Wireless CarPlay and Android Auto, with turn-by-turn on the cluster and HUD, on supported Gen5W cars. Other units with Wi-Fi get wireless Android Auto only. Uninstall puts back the stock files."
+os="CVEV.USA.*.260507,NEEV.USA.*.260507,NEEV23.USA.*.260507,NEEV23.USA.*.260903,NEEV23SE.USA.*.260903,CVEV.CAN.*.260206,NEEV.CAN.*.260206"
+models=any
+repository=https://github.com/zpoon/HMG-Leafia-Plus
 preinstall=scripts/pre.sh
 postinstall=scripts/post.sh
 preuninstall=scripts/preun.sh

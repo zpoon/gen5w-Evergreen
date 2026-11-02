@@ -18,7 +18,7 @@ crash record). Use the one a maintainer asked for.
 
    LEAFIA/public    Safe to share publicly.
                     - Checking your car: drop public/LEAFIA-REPORT.txt on
-                      https://vyssecodes.github.io/HMG-Leafia-Plus/
+                      https://zpoon.github.io/HMG-Leafia-Plus/
                     - Reporting a problem: zip the public folder and attach
                       it to your GitHub issue.
 

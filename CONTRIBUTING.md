@@ -3,7 +3,7 @@
 Thanks for helping! You don't need to write code to contribute:
 
 - **Report your car.** Run the Leafia kit and drop its report on the
-  [compatibility page](https://vyssecodes.github.io/HMG-Leafia-Plus/); it files the issue for you. Cars in the
+  [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/); it files the issue for you. Cars in the
   page's "Help add your car" list are the most wanted.
 - **Test a build** on your car and tell us how it went, especially for cars marked *testing*.
 - **Report a problem** with the issue form: it walks you through the Leafia kit.

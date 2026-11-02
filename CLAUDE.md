@@ -1,6 +1,6 @@
 # HMG Leafia Plus: notes for Claude
 
-Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803x/TCC897x, Android 4.4.2, Dalvik), installed through **NEMESIS** (xwtk/hmg_nemesis, AGPL-3.0). Maintainer: VysseCodes (Ko-fi vyssecodes). Reference car: 2023 Kia EV6 (CVEV.USA, firmware 260507, with HUD).
+Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803x/TCC897x, Android 4.4.2, Dalvik), installed through **NEMESIS** (xwtk/hmg_nemesis, AGPL-3.0). Created by VysseCodes (archived upstream: VysseCodes/HMG-Leafia-Plus); this community fork (zpoon/HMG-Leafia-Plus) is maintained by zpoon (Nick). Reference car: 2023 Kia EV6 (CVEV.USA, firmware 260507, with HUD).
 
 ## Working conventions
 
@@ -8,6 +8,7 @@ Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803
 - Anything that writes to `/system` ships as a NEMESIS package with a stock checksum gate, a backup, and an uninstall that restores the exact stock bytes.
 - Test packages on the mock head unit (below) before anyone runs them on a car, and say which cars a change was tested on.
 - Commits: describe the change in plain words. Don't rewrite or force-push shared history without the maintainer's OK.
+- `packages/wireless-carplay-aa/NEMESIS.data` uses descriptor `version=1.1` (NEMESIS 1.16). Its `os=` lists `ro.build.product` globs for every supported car and firmware (e.g. `CVEV.USA.*.260507`); keep it in step with `patches/cars` (`tools/check-descriptor.py`, run by `build-package.sh`, fails otherwise). Bump `package-version` for each release; the release tag must be `v<package-version>`.
 - No links to Claude chats or sessions in commits, PR descriptions or comments: no `Claude-Session:` trailers and no claude.ai session URLs. A `Co-Authored-By: Claude` line is fine.
 
 ## Hard rules

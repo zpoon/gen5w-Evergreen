@@ -1,22 +1,17 @@
-# HMG Leafia Plus
+# HMG Leafia Plus (community fork)
 
-> [!IMPORTANT]
-> **HMG Leafia Plus is archived. Its successor is [HMG-API](https://github.com/VysseCodes/HMG-API).**
+> [!NOTE]
+> **This is an unofficial community fork.** The original [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. This fork keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
-> HMG-API is a mod manager for Gen5W head units. Wireless CarPlay and Android Auto with turn-by-turn on the cluster and HUD is one of its mods, next to many others. It installs through NEMESIS, a USB stick or adb, and removing anything puts back exactly what it changed. [Install guide](https://github.com/VysseCodes/HMG-API/wiki/Installing-HMG-API) · [Supported cars](https://github.com/VysseCodes/HMG-API/wiki/Supported-cars) · [Releases](https://github.com/VysseCodes/HMG-API/releases)
+> **What's different from the original v1.0.5:**
+> - Hyundai Ioniq 5 US firmware **260903** (2023 and 2024 SE): [upstream PR #179](https://github.com/VysseCodes/HMG-Leafia-Plus/pull/179) by gdonaldson1676. **Testing**: tested off-car only, not yet confirmed on a car.
+> - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
 >
-> - **Your car or software version isn't supported yet?** Install HMG-API and make a [Car Report](https://github.com/VysseCodes/HMG-API/wiki/Car-Report). It maps your car from its own software, and it's what's needed to add it.
-> - **Already running Leafia?** It keeps working, and its uninstall still restores your stock files. Uninstall Leafia in NEMESIS Manager before you turn on HMG-API's wireless CarPlay and Android Auto mod (both change the same files).
-> - Issues and pull requests here are closed. Please use [HMG-API's issues](https://github.com/VysseCodes/HMG-API/issues/new/choose).
+> If you'd rather use the original author's maintained project, see [HMG-API](https://github.com/VysseCodes/HMG-API).
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-%E2%9D%A4-bf3989?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VysseCodes)
-[![Buy me a coffee on Ko-fi](https://img.shields.io/badge/Buy_me_a_coffee-Ko--fi-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/vyssecodes)
+Wireless **CarPlay** and **Android Auto** for Hyundai, Kia and Genesis **Gen5W** head units, installed through [NEMESIS](https://github.com/xwtk/hmg_nemesis), with turn-by-turn on the cluster and HUD on supported cars.
 
-> **HMG Leafia Plus is free.** If it saved you a dealer visit or made your drives nicer, please consider chipping in through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes). It keeps the testing and new-car ports going.
-
-Community tooling to improve Hyundai, Kia and Genesis **Gen5W** head units through [NEMESIS](https://github.com/xwtk/hmg_nemesis) packages. The first goal is wireless CarPlay and Android Auto on as many head units as possible.
-
-**Compatibility checker:** https://vyssecodes.github.io/HMG-Leafia-Plus/
+**Compatibility checker:** https://zpoon.github.io/HMG-Leafia-Plus/
 
 ## How it works
 
@@ -39,13 +34,17 @@ Cars without a patch set yet get **basic mode**: only the wireless projection pa
 
 ## Install
 
-1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) **1.15 or newer** on the head unit.
-2. Check your car on the [compatibility page](https://vyssecodes.github.io/HMG-Leafia-Plus/) with the Leafia kit.
+1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) **1.15 or newer** on the head unit (1.16 or newer recommended).
+2. Check your car on the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/) with the Leafia kit.
 3. Download **HMG_Leafia_Plus_Wireless_CarPlay_AA-<version>.zip** from the [latest release](../../releases/latest) (or build it yourself with `tools/build-package.sh`). Each release lists SHA256 checksums.
 4. Unzip it onto the root of an empty exFAT or FAT32 USB drive (`NEMESIS.data` and `packages/`).
 5. Car on (ideally in Ready, see the quirks below), plug in the drive and confirm the install. It takes a few minutes. While it runs, CarPlay, Android Auto, the navigation and Bluetooth settings are stopped so none of them restarts against half-changed files; they start again before the restart.
 6. **When the head unit restarts, remove the drive.** Leaving it in can stop CarPlay or Android Auto from connecting the first time. The installer renames `NEMESIS.data` to `NEMESIS.data.installed` so it can't run again by accident.
-7. **Uninstall** any time from NEMESIS Manager (Packages → Uninstall), then restart: every file goes back to stock.
+7. **Uninstall** any time from NEMESIS Manager (My Packages → Uninstall), then restart: every file goes back to stock.
+
+**Coming from the original Leafia (v1.0.5 or older)?** This fork uses the same package id, `wireless.carplay.aa`. Until updating in place has been tested on a car, **uninstall the old version in NEMESIS Manager and restart first**, then install this one as above. Uninstalling puts back your stock files, so the new install starts from a clean unit.
+
+**Coming from HMG-API's wireless CarPlay/AA mod?** Turn that mod off first. Both change the same files.
 
 **Optional: Wi-Fi client (testing).** By default the head unit's Wi-Fi only runs the hotspot that wireless CarPlay/Android Auto use. To also get the Wi-Fi menu and join a network (for example to reach ADB over your home Wi-Fi), put an empty file named `LEAFIA-WIFI-CLIENT` next to `NEMESIS.data` on the install drive. These units have one Wi-Fi radio, so whether a home network and wireless projection work at the same time is still being tested. Uninstalling turns it off again.
 
@@ -67,7 +66,7 @@ Something wrong? Open an issue with the [problem form](../../issues/new?template
 
 ## Supported head units
 
-See the [compatibility page](https://vyssecodes.github.io/HMG-Leafia-Plus/). The data lives in `docs/data/compat.json` (cars with a build) and `docs/data/wanted.json` (Gen5W cars we'd like to add).
+See the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/). The data lives in `docs/data/compat.json` (cars with a build) and `docs/data/wanted.json` (Gen5W cars we'd like to add).
 
 **Newest firmware only.** We support each car's newest head unit software for its region: currently **260507** in the US (**260903** for the Ioniq 5, in testing) and **260206** in Canada. On older firmware the package installs wireless Android Auto only (basic mode) and asks you to update; use the free Hyundai, Kia or Genesis Navigation Updater, then install again.
 
@@ -81,10 +80,10 @@ One read-only kit (`kits/leafia`) covers checking a car, reporting a problem and
 
 | Download | Collects | Use it for |
 |---|---|---|
-| [leafia-kit-quick.zip](https://vyssecodes.github.io/HMG-Leafia-Plus/downloads/leafia-kit-quick.zip) | `public/` only | checking a car (seconds) |
-| [leafia-kit.zip](https://vyssecodes.github.io/HMG-Leafia-Plus/downloads/leafia-kit.zip) | + `private/logs` (latest crash records) and `private/keys` | reporting a problem |
-| [leafia-kit-port.zip](https://vyssecodes.github.io/HMG-Leafia-Plus/downloads/leafia-kit-port.zip) | + `private/stock` (~90 MB) | adding a new car |
-| [leafia-kit-full.zip](https://vyssecodes.github.io/HMG-Leafia-Plus/downloads/leafia-kit-full.zip) | + every crash record | deep debugging, when asked |
+| [leafia-kit-quick.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-quick.zip) | `public/` only | checking a car (seconds) |
+| [leafia-kit.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit.zip) | + `private/logs` (latest crash records) and `private/keys` | reporting a problem |
+| [leafia-kit-port.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-port.zip) | + `private/stock` (~90 MB) | adding a new car |
+| [leafia-kit-full.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-full.zip) | + every crash record | deep debugging, when asked |
 
 It writes `LEAFIA/` on the drive:
 
@@ -109,6 +108,8 @@ Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTIN
 
 ## Credits and licences
 
+- HMG Leafia Plus was created by [VysseCodes](https://github.com/VysseCodes); this fork is maintained by [zpoon](https://github.com/zpoon). If the original work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
+- Merged into this fork: Hyundai Ioniq 5 US 260903 by [gdonaldson1676](https://github.com/gdonaldson1676) (upstream #179).
 - HMG Leafia Plus is GPL-3.0 (see `LICENSE`).
 - It runs through [NEMESIS](https://github.com/xwtk/hmg_nemesis) by xwtk, which is AGPL-3.0. Parts derived from NEMESIS packages are listed in `NOTICE.md` and stay under their original licence.
 - Thanks to [W-Floyd](https://github.com/W-Floyd) for their help with this project.
