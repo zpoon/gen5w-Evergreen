@@ -87,4 +87,5 @@ Telematics lives in `HKMC_TAppService` (system uid). Remote commands arrive over
 - NEMESIS 1.15 (2026-10-21): checked against its zip/INI code and hook environment; its `carplay.session` package conflicts with ours (in `LEGACY`).
 - Modem test plan for a volunteer (read-only identity/APN/SMS-in/wake tests).
 - Two iPhones (reported): phone B can't start CarPlay after phone A leaves, until restart; and A's CarPlay drops every few minutes while B is connected. Hypotheses and a test plan in `notes/multi-phone-carplay.md`, from HMG-API's readable `Bridge.java`; the bridge's own source isn't in this repo.
+- EV features (planned): roll willemcvu's egmp-aa-ev-feat (`aa.ev.model`: Maps EV routing, preconditioning, EV logs) into Evergreen as a TBT+EV GPM/library build per car, on by default, Ioniq 5 US 260507 first. Plan, decisions and open steps (licence record, vehicle-command review, private build inputs) in `notes/ev-features.md`.
 - Possible: install guide on the site; changelog describing fixes in plain words.
