@@ -86,4 +86,5 @@ Telematics lives in `HKMC_TAppService` (system uid). Remote commands arrive over
 - Also seen on the US Ioniq 5: Iap2ServerApp `InitSupportLanguage` index out of range on iAP2 disconnect; `/system` left mounted rw after install (`nemesis remount ro` got EBUSY and the parts ignore it).
 - NEMESIS 1.15 (2026-10-21): checked against its zip/INI code and hook environment; its `carplay.session` package conflicts with ours (in `LEGACY`).
 - Modem test plan for a volunteer (read-only identity/APN/SMS-in/wake tests).
+- Two iPhones (reported): phone B can't start CarPlay after phone A leaves, until restart; and A's CarPlay drops every few minutes while B is connected. Hypotheses and a test plan in `notes/multi-phone-carplay.md`, from HMG-API's readable `Bridge.java`; the bridge's own source isn't in this repo.
 - Possible: install guide on the site; changelog describing fixes in plain words.
