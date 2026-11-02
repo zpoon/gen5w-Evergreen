@@ -5,6 +5,8 @@
 > [!NOTE]
 > **Evergreen is an unofficial community fork** of [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes, which was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. Evergreen keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
+> **What Evergreen is for:** keeping Leafia's existing features working, not adding new ones. That means support for new firmware and cars that can use the existing builds, bug fixes, and keeping up with NEMESIS. New features are out of scope; for those, see [HMG-API](https://github.com/VysseCodes/HMG-API).
+>
 > **Already using Leafia?** Evergreen is the same package (`wireless.carplay.aa`), so it replaces Leafia rather than installing beside it. It also keeps the **Leafia kit** and its `LEAFIA-…` files and reports unchanged, so existing instructions and reports still work.
 >
 > **What's different from Leafia v1.0.5:**
@@ -107,7 +109,7 @@ It writes `LEAFIA/` on the drive:
 
 ## Contributing
 
-Have an idea for a feature? [Suggest it here](../../issues/new?template=feature.yml), or add a 👍 to the [ideas already suggested](../../issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement).
+Evergreen is maintenance only: it keeps the existing features working rather than adding new ones. The most useful help is **reports from new cars and firmware**, **real-car test results**, and **bug reports and fixes**. Ideas for new features are better suited to [HMG-API](https://github.com/VysseCodes/HMG-API), the original author's active project.
 
 Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, building, testing on the mock head unit, adding a car, and the project rules. Security issues: [SECURITY.md](SECURITY.md).
 
