@@ -169,11 +169,12 @@
       "product_prefix": "NEEV.USA.0000.V016.010.260903",
       "years": "2022",
       "firmware": "V016.010.260903",
-      "status": "testing",
+      "status": "supported",
       "verified": [
-        "Stock projection apps, Android Auto library and cluster calls identical to the 2023–2024 260903 build (Leafia kit report from a 2022 owner)"
+        "Stock projection apps, Android Auto library and cluster calls identical to the 2023–2024 260903 build (Leafia kit report from a 2022 owner)",
+        "v1.1.1 installed in full mode on a 2022, turn-by-turn on the cluster working (owner report)"
       ],
-      "notes": "Uses the 2023–2024 260903 build unchanged: the 2022 car has the same stock files. Not yet confirmed on a 2022 car in full mode.",
+      "notes": "Uses the 2023–2024 260903 build unchanged: the 2022 car has the same stock files.",
       "stock": {
         "/system/app/HKMC_GPM.apk": "66ceb9f7b12da2585a1e2e6ebd355177",
         "/system/app/HKMC_GPM.odex": "4978a2e09ce8473551236abd45a49112",
