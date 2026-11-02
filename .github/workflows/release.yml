@@ -63,7 +63,7 @@ jobs:
           cat > notes.md <<EOF
           ## Install
 
-          1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) 1.15 or newer on the head unit.
+          1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) 1.15 or newer on the head unit (1.16 or newer recommended). Coming from the original Leafia (v1.0.5 or older)? Uninstall it in NEMESIS Manager and restart first.
           2. Unzip **HMG_Leafia_Plus_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip** onto the root of an empty exFAT or FAT32 USB drive.
           3. Car on, plug in the drive and confirm the install. It takes a few minutes. When the head unit restarts, remove the drive: leaving it in can stop CarPlay or Android Auto connecting the first time.
 
@@ -73,6 +73,17 @@ jobs:
 
           Verify downloads with \`sha256sum -c SHA256SUMS\`.
           EOF
-          gh release create "$GITHUB_REF_NAME" release/* \
-            --verify-tag --title "HMG Leafia Plus $GITHUB_REF_NAME" \
-            --notes-file notes.md --generate-notes
+          # A release made in the web page (which also makes the tag) already exists:
+          # attach the files to it and add the install notes under its own text, once.
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" release/* --clobber
+            gh release view "$GITHUB_REF_NAME" --json body --jq .body > body.md
+            if ! grep -q 'sha256sum -c SHA256SUMS' body.md; then
+              { cat body.md; echo; cat notes.md; } > full.md
+              gh release edit "$GITHUB_REF_NAME" --notes-file full.md
+            fi
+          else
+            gh release create "$GITHUB_REF_NAME" release/* \
+              --verify-tag --title "HMG Leafia Plus $GITHUB_REF_NAME" \
+              --notes-file notes.md --generate-notes
+          fi
