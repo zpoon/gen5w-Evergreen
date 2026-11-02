@@ -4,7 +4,7 @@
 > **This is an unofficial community fork.** The original [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. This fork keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
 > **What's different from the original v1.0.5:**
-> - Hyundai Ioniq 5 US firmware **260903** (2023 and 2024 SE): [upstream PR #179](https://github.com/VysseCodes/HMG-Leafia-Plus/pull/179) by gdonaldson1676. **Testing**: tested off-car only, not yet confirmed on a car.
+> - Hyundai Ioniq 5 US firmware **260903** (2023 and 2024 SE): [upstream PR #179](https://github.com/VysseCodes/HMG-Leafia-Plus/pull/179) by gdonaldson1676. **Supported**: confirmed working on real cars, including with this fork's v1.1.0.
 > - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
 >
 > If you'd rather use the original author's maintained project, see [HMG-API](https://github.com/VysseCodes/HMG-API).
@@ -68,7 +68,7 @@ Something wrong? Open an issue with the [problem form](../../issues/new?template
 
 See the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/). The data lives in `docs/data/compat.json` (cars with a build) and `docs/data/wanted.json` (Gen5W cars we'd like to add).
 
-**Newest firmware only.** We support each car's newest head unit software for its region: currently **260507** in the US (**260903** for the Ioniq 5, in testing) and **260206** in Canada. On older firmware the package installs wireless Android Auto only (basic mode) and asks you to update; use the free Hyundai, Kia or Genesis Navigation Updater, then install again.
+**Newest firmware only.** We support each car's newest head unit software for its region: currently **260507** in the US (and **260903** for the Ioniq 5) and **260206** in Canada. On older firmware the package installs wireless Android Auto only (basic mode) and asks you to update; use the free Hyundai, Kia or Genesis Navigation Updater, then install again.
 
 **Navigation trims only.** Gen5W is the head unit in trims with built-in navigation. Trims without navigation have a different head unit ("Display Audio", for example "Display Audio Gen2V" on the Tucson) that NEMESIS and this package don't support.
 
