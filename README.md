@@ -1,9 +1,13 @@
-# HMG Leafia Plus (community fork)
+# Evergreen
+
+*A community continuation of HMG Leafia Plus.*
 
 > [!NOTE]
-> **This is an unofficial community fork.** The original [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. This fork keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
+> **Evergreen is an unofficial community fork** of [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes, which was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. Evergreen keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
-> **What's different from the original v1.0.5:**
+> **Already using Leafia?** Evergreen is the same package (`wireless.carplay.aa`), so it replaces Leafia rather than installing beside it. It also keeps the **Leafia kit** and its `LEAFIA-…` files and reports unchanged, so existing instructions and reports still work.
+>
+> **What's different from Leafia v1.0.5:**
 > - Hyundai Ioniq 5 US firmware **260903** (2023 and 2024 SE): [upstream PR #179](https://github.com/VysseCodes/HMG-Leafia-Plus/pull/179) by gdonaldson1676. **Supported**: confirmed working on real cars, including with this fork's v1.1.0.
 > - Hyundai Ioniq 5 US **2022** on firmware **260903**: same build as the 2023–2024 cars, since a 2022 owner's Leafia kit report shows identical stock files. **Supported**: v1.1.1 confirmed working on a 2022, turn-by-turn included.
 > - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
@@ -12,11 +16,11 @@
 
 Wireless **CarPlay** and **Android Auto** for Hyundai, Kia and Genesis **Gen5W** head units, installed through [NEMESIS](https://github.com/xwtk/hmg_nemesis), with turn-by-turn on the cluster and HUD on supported cars.
 
-**Compatibility checker:** https://zpoon.github.io/HMG-Leafia-Plus/
+**Compatibility checker:** https://zpoon.github.io/gen5w-Evergreen/
 
 ## How it works
 
-Firmware differs between models, regions and versions, so whole-file checksums rarely match across cars. HMG Leafia Plus checks **only the bytes it changes**:
+Firmware differs between models, regions and versions, so whole-file checksums rarely match across cars. Evergreen checks **only the bytes it changes**:
 
 - **Recipes** (`recipes/*.recipe`) list the new bytes for each patch together with hashes of the region around it. They contain no bytes from Kia/Hyundai files.
 - **`lpatch`** (`tools/lpatch/`) is a small static ARM tool that runs on the head unit. It patches only when every checked region matches its stock hash. A recipe therefore works on any firmware whose patched spots are identical, even when the rest of the file differs.
@@ -36,14 +40,14 @@ Cars without a patch set yet get **basic mode**: only the wireless projection pa
 ## Install
 
 1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) **1.15 or newer** on the head unit (1.16 or newer recommended).
-2. Check your car on the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/) with the Leafia kit.
-3. Download **HMG_Leafia_Plus_Wireless_CarPlay_AA-<version>.zip** from the [latest release](../../releases/latest) (or build it yourself with `tools/build-package.sh`). Each release lists SHA256 checksums.
+2. Check your car on the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/) with the Leafia kit.
+3. Download **Evergreen_Wireless_CarPlay_AA-<version>.zip** from the [latest release](../../releases/latest) (or build it yourself with `tools/build-package.sh`). Each release lists SHA256 checksums.
 4. Unzip it onto the root of an empty exFAT or FAT32 USB drive (`NEMESIS.data` and `packages/`).
 5. Car on (ideally in Ready, see the quirks below), plug in the drive and confirm the install. It takes a few minutes. While it runs, CarPlay, Android Auto, the navigation and Bluetooth settings are stopped so none of them restarts against half-changed files; they start again before the restart.
 6. **When the head unit restarts, remove the drive.** Leaving it in can stop CarPlay or Android Auto from connecting the first time. The installer renames `NEMESIS.data` to `NEMESIS.data.installed` so it can't run again by accident.
 7. **Uninstall** any time from NEMESIS Manager (My Packages → Uninstall), then restart: every file goes back to stock.
 
-**Coming from the original Leafia (v1.0.5 or older)?** This fork uses the same package id, `wireless.carplay.aa`. Until updating in place has been tested on a car, **uninstall the old version in NEMESIS Manager and restart first**, then install this one as above. Uninstalling puts back your stock files, so the new install starts from a clean unit.
+**Coming from the original Leafia (v1.0.5 or older)?** Evergreen uses the same package id, `wireless.carplay.aa`. Until updating in place has been tested on a car, **uninstall the old version in NEMESIS Manager and restart first**, then install this one as above. Uninstalling puts back your stock files, so the new install starts from a clean unit.
 
 **Coming from HMG-API's wireless CarPlay/AA mod?** Turn that mod off first. Both change the same files.
 
@@ -67,7 +71,7 @@ Something wrong? Open an issue with the [problem form](../../issues/new?template
 
 ## Supported head units
 
-See the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/). The data lives in `docs/data/compat.json` (cars with a build) and `docs/data/wanted.json` (Gen5W cars we'd like to add).
+See the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/). The data lives in `docs/data/compat.json` (cars with a build) and `docs/data/wanted.json` (Gen5W cars we'd like to add).
 
 **Newest firmware only.** We support each car's newest head unit software for its region: currently **260507** in the US (and **260903** for the Ioniq 5) and **260206** in Canada. On older firmware the package installs wireless Android Auto only (basic mode) and asks you to update; use the free Hyundai, Kia or Genesis Navigation Updater, then install again.
 
@@ -81,10 +85,10 @@ One read-only kit (`kits/leafia`) covers checking a car, reporting a problem and
 
 | Download | Collects | Use it for |
 |---|---|---|
-| [leafia-kit-quick.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-quick.zip) | `public/` only | checking a car (seconds) |
-| [leafia-kit.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit.zip) | + `private/logs` (latest crash records) and `private/keys` | reporting a problem |
-| [leafia-kit-port.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-port.zip) | + `private/stock` (~90 MB) | adding a new car |
-| [leafia-kit-full.zip](https://zpoon.github.io/HMG-Leafia-Plus/downloads/leafia-kit-full.zip) | + every crash record | deep debugging, when asked |
+| [leafia-kit-quick.zip](https://zpoon.github.io/gen5w-Evergreen/downloads/leafia-kit-quick.zip) | `public/` only | checking a car (seconds) |
+| [leafia-kit.zip](https://zpoon.github.io/gen5w-Evergreen/downloads/leafia-kit.zip) | + `private/logs` (latest crash records) and `private/keys` | reporting a problem |
+| [leafia-kit-port.zip](https://zpoon.github.io/gen5w-Evergreen/downloads/leafia-kit-port.zip) | + `private/stock` (~90 MB) | adding a new car |
+| [leafia-kit-full.zip](https://zpoon.github.io/gen5w-Evergreen/downloads/leafia-kit-full.zip) | + every crash record | deep debugging, when asked |
 
 It writes `LEAFIA/` on the drive:
 
@@ -109,9 +113,9 @@ Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTIN
 
 ## Credits and licences
 
-- HMG Leafia Plus was created by [VysseCodes](https://github.com/VysseCodes); this fork is maintained by [zpoon](https://github.com/zpoon). If the original work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
-- Merged into this fork: Hyundai Ioniq 5 US 260903 by [gdonaldson1676](https://github.com/gdonaldson1676) (upstream #179).
-- HMG Leafia Plus is GPL-3.0 (see `LICENSE`).
+- Evergreen is a fork of HMG Leafia Plus, created by [VysseCodes](https://github.com/VysseCodes). Evergreen is maintained by [zpoon](https://github.com/zpoon). If the original work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
+- Merged into Evergreen: Hyundai Ioniq 5 US 260903 by [gdonaldson1676](https://github.com/gdonaldson1676) (upstream #179).
+- Evergreen, like HMG Leafia Plus, is GPL-3.0 (see `LICENSE`).
 - It runs through [NEMESIS](https://github.com/xwtk/hmg_nemesis) by xwtk, which is AGPL-3.0. Parts derived from NEMESIS packages are listed in `NOTICE.md` and stay under their original licence.
 - Thanks to [W-Floyd](https://github.com/W-Floyd) for their help with this project.
 - Not affiliated with Hyundai, Kia, Genesis, Apple or Google. Modifying your head unit is at your own risk.

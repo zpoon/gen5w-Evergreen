@@ -3,7 +3,7 @@
 Thanks for helping! You don't need to write code to contribute:
 
 - **Report your car.** Run the Leafia kit and drop its report on the
-  [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/); it files the issue for you. Cars in the
+  [compatibility page](https://zpoon.github.io/gen5w-Evergreen/); it files the issue for you. Cars in the
   page's "Help add your car" list are the most wanted.
 - **Test a build** on your car and tell us how it went, especially for cars marked *testing*.
 - **Report a problem** with the issue form: it walks you through the Leafia kit.
@@ -37,7 +37,7 @@ Security problems go through [SECURITY.md](SECURITY.md), not public issues.
 ## Build
 
 ```sh
-tools/build-package.sh                       # dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip
+tools/build-package.sh                       # dist/Evergreen_Wireless_CarPlay_AA.zip
 tools/build-kit.sh [quick|standard|port|full]  # dist/leafia-kit*.zip (default: standard)
 tools/lpatch/build.sh                        # lpatch (ARM) and lpatch-host
 src/ev6aac/build.sh                          # libev6aac.so (CLANG=clang-18 for a byte-identical build)
@@ -62,12 +62,12 @@ stock `/system` on your computer, and passes only if uninstall restores it byte 
 `LEAFIA/private/stock/` folder works as the stock tree:
 
 ```sh
-MOCK_SH=mksh MOCK_NEMESIS=1.15 tools/mock/install-test.sh dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip \
+MOCK_SH=mksh MOCK_NEMESIS=1.15 tools/mock/install-test.sh dist/Evergreen_Wireless_CarPlay_AA.zip \
     CVEV.USA.0000.V015.012.260507 cvev_us /path/to/LEAFIA/private/stock
 ```
 
 List your test cars in `tools/mock/cars.local` (git-ignored) and run them all with
-`tools/mock/matrix.sh dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip`. Run the hooks with `MOCK_SH=mksh`: the head
+`tools/mock/matrix.sh dist/Evergreen_Wireless_CarPlay_AA.zip`. Run the hooks with `MOCK_SH=mksh`: the head
 unit's shell lacks commands your desktop shell has (`printf`, `tail`, ...).
 
 ## Adding a car

@@ -46,12 +46,12 @@ jobs:
       - name: Build the package and the kit
         run: |
           mkdir -p release
-          ./tools/build-package.sh "release/HMG_Leafia_Plus_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip"
+          ./tools/build-package.sh "release/Evergreen_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip"
           for lv in quick standard port full; do
             n=leafia-kit-$lv; [ $lv = standard ] && n=leafia-kit
             ./tools/build-kit.sh $lv "release/$n-$GITHUB_REF_NAME.zip"
           done
-          unzip -p "release/HMG_Leafia_Plus_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip" packages/wireless.carplay.aa.zip \
+          unzip -p "release/Evergreen_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip" packages/wireless.carplay.aa.zip \
             | python3 -c "import io,sys,zipfile; print('package BUILD:', zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())).read('BUILD').decode().strip())"
           (cd release && sha256sum -- *.zip > SHA256SUMS)
           cat release/SHA256SUMS
@@ -64,12 +64,12 @@ jobs:
           ## Install
 
           1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) 1.15 or newer on the head unit (1.16 or newer recommended). Coming from the original Leafia (v1.0.5 or older)? Uninstall it in NEMESIS Manager and restart first.
-          2. Unzip **HMG_Leafia_Plus_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip** onto the root of an empty exFAT or FAT32 USB drive.
+          2. Unzip **Evergreen_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip** onto the root of an empty exFAT or FAT32 USB drive.
           3. Car on, plug in the drive and confirm the install. It takes a few minutes. When the head unit restarts, remove the drive: leaving it in can stop CarPlay or Android Auto connecting the first time.
 
           See **Known quirks** in the README if something doesn't connect at first.
 
-          Check your car first on the [compatibility page](https://zpoon.github.io/HMG-Leafia-Plus/). Something wrong? Run **leafia-kit-$GITHUB_REF_NAME.zip** and open an issue with the problem form. (Other kit sizes: **quick** to check a car, **port** to add a new car, **full** for every crash record.) Uninstall any time from NEMESIS Manager; every file goes back to stock.
+          Check your car first on the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/). Something wrong? Run **leafia-kit-$GITHUB_REF_NAME.zip** and open an issue with the problem form. (Other kit sizes: **quick** to check a car, **port** to add a new car, **full** for every crash record.) Uninstall any time from NEMESIS Manager; every file goes back to stock.
 
           Verify downloads with \`sha256sum -c SHA256SUMS\`.
           EOF
@@ -84,6 +84,6 @@ jobs:
             fi
           else
             gh release create "$GITHUB_REF_NAME" release/* \
-              --verify-tag --title "HMG Leafia Plus $GITHUB_REF_NAME" \
+              --verify-tag --title "Evergreen $GITHUB_REF_NAME" \
               --notes-file notes.md --generate-notes
           fi

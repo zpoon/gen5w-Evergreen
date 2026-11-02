@@ -1,4 +1,4 @@
-HMG Leafia Plus kit (read-only) - one kit for checking your car, reporting a
+Leafia kit (read-only, from HMG Leafia Plus, used by Evergreen) - one kit for checking your car, reporting a
 problem, and helping port the package to a new car
 
 This copy's size is in LEAFIA-LEVEL: quick (public report only), standard
@@ -18,7 +18,7 @@ crash record). Use the one a maintainer asked for.
 
    LEAFIA/public    Safe to share publicly.
                     - Checking your car: drop public/LEAFIA-REPORT.txt on
-                      https://zpoon.github.io/HMG-Leafia-Plus/
+                      https://zpoon.github.io/gen5w-Evergreen/
                     - Reporting a problem: zip the public folder and attach
                       it to your GitHub issue.
 

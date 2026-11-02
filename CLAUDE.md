@@ -1,6 +1,6 @@
-# HMG Leafia Plus: notes for Claude
+# Evergreen (fork of HMG Leafia Plus): notes for Claude
 
-Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803x/TCC897x, Android 4.4.2, Dalvik), installed through **NEMESIS** (xwtk/hmg_nemesis, AGPL-3.0). Created by VysseCodes (archived upstream: VysseCodes/HMG-Leafia-Plus); this community fork (zpoon/HMG-Leafia-Plus) is maintained by zpoon (Nick). Reference car: 2023 Kia EV6 (CVEV.USA, firmware 260507, with HUD).
+Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803x/TCC897x, Android 4.4.2, Dalvik), installed through **NEMESIS** (xwtk/hmg_nemesis, AGPL-3.0). Created by VysseCodes (archived upstream: VysseCodes/HMG-Leafia-Plus); this community fork, **Evergreen** (zpoon/gen5w-Evergreen), is maintained by zpoon (Nick). Project-facing text says Evergreen; technical names stay as they were so existing installs and reports keep working: package id `wireless.carplay.aa`, the Leafia kit (`kits/leafia`, `leafia-kit*.zip`, `LEAFIA/`, `LEAFIA-REPORT.txt`, `LEAFIA-LEVEL`, `LEAFIA-WIFI-CLIENT`), `Leafia:` log tags and the `HMG Leafia Plus` marker `tools/mkmenu.py` looks for. Reference car: 2023 Kia EV6 (CVEV.USA, firmware 260507, with HUD).
 
 ## Working conventions
 
@@ -31,7 +31,7 @@ Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803
 | `packages/wireless-carplay-aa/` | NEMESIS package source: parts `1_projection` (feature flags, hotspot only), `2_tbt` (turn-by-turn), `3_bridge` (CarPlay Bluetooth bridge), `4_audio`. `scripts/build.sh` rebuilds the apps on the unit from stock files before any part runs. |
 | `kits/leafia` | The one read-only USB kit, in four sizes set by a `LEAFIA-LEVEL` file (`tools/build-kit.sh [quick|standard|port|full]`): `leafia-kit-quick.zip` (public only), `leafia-kit.zip` (standard: + private logs with the latest crash records, + keys), `leafia-kit-port.zip` (+ stock files), `leafia-kit-full.zip` (+ every crash record). The old fingerprint/support/deep zip names stay as copies of quick/standard/port; `tools/check-downloads.sh [--fix]` checks/rebuilds them all. Writes `LEAFIA/public/` (LEAFIA-REPORT.txt for the compatibility page, summary.txt, our install logs: safe to post) and `LEAFIA/private/` (`logs/`, `stock/` for porting, `keys/` firmware key files: only privately, when a maintainer asks). Packages carry a `BUILD` stamp (commit + date) that the install log and the kit show. |
 | `docs/` | GitHub Pages compatibility checker (`docs/data/compat.json`; its `built` lists, the md5 of every file our package installs per car, come from the manifests via `tools/compat-built.py` and CI checks them; status `supported`/`testing`/`in-progress`/`no-wifi`; `product_prefix` may be a list). |
-| `tools/build-package.sh` | Builds `dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip` from the repo alone. |
+| `tools/build-package.sh` | Builds `dist/Evergreen_Wireless_CarPlay_AA.zip` from the repo alone. |
 | `tools/port.py` | Ports the app changes to a new car from its deep-kit collection (class-by-class compare, auto-merge, reference/framework checks, writes the patch set and `cars` line). |
 | `tools/mkmenu.py` | Makes the `5_menu` fix (`HKMC_BtSettings`) for one stock tree and adds its line to `patches/common/optional`; finds the code by structure and refuses unknown shapes. |
 | `tools/mkpatches.py`, `tools/mkdelta.py` | Patch-set and single-delta makers (need `pip install --require-hashes -r tools/requirements.txt`). |

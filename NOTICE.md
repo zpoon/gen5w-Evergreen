@@ -1,5 +1,9 @@
 # Notices
 
+## Evergreen
+
+Evergreen is a community fork of HMG Leafia Plus by VysseCodes (https://github.com/VysseCodes/HMG-Leafia-Plus), GPL-3.0, maintained by zpoon. Everything below describes HMG Leafia Plus as it was forked; Evergreen keeps the same licences.
+
 ## NEMESIS
 
 HMG Leafia Plus packages install and run through **NEMESIS** by xwtk:

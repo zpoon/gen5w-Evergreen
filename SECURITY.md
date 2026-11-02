@@ -1,12 +1,12 @@
 # Security
 
-HMG Leafia Plus runs as root on car head units, so we take security reports seriously.
+Evergreen runs as root on car head units, so we take security reports seriously.
 
 ## Reporting a vulnerability
 
 **Please don't open a public issue.** Report it privately through GitHub:
 **Security → Report a vulnerability** on this repository
-([direct link](https://github.com/zpoon/HMG-Leafia-Plus/security/advisories/new)).
+([direct link](https://github.com/zpoon/gen5w-Evergreen/security/advisories/new)).
 
 Include what's affected (package part, kit, tool or workflow), how to reproduce it, and which cars or
 firmware you saw it on. We'll acknowledge it within a few days and agree a disclosure date with you once a

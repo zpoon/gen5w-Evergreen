@@ -3,7 +3,7 @@
 # copy of a car's stock /system, entirely on this computer. Nothing touches a car.
 #
 # usage: tools/mock/install-test.sh <package zip> <ro.build.product> <region dir> <stock system dir>
-#   package zip         dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip (tools/build-package.sh)
+#   package zip         dist/Evergreen_Wireless_CarPlay_AA.zip (tools/build-package.sh)
 #   ro.build.product    the product id to pretend to be, e.g. CVEV.USA.0000.V015.012.260507
 #   region dir          the onebin folder name, e.g. cvev_us (any name works)
 #   stock system dir    a stock /system tree: app/, lib/, framework/, etc/permissions/,

@@ -5,7 +5,7 @@
 # usage: build-package.sh [output zip]
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-OUT=${1:-$ROOT/dist/HMG_Leafia_Plus_Wireless_CarPlay_AA.zip}
+OUT=${1:-$ROOT/dist/Evergreen_Wireless_CarPlay_AA.zip}
 case "$OUT" in /*) ;; *) OUT=$(pwd)/$OUT ;; esac
 # the HU's shell (mksh) has no printf, but the host shells the tests run in do;
 # the only allowed use is putline's host fallback
