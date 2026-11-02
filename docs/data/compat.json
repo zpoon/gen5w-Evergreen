@@ -123,7 +123,57 @@
         "Sandbox install and uninstall on this firmware’s own files",
         "Community fork v1.1.0 installed and working on a 2024 Limited (owner report)"
       ],
-      "notes": "Ported from the US Ioniq 5 260507 build. 2022 cars (NEEV.USA.) on 260903 are not covered yet.",
+      "notes": "Ported from the US Ioniq 5 260507 build. 2022 cars on 260903 have their own entry.",
+      "stock": {
+        "/system/app/HKMC_GPM.apk": "66ceb9f7b12da2585a1e2e6ebd355177",
+        "/system/app/HKMC_GPM.odex": "4978a2e09ce8473551236abd45a49112",
+        "/system/app/HKMC_DiPO.apk": "34901b8939a691bac873a6cb1e3756e3",
+        "/system/app/HKMC_DiPO.odex": "92ff2fce2914aa3194c94aaf44f208be",
+        "/system/app/Iap2ServerApp.apk": "fde208439f993986a60396e759797a01",
+        "/system/app/Iap2ServerApp.odex": "46f392ece018bb218d180035b28e658b",
+        "/system/app/HKMC_Navi_ExSL.apk": "98ed8950556d945e37de1176cbb01f9e",
+        "/system/app/HKMC_Navi_ExSL.odex": "45d033884fe70b00fc0ac46385dbddf0",
+        "/system/lib/libautoreceiver_infobank.so": "48ee793af8b86052503b8c952b034731"
+      },
+      "built": {
+        "/system/app/HKMC_BtSettings.apk": [
+          "93ecaa97597a79be2a10728e45c72b33",
+          "b977e268fbe73cb5637c4413647a7dea",
+          "cd98c36db6857ed174757c6010a36494",
+          "e7c90e78f45f7e6b9c90ddd7a238b566"
+        ],
+        "/system/app/HKMC_DiPO.apk": [
+          "8b1d23f89ceff4016ade508be1691d18",
+          "c82fdb7e5710f21399e17d557ac2eb6f"
+        ],
+        "/system/app/HKMC_GPM.apk": [
+          "7f69ea05602f6ab9d5ce4da432e2a1d1"
+        ],
+        "/system/app/HKMC_Navi_ExSL.apk": [
+          "e01f7ef64d1d824930b656129f77c6bc"
+        ],
+        "/system/app/Iap2ServerApp.apk": [
+          "75d7fea4d2009be6aa5c840118f58c94",
+          "7e90fa7d8a161ade71e11dc15e56c410"
+        ],
+        "/system/lib/libautoreceiver_infobank.so": [
+          "c08410a8d32a615b1aa805cd8a243d52"
+        ]
+      }
+    },
+    {
+      "id": "hyundai-ioniq5-2022-us-260903",
+      "name": "Hyundai Ioniq 5",
+      "region": "US",
+      "chip": "TCC803x",
+      "product_prefix": "NEEV.USA.0000.V016.010.260903",
+      "years": "2022",
+      "firmware": "V016.010.260903",
+      "status": "testing",
+      "verified": [
+        "Stock projection apps, Android Auto library and cluster calls identical to the 2023–2024 260903 build (Leafia kit report from a 2022 owner)"
+      ],
+      "notes": "Uses the 2023–2024 260903 build unchanged: the 2022 car has the same stock files. Not yet confirmed on a 2022 car in full mode.",
       "stock": {
         "/system/app/HKMC_GPM.apk": "66ceb9f7b12da2585a1e2e6ebd355177",
         "/system/app/HKMC_GPM.odex": "4978a2e09ce8473551236abd45a49112",
