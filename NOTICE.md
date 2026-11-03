@@ -4,6 +4,16 @@
 
 Evergreen is a community fork of HMG Leafia Plus by VysseCodes (https://github.com/VysseCodes/HMG-Leafia-Plus), GPL-3.0, maintained by zpoon. Everything below describes HMG Leafia Plus as it was forked; Evergreen keeps the same licences.
 
+## egmp-aa-ev-feat (EV features, permission)
+
+egmp-aa-ev-feat by willemcvu (https://github.com/willemcvu/egmp-aa-ev-feat): Google Maps EV routing, battery preconditioning and EV logging for Android Auto. At the time of writing, that repository has no licence file. Its author gave permission publicly, in the NEMESIS community Discord on 2026-11-03 (13:06 UTC), in reply to taking it over:
+
+> "Yes, go for it. I do need to add a license but have absolutely no problems with anyone taking it and doing whatever with it. I'd like to continue improving the energy consumption models but can do that easily as a PR on someone else's repo too eventually."
+
+Message link (visible to members of that server): https://discord.com/channels/1074629698379841567/1558908831143297125/1567163151449989332
+
+On that basis, code taken from egmp-aa-ev-feat into Evergreen is distributed under Evergreen's licence, GPL-3.0, with credit to willemcvu. Its bundled `lpatch` came from HMG Leafia Plus and is GPL-3.0 already.
+
 ## NEMESIS
 
 HMG Leafia Plus packages install and run through **NEMESIS** by xwtk:

@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **planned**. Nothing is merged yet. This note is the plan.
+Status: **planned**, permission recorded. Nothing is merged yet. This note is the plan.
 
 ## Goal
 
@@ -36,11 +36,11 @@ What it adds for Android Auto with Google Maps:
 
 ## Before any code
 
-1. **Put the permission on record.** Ask willemcvu to add a `LICENSE` file
-   (GPL-3.0, to match Evergreen) to egmp-aa-ev-feat, or to post the permission
-   in a public issue there. The repo has no licence today. Only its bundled
-   `lpatch`, which came from Leafia, is GPL. A public record keeps Evergreen's
-   provenance clear for anyone who reuses it later.
+1. **Permission: done.** willemcvu agreed publicly on 2026-11-03 ("anyone
+   taking it and doing whatever with it"). It's quoted, dated and linked in
+   `NOTICE.md`. They said they'll add a licence to their repo. When they do, if
+   it's GPL-3.0-compatible, link it from `NOTICE.md` too. They'd like to keep
+   improving the energy model through PRs, which Evergreen should welcome.
 2. **Bring the history across.** Use
    `git subtree add --prefix=ev https://github.com/willemcvu/egmp-aa-ev-feat main`,
    so willemcvu's commits and authorship stay in Evergreen's history. Credit it
