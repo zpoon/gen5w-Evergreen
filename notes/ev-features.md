@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **planned**, permission recorded. Nothing is merged yet. This note is the plan.
+Status: **in progress**. Permission recorded; code imported into `ev/` on branch `ev-import`; vehicle-command review done. Not wired into the package yet.
 
 ## Goal
 
@@ -41,17 +41,15 @@ What it adds for Android Auto with Google Maps:
    `NOTICE.md`. They said they'll add a licence to their repo. When they do, if
    it's GPL-3.0-compatible, link it from `NOTICE.md` too. They'd like to keep
    improving the energy model through PRs, which Evergreen should welcome.
-2. **Bring the history across.** Use
+2. **Bring the history across: done** (branch `ev-import`, all 33 of
+   willemcvu's commits kept). Used
    `git subtree add --prefix=ev https://github.com/willemcvu/egmp-aa-ev-feat main`,
    so willemcvu's commits and authorship stay in Evergreen's history. Credit it
    in `NOTICE.md` and the README.
-3. **Review the vehicle commands.** This is required by the rules in
-   `CLAUDE.md`. Preconditioning calls the stock HEV service's binder
-   transactions **3, 62, 65 and 66** (`setBattCondEvStation`,
-   `setBattCondRouteDis`, `setBattCondRemainTime`) and BCM transaction **109**,
-   **by number**. They're verified on Ioniq 5 US 260507 only. Write down what
-   each one does, what values it sends, and how a request gets cancelled (route
-   ended, session teardown, stale journal on the next start).
+3. **Review the vehicle commands: done**, in `notes/ev-vehicle-commands.md`.
+   The three preconditioning commands are approved as they are. Before
+   release, the reads need the same firmware gate as the writes, the VIN read
+   has to go, and the log-offload service needs renaming.
 
 ## Design
 
