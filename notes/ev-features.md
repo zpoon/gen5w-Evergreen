@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **in progress**. Permission recorded; code imported into `ev/` on branch `ev-import`; vehicle-command review done and its three required changes made (2026-11-04). The package side is ready: `+ev` manifest lines, `EVERGREEN-NO-EV`, the log copier service, the refusal while `aa.ev.model` is installed, and CI. **Waiting for:** the EV GPM and library deltas, which need the maintainer's stock files (see "Building").
+Status: **built, waiting for a car test**. The EV GPM and library for the Ioniq 5 US 260507 (`neev` set, so the 2022, 2023 and 2024 SE on 260507) were built from the maintainer's stock files on 2026-11-04 and are in `patches/neev/manifest` as `+ev` lines; package-version 1.2.0. Off-car: the mock head unit installs the EV build by default and the plain one with `EVERGREEN-NO-EV`, and both uninstall to byte-identical stock (mksh). Every other car builds as before.
 
 ## Goal
 
@@ -106,19 +106,43 @@ logs itself and keeps at most 100 MB.
 
 ## Building (private inputs)
 
-The EV GPM is built from a car's stock GPM, which can't live in the repo.
+The EV GPM is built from a car's stock GPM, which can't live in the repo. Done for
+the Ioniq 5 US 260507 on 2026-11-04; to redo it (or for another car):
 
-1. **Stock files:** the maintainer runs the **port kit** on his own Ioniq 5
-   (US, 260507) and keeps `LEAFIA/private/stock` privately.
-2. **Toolchain:** Android SDK, smali/baksmali (`-a 18` and `--api 18 -j 1`, as
-   in `CLAUDE.md`), protoc, and Python with `bsdiff4` and `capstone`.
-3. **Build:** egmp-aa-ev-feat's `tools/build_all.sh` steps, with the base being
-   Evergreen's turn-by-turn GPM. On 260507 that's byte-identical to Leafia
-   v1.0.5's, which is what egmp-aa-ev-feat was built against.
-4. **Make the deltas** with `tools/mkdelta.py`, from the stock files to the
-   results, and add the manifest lines with the result md5s.
-5. **Check:** the build must be deterministic. A second build gives the same
-   md5s.
+1. **Stock files:** the owner runs the **port kit** and sends `LEAFIA/private/stock`
+   privately. Check it against `patches/<set>/stock` first.
+2. **Toolchain**, from official sources only:
+   - smali/baksmali 2.5.2: Ubuntu's `libsmali-java` (`apt install libsmali-java`).
+   - Android 4.4 `android.jar` and `d8`: Google's `platforms;android-19`
+     (`android-19_r04.zip`, SHA-1 `2ff20d89e68f2f5390981342e009db5a2d456aaa`) and
+     `build-tools;34.0.0` (`build-tools_r34-linux.zip`, SHA-1
+     `d6d58e0c6925a9e4d9a541e84cd1f405c2f9d2a9`) from dl.google.com, as listed in
+     `repository2-1.xml`. `~/tools/env.sh` sets `ANDROID_HOME` to them.
+   - Python: `capstone==5.0.1` (plus `setuptools<80` on Python 3.12+, for its
+     `distutils` import) and Evergreen's `tools/requirements.txt` (bsdiff4).
+   - Evergreen's host `lpatch` (`cc -DHOST -O2 -o lpatch-host tools/lpatch/lpatch.c`).
+3. **Base:** rebuild Evergreen's turn-by-turn files from stock with `lpatch-host
+   delta` (`patches/<set>/HKMC_GPM.tbt.lpd`, `patches/common/libautoreceiver_infobank.tbt.lpd`)
+   and check them against the manifest (GPM APK `0308224b…`, library `c08410a8…`
+   on 260507, the same base egmp-aa-ev-feat was built on).
+4. **Library:** `ev/tools/patch_library.py <tbt lib> <out>` (result `37cbe6bf…`).
+5. **GPM:** `baksmali d --api 18` the turn-by-turn dex into
+   `ev/private/car-current-leafia105/smali-gpm`, then `sh ev/gpm-ev/build.sh`,
+   `ev/tools/patch_gpm_smali.py`, `smali a -j 1 --api 18 -o <dex> ev/build/gpm-smali`,
+   and `lpatch-host zipadd <stock APK> <dex> <apk>` (dex `79eacf25…`, APK `b9a641e9…`).
+   Everything under `ev/private`, `ev/build`, `ev/dist` and `ev/gpm-ev/build` is
+   git-ignored; delete it afterwards.
+6. **Deltas:** `tools/mkdelta.py <stock odex> <EV dex> patches/<set>/HKMC_GPM.ev.lpd`
+   and `tools/mkdelta.py <stock lib> <EV lib> patches/common/libautoreceiver_infobank.ev.lpd`;
+   round-trip both with `lpatch-host delta`, then add the `+ev` manifest lines and
+   run `tools/compat-built.py`.
+7. **Checks done on 2026-11-04:** two clean builds gave the same dex and APK;
+   `dexdump` reads the dex (DEX 035, 824 classes = 792 + 32 EV); no `getVIN` or
+   `vin_model` in it; the car's framework (deodexed with `baksmali x -a 18`) has
+   every interface the EV code looks up by name, with the numbers egmp-aa-ev-feat
+   verified (HEV 3, DATC 0x29/6, BCM 1, IBCMListener 0x11, hscan 0xb/0xd6), and
+   its `automotive*.odex` and `com.hkmc.ext.hcan.odex` hashes match `Precond`'s
+   and `EvCar`'s checks. Mock install with and without `EVERGREEN-NO-EV` passed.
 
 ## Testing
 
