@@ -333,11 +333,12 @@
       "product_prefix": "NQ5.USA.",
       "years": "2023",
       "firmware": "V015.012.260507",
-      "status": "testing",
+      "status": "supported",
       "verified": [
+        "Owner report: the v1.1.4 test build works on a 2023 Sportage",
         "Sandbox install and uninstall on this firmware's own files"
       ],
-      "notes": "Ported from an owner's Leafia kit (issue #2): its projection apps run the same code as the Ioniq 5 and EV6 on 260507, only the APK and odex wrappers differ. Awaiting the first real-car test.",
+      "notes": "Ported from an owner's Leafia kit (issue #2): its projection apps run the same code as the Ioniq 5 and EV6 on 260507, only the APK and odex wrappers differ.",
       "stock": {
         "/system/app/HKMC_DiPO.apk": "0b04c9d790dfe80e5d33c3be4f3b3f3b",
         "/system/app/HKMC_DiPO.odex": "6953fa525b2a2fe4252250f38296c837",
