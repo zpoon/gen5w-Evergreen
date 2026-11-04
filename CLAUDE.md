@@ -8,7 +8,7 @@ Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803
 - Anything that writes to `/system` ships as a NEMESIS package with a stock checksum gate, a backup, and an uninstall that restores the exact stock bytes.
 - Test packages on the mock head unit (below) before anyone runs them on a car, and say which cars a change was tested on.
 - Commits: describe the change in plain words. Don't rewrite or force-push shared history without the maintainer's OK.
-- `packages/wireless-carplay-aa/NEMESIS.data` uses descriptor `version=1.1` (NEMESIS 1.16). Its `os=` lists `ro.build.product` globs for every supported car and firmware (e.g. `CVEV.USA.*.260507`); keep it in step with `patches/cars` (`tools/check-descriptor.py`, run by `build-package.sh`, fails otherwise). Bump `package-version` for each release; the release tag must be `v<package-version>`.
+- `packages/wireless-carplay-aa/NEMESIS.data` uses descriptor `version=1.1` (NEMESIS 1.16). Its `os=` lists `ro.build.product` globs for every supported car and firmware (e.g. `CVEV.USA.*.260507`); keep it in step with `patches/cars` (`tools/check-descriptor.py`, run by `build-package.sh`, fails otherwise). Bump `package-version` for each release; the release tag must be `v<package-version>` (on `main`). A beta is tagged `v<package-version>-beta.N` on any branch and published as a pre-release, never the latest; if a beta needs changes, the next beta bumps `package-version`, so no number is used for two different builds.
 - No links to Claude chats or sessions in commits, PR descriptions or comments: no `Claude-Session:` trailers and no claude.ai session URLs. A `Co-Authored-By: Claude` line is fine.
 
 ## Hard rules
