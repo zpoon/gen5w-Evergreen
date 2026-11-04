@@ -221,7 +221,16 @@ decide_mode() {
     MODE_WHY=""
     MODE_UPDATE=""
     if ! car_name >/dev/null; then
-        MODE_WHY="no build for this car/firmware yet ($(getprop ro.build.product 2>/dev/null))"
+        # no patch set of its own: the universal build fits if every projection
+        # app runs code we have patches for (scripts/universal.sh)
+        . ./scripts/build.sh
+        if check_cluster_api && universal_build && build_optional; then
+            log "car: no patch set of its own; universal build ($(getprop ro.build.product 2>/dev/null))"
+        else
+            clean_build
+            rm -rf patches/auto 2>/dev/null
+            MODE_WHY="no build for this car/firmware yet ($(getprop ro.build.product 2>/dev/null))"
+        fi
     elif ! check_cluster_api; then
         MODE_WHY="cluster API missing for turn-by-turn"
     else

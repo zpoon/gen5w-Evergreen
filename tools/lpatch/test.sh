@@ -56,6 +56,13 @@ w('other', r.randbytes(65536))
 a = r.randbytes(200000); w('dsrc', a)
 w('dtgt', a[:5000] + r.randbytes(3000) + a[5000:150000] + a[160000:] + r.randbytes(777))
 w('classes.dex', b'dex\n035\0' + r.randbytes(100000))
+# an odex: 40-byte header (dex offset/length, deps offset/length ...), the dex, then deps
+import struct
+dex = b'dex\n035\0' + r.randbytes(5000)
+deps = r.randbytes(300)
+w('app.odex', b'dey\n036\0' + struct.pack('<8I', 40, len(dex), 40 + len(dex), len(deps), 0, 0, 0, 0) + dex + deps)
+w('app.odex.dex', dex)
+w('bad.odex', b'dey\n036\0' + struct.pack('<8I', 40, 999999, 0, 0, 0, 0, 0, 0) + dex)
 with zipfile.ZipFile(os.path.join(d, 'app.apk'), 'w') as z:
     z.writestr('AndroidManifest.xml', r.randbytes(4000), zipfile.ZIP_DEFLATED)
     z.writestr('res/raw/a.bin', r.randbytes(9000), zipfile.ZIP_STORED)
@@ -101,6 +108,14 @@ EOF
 then ok "zipadd makes a valid apk"; else bad "zipadd"; fi
 run zipadd-twice zipadd out.apk ../in/classes.dex out2.apk
 [ ! -e "$W/fresh/out2.apk" ] && ! grep -qx exit=0 "$W/fresh/zipadd-twice.log" && ok "zipadd refuses an apk with classes.dex" || bad "zipadd-twice"
+
+# ---- odexdex ----
+run odexdex odexdex ../in/app.odex odex.dex
+cmp -s "$W/fresh/odex.dex" "$W/in/app.odex.dex" && result odexdex | grep -q 'status=BUILT' && ok "odexdex writes the dex inside an odex" || { bad "odexdex"; result odexdex; }
+run odexdex-apk odexdex ../in/app.apk odexdex-apk.dex
+[ ! -e "$W/fresh/odexdex-apk.dex" ] && result odexdex-apk | grep -q 'status=NOTODEX' && ok "odexdex refuses a file that isn't an odex" || bad "odexdex-apk"
+run odexdex-bad odexdex ../in/bad.odex odexdex-bad.dex
+[ ! -e "$W/fresh/odexdex-bad.dex" ] && result odexdex-bad | grep -q 'status=NOTODEX' && ok "odexdex refuses an odex whose dex runs past its end" || bad "odexdex-bad"
 
 run usage bogus
 expect_exit usage 2

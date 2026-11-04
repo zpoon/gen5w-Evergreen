@@ -13,6 +13,12 @@ car_line() {
         case "$_pre" in ''|\#*) continue ;; esac
         case "$_p" in "$_pre"*) echo "$_v $_n"; return 0 ;; esac
     done < "$CARS_DIR/cars"
+    # no patch set of its own, but the universal build matched this unit at install
+    # (scripts/universal.sh wrote patches/auto for exactly this product id)
+    if [ -s "$CARS_DIR/auto/manifest" ] && [ "$(cat "$CARS_DIR/auto/product" 2>/dev/null)" = "$_p" ]; then
+        echo "auto Gen5W unit, universal build (${_p%%.*})"
+        return 0
+    fi
     return 1
 }
 car_variant() { local _l; _l=$(car_line) || return 1; echo "${_l%% *}"; }

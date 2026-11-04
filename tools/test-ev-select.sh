@@ -15,7 +15,7 @@ mkdir -p "$T/pkg/scripts" "$T/pkg/patches/car" "$T/drive"
 # the drive paths rewritten into the sandbox, as tools/mock/install-test.sh does
 sed -e "s|/storage/usb0|$T/drive|g" -e "s|/storage/usb[12]|$T/none|g" -e "s|/mnt/media_rw/usb[0-9]|$T/none|g" \
     "$ROOT/packages/wireless-carplay-aa/scripts/build.sh" > "$T/pkg/scripts/build.sh"
-: > "$T/pkg/scripts/lpatch.sh"; : > "$T/pkg/scripts/cars.sh"
+: > "$T/pkg/scripts/lpatch.sh"; : > "$T/pkg/scripts/cars.sh"; : > "$T/pkg/scripts/universal.sh"
 cat > "$T/pkg/run.sh" <<'R'
 log() { echo "log: $1" >> "$T/log"; }
 car_variant() { echo car; }

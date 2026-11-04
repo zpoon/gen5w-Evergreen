@@ -25,7 +25,7 @@ Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803
 
 | Path | What |
 |---|---|
-| `tools/lpatch/` | Freestanding static ARM tool (no libc). `check`/`apply` (hash-gated recipes), `delta` (rebuild a file from `.lpd`, only from the exact stock original), `zipadd` (add classes.dex to a stock APK, deterministic), `md5`. Build: `tools/lpatch/build.sh` (also builds `lpatch-host`). Test: `tools/lpatch/test.sh` (fresh build vs committed binary under qemu, plus EV6 manifest rebuild if `~/hmg-private/stock/ev6` exists). |
+| `tools/lpatch/` | Freestanding static ARM tool (no libc). `check`/`apply` (hash-gated recipes), `delta` (rebuild a file from `.lpd`, only from the exact stock original), `zipadd` (add classes.dex to a stock APK, deterministic), `odexdex` (write the dex inside an odex), `md5`. Build: `tools/lpatch/build.sh` (also builds `lpatch-host`). Test: `tools/lpatch/test.sh` (fresh build vs committed binary under qemu, plus EV6 manifest rebuild if `~/hmg-private/stock/ev6` exists). |
 | `recipes/` | Hash-only native-library patches (libCarPlayCore Wi-Fi sessions, libCarPlayAudio formats, libCarPlayUtils converter). Make with `tools/mkrecipe.py`. |
 | `patches/` | Per-car delta sets for the projection apps + `cars` table + `<car>/stock` checksums + `<car>/manifest` expected results. See `patches/README.md`. |
 | `packages/wireless-carplay-aa/` | NEMESIS package source: parts `1_projection` (feature flags, hotspot only), `2_tbt` (turn-by-turn), `3_bridge` (CarPlay Bluetooth bridge), `4_audio`. `scripts/build.sh` rebuilds the apps on the unit from stock files before any part runs. |
@@ -35,6 +35,7 @@ Community tooling for Hyundai/Kia/Genesis **Gen5W** head units (Telechips TCC803
 | `tools/build-package.sh` | Builds `dist/Evergreen_Wireless_CarPlay_AA.zip` from the repo alone. |
 | `tools/port.py` | Ports the app changes to a new car from its deep-kit collection (class-by-class compare, auto-merge, reference/framework checks, writes the patch set and `cars` line). |
 | `tools/mkmenu.py` | Makes the `5_menu` fix (`HKMC_BtSettings`) for one stock tree and adds its line to `patches/common/optional`; finds the code by structure and refuses unknown shapes. |
+| `patches/universal/`, `tools/mkuniversal.py` | The universal build: patches keyed to the code inside each stock `.odex` (`lpatch odexdex`; cars with identical app code differ only in the `.odex` header's framework checksums). For a product id not in `cars`, `scripts/universal.sh` builds the full set if every app and the AA library match, and writes `patches/auto/` (that unit's own stock/manifest/product) so the parts work unchanged; otherwise basic mode. Kit reports `code` lines; the compatibility page's `universal` data comes from `tools/compat-built.py`. Test: `tools/test-universal.sh` (synthetic, CI); mock runs need stock trees. Made from the Ioniq 5 US 260507 (same code as the Sportage). |
 | `tools/mkpatches.py`, `tools/mkdelta.py` | Patch-set and single-delta makers (need `pip install --require-hashes -r tools/requirements.txt`). |
 
 ## Supported cars (patches/cars)
