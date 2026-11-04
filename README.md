@@ -12,6 +12,7 @@
 > **What's different from Leafia v1.0.5:**
 > - Hyundai Ioniq 5 US firmware **260903** (2023 and 2024 SE): [upstream PR #179](https://github.com/VysseCodes/HMG-Leafia-Plus/pull/179) by gdonaldson1676. **Supported**: confirmed working on real cars, including with this fork's v1.1.0.
 > - Hyundai Ioniq 5 US **2022** on firmware **260903**: same build as the 2023–2024 cars, since a 2022 owner's Leafia kit report shows identical stock files. **Supported**: v1.1.1 confirmed working on a 2022, turn-by-turn included.
+> - Hyundai Ioniq 5 US **2024 special edition** (`NEEV23SE`) on firmware **260507**: the same files as the 2022–2023 cars on 260507, per an owner's Leafia kit report ([upstream #182](https://github.com/VysseCodes/HMG-Leafia-Plus/issues/182)). Not yet confirmed on the car with Evergreen.
 > - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
 >
 > If you'd rather use the original author's maintained project, see [HMG-API](https://github.com/VysseCodes/HMG-API).
