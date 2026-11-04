@@ -38,6 +38,25 @@ def built_for(patch_set):
     return {f: sorted(v) for f, v in sorted(built.items())}
 
 
+def universal():
+    path = os.path.join(PATCHES, 'universal', 'manifest')
+    if not os.path.exists(path):
+        return {}
+    apps, files = {}, {}
+    for l in open(path):
+        p = l.split()
+        if len(p) != 6 or p[0].startswith('#'):
+            continue
+        part, kind, name, code = p[:4]
+        if kind == 'app':
+            key = '/system/app/%s.odex' % name
+            apps.setdefault(key, set()).add(code)
+        else:
+            files.setdefault('/system/lib/%s' % name, set()).add(code)
+    return {'code': {k: sorted(v) for k, v in sorted(apps.items())},
+            'files': {k: sorted(v) for k, v in sorted(files.items())}}
+
+
 def main():
     check = '--check' in sys.argv[1:]
     sets = {}
@@ -60,6 +79,15 @@ def main():
             v['built'] = b
         else:
             v.pop('built', None)
+    # the universal build (patches/universal/manifest): for each app, the code md5s
+    # (the dex inside its stock odex, as the kit's "code" lines report) we have
+    # patches for; for each file, its stock md5s. A car matching all of them gets
+    # the full build without a patch set of its own.
+    uni = universal()
+    if uni:
+        db['universal'] = uni
+    else:
+        db.pop('universal', None)
     new = json.dumps(db, indent=2, ensure_ascii=False) + '\n'
     if new == raw:
         print('compat.json built lists are up to date')

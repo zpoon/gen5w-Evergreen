@@ -13,6 +13,7 @@ LP_ROOT=.
 
 CARS_DIR=patches
 . ./scripts/cars.sh
+. ./scripts/universal.sh
 
 lp_md5() {
     local _l
@@ -79,6 +80,11 @@ build_one() {
 build_payloads() {
     local _v _m _part _kind _name _patch _want
     _v=$(car_variant) || { log "FAIL: no patch set for this car"; return 1; }
+    if [ "$_v" = auto ]; then   # the universal build (scripts/universal.sh)
+        universal_rebuilt || universal_build || return 1
+        build_optional
+        return 0
+    fi
     _m="patches/$_v/manifest"
     if [ ! -s "$_m" ]; then
         log "FAIL: missing $_m"

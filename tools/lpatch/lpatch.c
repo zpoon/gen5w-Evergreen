@@ -482,6 +482,28 @@ static int cmd_delta(const char *patch, const char *src, const char *dst)
     return 0;
 }
 
+/* ---- odexdex: the dex inside a Dalvik odex ----
+   An odex is "dey\n036\0" (or 035), then dexOffset dexLength depsOffset depsLength
+   optOffset optLength flags checksum, then the (optimised) dex. The deps hold the
+   framework checksums it was made against, so two cars with the same app code have
+   the same dex here but different odex files. Universal patches start from this dex. */
+static int cmd_odexdex(const char *odex, const char *dst)
+{
+    char m[33];
+    if (loadfile(odex) < 0) { out("RESULT odexdex status=MISSING file="); out(odex); out("\n"); return 1; }
+    if (flen < 40 || !seq2((const char *)fbuf, "dey\n03", 6) || fbuf[7] != 0) {
+        out("RESULT odexdex status=NOTODEX file="); out(odex); out("\n"); return 1;
+    }
+    u32 off = rd32(fbuf + 8), len = rd32(fbuf + 12);
+    if (off < 40 || len < 112 || (ul)off + len > flen || !seq2((const char *)fbuf + off, "dex\n", 4)) {
+        out("RESULT odexdex status=NOTODEX file="); out(odex); out("\n"); return 1;
+    }
+    if (writefile(dst, fbuf + off, len) < 0) die("cannot write destination");
+    md5hex(fbuf + off, len, m);
+    out("RESULT odexdex status=BUILT file="); out(dst); out(" md5="); out(m); out("\n");
+    return 0;
+}
+
 /* ---- zipadd: append classes.dex (stored) to an APK that has none ---- */
 static u32 crc32(const u8 *p, ul n)
 {
@@ -541,6 +563,7 @@ int main(int argc, char **argv)
 {
     if (argc >= 5 && seq(argv[1], "delta")) return cmd_delta(argv[2], argv[3], argv[4]);
     if (argc >= 5 && seq(argv[1], "zipadd")) return cmd_zipadd(argv[2], argv[3], argv[4]);
+    if (argc >= 4 && seq(argv[1], "odexdex")) return cmd_odexdex(argv[2], argv[3]);
     if (argc >= 3 && seq(argv[1], "check")) return cmd_check(argv[2], argc > 3 ? argv[3] : 0);
     if (argc >= 5 && seq(argv[1], "apply")) return cmd_apply(argv[2], argv[3], argv[4]);
     if (argc >= 3 && seq(argv[1], "md5")) {
@@ -555,7 +578,8 @@ int main(int argc, char **argv)
         return 0;
     }
     err("usage: lpatch check <recipe> [file] | apply <recipe> <src> <dst> | md5 <file>\n"
-        "       lpatch delta <patch.lpd> <src> <dst> | zipadd <src.apk> <classes.dex> <dst.apk>\n");
+        "       lpatch delta <patch.lpd> <src> <dst> | zipadd <src.apk> <classes.dex> <dst.apk>\n"
+        "       lpatch odexdex <app.odex> <dst.dex>\n");
     return 2;
 }
 

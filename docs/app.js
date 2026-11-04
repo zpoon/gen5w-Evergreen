@@ -20,7 +20,7 @@ const BRIDGE_FILES = ["/system/app/HKMC_DiPO.apk", "/system/app/HKMC_DiPO.odex",
   "/system/app/Iap2ServerApp.apk", "/system/app/Iap2ServerApp.odex"];
 
 function parse(text) {
-  const r = { props: {}, pkgs: [], files: {}, results: {}, notes: {}, spots: [], api: {}, perm: {}, features: [], valid: false };
+  const r = { props: {}, pkgs: [], files: {}, code: {}, results: {}, notes: {}, spots: [], api: {}, perm: {}, features: [], valid: false };
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line || line.startsWith("#")) continue;
@@ -29,6 +29,7 @@ function parse(text) {
     if ((m = line.match(/^prop ([^=]+)=(.*)$/))) r.props[m[1]] = m[2];
     else if ((m = line.match(/^pkg (\S+)/))) r.pkgs.push(m[1]);
     else if ((m = line.match(/^file (\S+) (?:md5=([0-9a-f]{32})|missing)/))) r.files[m[1]] = m[2] || null;
+    else if ((m = line.match(/^code (\S+) (?:md5=([0-9a-f]{32})|none)/))) r.code[m[1]] = m[2] || null;
     else if ((m = line.match(/^RESULT (\S+) status=(\S+)(?:.* md5=([0-9a-f]{32}))?/))) r.results[m[1]] = { status: m[2], md5: m[3] || null };
     else if ((m = line.match(/^NATIVE_NOTE (\S+) (.*)$/))) r.notes[m[1]] = m[2];
     else if (line.startsWith("SPOT ")) r.spots.push(line);
@@ -51,6 +52,14 @@ function filesMatch(r, v, list) {
   if (!v) return false;
   return list.every((f) => (v.stock[f] && r.files[f] === v.stock[f]) || isBuilt(r, v, f)
     || (f.endsWith(".odex") && isBuilt(r, v, f.replace(/\.odex$/, ".apk"))));
+}
+// the universal build: a car with no build of its own whose projection apps run code
+// we have patches for (the kit's "code" lines: the dex inside each stock odex)
+function universalMatch(r) {
+  const u = DB.universal;
+  if (!u || !Object.keys(r.code).length) return false;
+  return Object.entries(u.code).every(([f, list]) => list.includes(r.code[f]))
+    && Object.entries(u.files).every(([f, list]) => list.includes(r.files[f]));
 }
 function leafiaInstalled(r, v) { return !!(v && v.built && Object.keys(v.built).some((f) => isBuilt(r, v, f))); }
 
@@ -97,9 +106,11 @@ function verdict(r) {
 
   const built = v && (v.status === "supported" || v.status === "testing");
   const tested = v && v.status === "supported";
+  const uni = !v && universalMatch(r);
   const bridgeOk = filesMatch(r, v, BRIDGE_FILES);
-  parts.push({ name: "CarPlay Bluetooth bridge", state: bridgeOk && built ? "ok" : "build",
-    why: bridgeOk && built ? (tested ? "A tested build exists for these exact CarPlay apps." : "A build exists for these exact CarPlay apps; it hasn't been tried on a real car yet.") : "The CarPlay apps on this unit have no build yet. Sharing your report helps get one made." });
+  parts.push({ name: "CarPlay Bluetooth bridge", state: (bridgeOk && built) || uni ? "ok" : "build",
+    why: uni ? "No build for this car yet, but its CarPlay apps run the same code as cars we support, so the universal build fits; it hasn't been tried on this model yet."
+      : bridgeOk && built ? (tested ? "A tested build exists for these exact CarPlay apps." : "A build exists for these exact CarPlay apps; it hasn't been tried on a real car yet.") : "The CarPlay apps on this unit have no build yet. Sharing your report helps get one made." });
 
   const apiKnown = TBT_CALLS.some((c) => c in r.api);
   const apiMissing = TBT_CALLS.filter((c) => r.api[c] === false);
@@ -107,6 +118,7 @@ function verdict(r) {
   let tbtState, tbtWhy;
   if (!apiKnown) { tbtState = "unknown"; tbtWhy = "Not in this report."; }
   else if (apiMissing.length) { tbtState = "no"; tbtWhy = "This firmware lacks cluster calls turn-by-turn needs: " + apiMissing.join(", ") + ". The package refuses to install it here."; }
+  else if (uni) { tbtState = "ok"; tbtWhy = "Cluster API present, and the navigation/projection apps run the same code as cars we support, so the universal build fits (not yet tried on this model)."; }
   else if (filesMatch(r, v, tbtFiles) && built) { tbtState = "ok"; tbtWhy = "Cluster API present and a " + (tested ? "tested build" : "build (not yet tried on a real car)") + " exists. No HUD? That's fine; the HUD frames just go unused."; }
   else { tbtState = "build"; tbtWhy = "Cluster API present, but these navigation/projection apps have no build yet."; }
   parts.push({ name: "Turn-by-turn on cluster / HUD", state: tbtState, why: tbtWhy });
@@ -121,6 +133,7 @@ function verdict(r) {
     + " for the " + v.name + "): update the head unit's software, then check again. Until then, the package installs wireless Android Auto (basic mode)."];
   else if (v && v.status === "no-wifi") overall = ["no", "This head unit has no working Wi-Fi hardware, so wireless CarPlay and Android Auto aren't possible. Wired CarPlay and Android Auto still work."];
   else if (allGood && v && v.status === "supported") overall = ["ok", "Supported: install the Wireless CarPlay and Android Auto package."];
+  else if (allGood && uni) overall = ["ok", "Universal build: there's no build made for this car yet, but its projection apps run the same code as cars Evergreen supports, so the package installs the full build (wireless CarPlay, turn-by-turn). Nobody has tried it on this model yet: please share your report and how it goes. Uninstall puts everything back to stock."];
   else if (allGood && v && v.status === "testing") overall = ["ok", "Build ready, awaiting its first real-car test. You can install the package; uninstall puts everything back to stock."];
   else if (v && v.status === "in-progress") overall = ["build", "Support for " + v.name + " is in progress. Share your report to help."];
   else if (!hasWifi) overall = ["no", "This unit has no Wi-Fi module, so wireless projection isn't possible."];

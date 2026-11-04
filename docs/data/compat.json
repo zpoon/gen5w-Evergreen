@@ -377,5 +377,26 @@
         ]
       }
     }
-  ]
+  ],
+  "universal": {
+    "code": {
+      "/system/app/HKMC_DiPO.odex": [
+        "77a5160a52ab0f93ab2b14db884b3343"
+      ],
+      "/system/app/HKMC_GPM.odex": [
+        "fcd9285700d766d4a75ef9b089dba1e3"
+      ],
+      "/system/app/HKMC_Navi_ExSL.odex": [
+        "7dc811232a9171a18c53c337672a4e9c"
+      ],
+      "/system/app/Iap2ServerApp.odex": [
+        "30a34f8331e3c74a18c0241a28a036ea"
+      ]
+    },
+    "files": {
+      "/system/lib/libautoreceiver_infobank.so": [
+        "48ee793af8b86052503b8c952b034731"
+      ]
+    }
+  }
 }

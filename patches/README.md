@@ -12,6 +12,7 @@ One folder per car, plus `common/`. The head unit rebuilds the modified projecti
 | `nq5/` | Kia Sportage, US (`NQ5.USA.*`): ported with `tools/port.py` from an owner's kit, with the Ioniq 5 as reference; every class is identical, only the APK/odex wrappers differ | 260507 |
 | `dl3hev/` | Kia K5 Hybrid, Korea: kept, not in `cars` (no Korean unit has shown Wi-Fi hardware) | 260902 |
 | `neev_kr/` | Hyundai Ioniq 5, Korea: kept, not in `cars` (as above) | 260902 |
+| `universal/` | For cars with no set of their own: patches keyed to the **code inside** each stock `.odex` (`lpatch odexdex`) rather than the `.odex` file, so they fit every car whose apps run that code, whatever its framework. `manifest`: `<part> app <App> <code md5> <patch> <result dex md5>` and `<part> file <library> <stock md5> <patch> <result md5>`. Made with `tools/mkuniversal.py <stock dir> <set>`; the installer (`scripts/universal.sh`) uses them only if every app and the library match, and then writes the car's own set to `patches/auto/` on the unit | any |
 | `common/` | `libautoreceiver_infobank.so` for every car with the US stock library (a car with a different one has its own delta in its folder); `optional`: fixes applied wherever the stock file matches | |
 
 `cars` maps a firmware product id prefix (`ro.build.product`) to a folder and a car name. The installer reads it, so adding a car needs no script changes.
@@ -44,6 +45,14 @@ It compares the new car's apps with the EV6's class by class:
 Every result is then checked: each reference inside the app must resolve, and every system call must exist in the new car's framework. If all checks pass, it writes `patches/<name>/` and adds the car to `cars`. The full builds in `--out-builds` stay private.
 
 Ported this way, the Ioniq 5 comes out byte for byte identical to its hand-made set, and the K5 Hybrid class for class identical.
+
+## The universal build (`universal/`)
+
+A car's own set rebuilds each app from that car's exact stock `.odex`. An `.odex` is the app's optimised dex plus a header holding checksums of the framework it was made against, so cars whose apps run the same code have byte-identical dex inside different `.odex` files (the Ioniq 5 and Sportage on US 260507, for example). `lpatch odexdex` writes that dex out, and the universal patches rebuild the modified app from it.
+
+On a unit whose product id isn't in `cars`, the installer takes the code md5 of each app the universal manifest names, and the library's md5. If every one has a line, it builds those apps (`odexdex` → `delta` → `zipadd` with the unit's own APK) and writes `patches/auto/{stock,manifest,product}`, this unit's own checksums in the usual set format, so the parts install and uninstall as for any car. One mismatch and nothing is generated: basic mode, as before.
+
+After a new port, add its code to the universal list too: `tools/mkuniversal.py <stock dir> <set>` (lines for code already listed are replaced). EV builds (`+ev`) stay per car.
 
 ## Optional fixes (`common/optional`)
 

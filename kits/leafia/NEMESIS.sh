@@ -111,6 +111,19 @@ for _f in /system/app/HKMC_GPM.apk /system/app/HKMC_GPM.odex /system/app/HKMC_Di
     fi
 done
 
+# the code inside each projection app's odex (lpatch odexdex): cars with the same
+# app code have the same md5 here even when their odex files differ, which is what
+# Evergreen's universal build matches on
+for _a in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
+    if "$LP" odexdex "/system/app/$_a.odex" "$TMP/code.dex" >/dev/null 2>&1; then
+        set -- $("$LP" md5 "$TMP/code.dex" 2>/dev/null)
+        rsay "code /system/app/$_a.odex md5=$1"
+    else
+        rsay "code /system/app/$_a.odex none"
+    fi
+    rm -f "$TMP/code.dex"
+done
+
 # byte-level recipe checks (RESULT / SPOT / NATIVE_NOTE lines)
 for _r in "$KIT"/recipes/*.recipe; do
     [ -f "$_r" ] && "$LP" check "$_r" >> "$REPORT" 2>&1

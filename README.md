@@ -39,7 +39,9 @@ Firmware differs between models, regions and versions, so whole-file checksums r
 | CarPlay Bluetooth bridge | Starts wireless CarPlay over Bluetooth/iAP2 | Rebuilt on the unit from its stock apps (`patches/<car>`) |
 | Turn-by-turn | Projection navigation on the cluster and HUD | Rebuilt on the unit from its stock apps (`patches/<car>`). Uses only the standard cluster calls, so cars without a HUD are fine. The installer refuses if the firmware lacks any call it needs. |
 
-Cars without a patch set yet get **basic mode**: only the wireless projection part, which gives wireless Android Auto on any Gen5W unit with a Wi-Fi module. The installer also saves a report so a full build can be made for that car.
+Cars without a patch set of their own get the **universal build** when their projection apps run the same code as a car we support. An app's `.odex` is its code plus checksums of the firmware it was made for, so two cars with identical apps still have different `.odex` files; the universal patches (`patches/universal/`) start from the code inside instead. The installer checks every projection app and the Android Auto library: only if all of them match does it install the full build, which is then byte for byte what a hand-made port would give. The Leafia kit's report lists each app's code (`code` lines), so the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/) can tell from a report alone.
+
+Anything else gets **basic mode**: only the wireless projection part, which gives wireless Android Auto on any Gen5W unit with a Wi-Fi module. The installer also saves a report so a full build can be made for that car.
 
 ## Install
 
