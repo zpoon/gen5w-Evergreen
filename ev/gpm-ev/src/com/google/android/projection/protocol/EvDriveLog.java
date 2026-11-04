@@ -36,14 +36,14 @@ import java.util.TimeZone;
  *
  * Technical data only: no location (GPS gives only the altitude change since
  * the file started), no addresses or names, no wall-clock times (the file's
- * UTC date only), no full VIN.
+ * UTC date only), no VIN (not even the model part older versions logged).
  *
  * Never throws out of its entry points: this runs inside GPM, where an
  * uncaught exception kills Android Auto.
  */
 public final class EvDriveLog {
     private static final String TAG = "EvDriveLog";
-    static final String PKG = "aa.ev.model 0.2.1";
+    static final String PKG = "Evergreen wireless.carplay.aa 1.2.0";
     static final String MAGIC = "# egmp-aa-ev-log v2";
 
     static final long SAMPLE_MS = 1000;
@@ -406,18 +406,16 @@ public final class EvDriveLog {
         String product = prop("ro.build.product");
         sPrefix = "egmp-" + EvLogger.productShort(product) + "-"
                 + (date == null ? "00000000" : date.replace("-", "")) + "-";
-        sHeader = header(product, Build.DEVICE, EvCar.vinModel(),
-                EvModelSender.capacitySource(), date);
+        sHeader = header(product, Build.DEVICE, EvModelSender.capacitySource(), date);
     }
 
     /** The full header: magic line, keys, column row. */
-    static String header(String product, String device, String vinModel,
+    static String header(String product, String device,
             String capacitySource, String date) {
         StringBuilder h = new StringBuilder(1200);
         h.append(MAGIC).append('\n');
         EvLogger.header(h, "product", product);
         EvLogger.header(h, "device", device);
-        EvLogger.header(h, "vin_model", vinModel);
         EvLogger.header(h, "pkg", PKG);
         EvLogger.header(h, "model_capacity_wh", String.valueOf(EvModelTemplate.CAPACITY_WH));
         EvLogger.header(h, "capacity_source", capacitySource);

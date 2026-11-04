@@ -2,7 +2,7 @@
 version=1.1
 id=wireless.carplay.aa
 name=Evergreen - Wireless CarPlay/AA
-type=application
+type=application,service
 package-version=1.1.3
 short-desc="Wireless CarPlay and Android Auto, turn-by-turn on the cluster"
 detailed-desc="Evergreen continues the archived HMG Leafia Plus. Wireless CarPlay and Android Auto, with turn-by-turn on the cluster and HUD, on supported Gen5W cars. Other units with Wi-Fi get wireless Android Auto only. Uninstall restores stock files."
@@ -17,3 +17,11 @@ preuninstall=scripts/preun.sh
 kind=sh
 path=bin/status.sh
 uid=root
+
+# EV logs to a USB drive with an egmp-aa-ev-logs folder (EV build only; idle otherwise)
+[service.0]
+name=evlog-offload
+kind=sh
+path=svc/evlog-offload.sh
+uid=root
+mode=restart

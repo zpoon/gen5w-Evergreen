@@ -3,7 +3,7 @@
 # every way out of this run starts again whatever it, or an earlier run, stopped
 trap apps_release EXIT
 log "postinstall wireless.carplay.aa"
-check_legacy || { toast "Install failed: uninstall the separate wireless/projection packages first, reboot, then try again."; exit 1; }
+check_legacy || { toast "Install failed: uninstall the separate wireless/projection or AA EV packages first, reboot, then try again."; exit 1; }
 check_remount || { toast "Install failed: could not unlock the system partition. Reboot the head unit and try again."; exit 1; }
 decide_mode
 if [ "$MODE" = basic ]; then

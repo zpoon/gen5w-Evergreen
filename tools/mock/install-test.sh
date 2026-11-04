@@ -25,6 +25,8 @@
 #                           the Wi-Fi client (implies MOCK_USB_DESCRIPTOR=1)
 #   MOCK_NO_WIFI=1          a unit whose Wi-Fi chip never responds (no wlan0, driver
 #                           gives up): the install must be refused
+#   MOCK_NO_EV=1            EVERGREEN-NO-EV on the install drive: the plain turn-by-turn
+#                           build instead of the EV one (implies MOCK_USB_DESCRIPTOR=1)
 #
 # Needs: qemu-arm-static (runs the ARM lpatch), unzip, md5sum.
 set -e
@@ -117,6 +119,7 @@ find "$X/pkg" -name '*.sh' | while read -r f; do
         -e "s|^\(export PATH=.*\)$|\1:/usr/bin:/bin|" "$f"
 done
 [ "$MOCK_WIFI_CLIENT" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/LEAFIA-WIFI-CLIENT"
+[ "$MOCK_NO_EV" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/EVERGREEN-NO-EV"
 [ "$MOCK_USB_DESCRIPTOR" = 1 ] && printf '[nemesis]\nversion=1.0\ntype=install\npath=packages/wireless.carplay.aa.zip\n' > "$R/storage/usb0/NEMESIS.data"
 
 (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/before.md5"

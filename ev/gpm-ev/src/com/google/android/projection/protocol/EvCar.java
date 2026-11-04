@@ -21,10 +21,19 @@ import com.hkmc.cluster.NavigationClusterListener;
  * null): this runs inside GPM, where an uncaught exception kills Android
  * Auto. Any thread.
  *
- * Sources:
+ * Binder transaction numbers come from the car's own interface classes, by
+ * method name (tx(): IHEVService$Stub.TRANSACTION_getHEVStatus and so on), so
+ * a firmware whose framework numbers its methods differently can't send a
+ * read to another method. A name that isn't found makes that read "unknown".
+ * The telematics interface (hscan) is in com.hkmc.ext.hcan, which GPM may not
+ * load: then the numbers verified on the Ioniq 5 US 260507 (0x0b, 0xd6) are
+ * used only if that library is byte for byte the 260507 one (HCAN_MD5).
+ * No VIN is read (Evergreen collects no per-car identity).
+ *
+ * Sources (numbers as on the Ioniq 5 US 260507):
  *  - HEV getHEVStatus(flag) (com.hkmc.micom.hev txn 3), cached per flag so a
  *    second caller within maxAgeMs gets the same value without a binder call
- *  - hscan (tm_hscan_service): speed 0x0b, SOH 0xd6, VIN 0x2f
+ *  - hscan (tm_hscan_service): getCarSpeed 0x0b, getXEV_Bms_GDS_SOH 0xd6
  *  - the nav battery packet via NavigationCluster.requestBatteryInfoReq()
  *    (pack min temp, outside temp, EV_AVLBL_ENRG, DTE), requested at most
  *    every NAV_POLL_MS whoever asks; the listener stays registered for the
@@ -45,19 +54,21 @@ final class EvCar {
 
     private static final String HEV_SERVICE = "com.hkmc.micom.hev";
     private static final String HEV_TOKEN = "com.hkmc.hev.IHEVService";
-    private static final int HEV_TX_GET_HEV_STATUS = 3;
+    private static final String HEV_GET_HEV_STATUS = "getHEVStatus";
 
     private static final String HCAN_SERVICE = "tm_hscan_service";
     private static final String HCAN_TOKEN =
             "com.hkmc.telematics.hscan.tm_interface.ITM_HSCANService";
-    private static final int HCAN_TX_GET_CAR_SPEED = 0x0b;  // getCarSpeed(B)F
-    private static final int HCAN_TX_GET_VIN = 0x2f;        // getVIN()String
-    private static final int HCAN_TX_GET_SOH = 0xd6;        // getXEV_Bms_GDS_SOH
+    private static final String HCAN_GET_CAR_SPEED = "getCarSpeed";        // (B)F, 0x0b on 260507
+    private static final String HCAN_GET_SOH = "getXEV_Bms_GDS_SOH";       // ()I, 0xd6 on 260507
+    // com.hkmc.ext.hcan.odex of the Ioniq 5 US 260507, where 0x0b and 0xd6 were verified
+    static final String HCAN_ODEX = "/system/framework/com.hkmc.ext.hcan.odex";
+    static final String HCAN_MD5 = "c4638b2befbabce418d2664f4e7ec304";
 
     private static final String DATC_SERVICE = "com.hkmc.micom.datc";
     private static final String DATC_TOKEN = "com.hkmc.datc.IDATCService";
-    private static final int DATC_TX_IS_UNIT_CELSIUS = 0x06;
-    private static final int DATC_TX_GET_VR_CLIMATE_STATUS = 0x29;
+    private static final String DATC_IS_UNIT_CELSIUS = "isUnitCelsius";            // 0x06 on 260507
+    private static final String DATC_GET_VR_CLIMATE_STATUS = "getVRClimateStatus"; // 0x29 on 260507
     // DATCFlag values getVRClimateStatus answers (DATCService.smali)
     static final int DATC_TEMP = 0x2;         // driver set temp, display unit
     static final int DATC_BLOWER_LEVEL = 0x5; // MainBlowerDisp
@@ -70,8 +81,8 @@ final class EvCar {
     private static final String BCM_SERVICE = "com.hkmc.micom.bcm";
     private static final String BCM_TOKEN = "com.hkmc.bcm.IBCMService";
     private static final String BCM_LISTENER = "com.hkmc.bcm.IBCMListener";
-    private static final int BCM_TX_REGISTER_LISTENER = 1;
-    private static final int BCM_LTX_ON_DRIVE_MODE_CHANGED = 0x11;
+    private static final String BCM_REGISTER_LISTENER = "registerBCMListener";      // 1 on 260507
+    private static final String BCM_ON_DRIVE_MODE_CHANGED = "onDriveModeChanged";  // 0x11 on 260507
 
     // Navigation.BATTERY_INFO_RX packet indices (see
     // com.hkmc.micom.protocol.Navigation$BATTERY_INFO_RX).
@@ -93,7 +104,6 @@ final class EvCar {
     private static final long[] sHevAt = new long[256];  // 0 = never read
 
     private static volatile int sSohRaw = Integer.MIN_VALUE;  // until > 0
-    private static volatile String sVinModel;                 // null = not read
 
     private EvCar() {}
 
@@ -137,12 +147,16 @@ final class EvCar {
                 }
                 sHev = b;
             }
+            int tx = tx(HEV_TOKEN, HEV_GET_HEV_STATUS);
+            if (tx < 0) {
+                return -1;
+            }
             Parcel data = Parcel.obtain();
             Parcel reply = Parcel.obtain();
             try {
                 data.writeInterfaceToken(HEV_TOKEN);
                 data.writeInt(flag);
-                if (!b.transact(HEV_TX_GET_HEV_STATUS, data, reply, 0)) {
+                if (!b.transact(tx, data, reply, 0)) {
                     return -1;
                 }
                 reply.readException();
@@ -161,7 +175,7 @@ final class EvCar {
 
     /** Display speed in km/h (hscan getCarSpeed unit 0), NaN if unknown. */
     static float speedKph() {
-        float v = hscanFloat(HCAN_TX_GET_CAR_SPEED, 0);
+        float v = hscanFloat(hscanTx(HCAN_GET_CAR_SPEED, 0x0b), 0);
         return Float.isNaN(v) || v < 0 || v > 400 ? Float.NaN : v;
     }
 
@@ -169,7 +183,7 @@ final class EvCar {
     static int sohRaw() {
         int s = sSohRaw;
         if (s <= 0) {
-            int v = hscanInt(HCAN_TX_GET_SOH);
+            int v = hscanInt(hscanTx(HCAN_GET_SOH, 0xd6));
             if (v != s) {
                 Log.i(TAG, "BMS SOH raw: " + v);
             }
@@ -177,22 +191,6 @@ final class EvCar {
             s = v;
         }
         return s;
-    }
-
-    /**
-     * VIN characters 1-8 and 10 (make, model, body, motor, model year) for
-     * the log header; never the check digit, plant or serial. "" if unknown
-     * (retried next time).
-     */
-    static String vinModel() {
-        String m = sVinModel;
-        if (m == null || m.length() == 0) {
-            String vin = hscanString(HCAN_TX_GET_VIN);
-            m = vin != null && vin.matches("[A-HJ-NPR-Z0-9]{17}")
-                    ? vin.substring(0, 8) + vin.charAt(9) : "";
-            sVinModel = m;
-        }
-        return m;
     }
 
     private static IBinder hscan() throws Exception {
@@ -206,6 +204,9 @@ final class EvCar {
 
     /** hscan float getter with one byte argument, NaN on failure. */
     private static float hscanFloat(int txn, int arg) {
+        if (txn < 0) {
+            return Float.NaN;
+        }
         try {
             IBinder b = hscan();
             if (b == null) {
@@ -233,6 +234,9 @@ final class EvCar {
 
     /** hscan int getter without arguments, -1 on failure. */
     private static int hscanInt(int txn) {
+        if (txn < 0) {
+            return -1;
+        }
         try {
             IBinder b = hscan();
             if (b == null) {
@@ -254,32 +258,6 @@ final class EvCar {
         } catch (Throwable t) {
             sHcan = null;
             return -1;
-        }
-    }
-
-    /** hscan String getter, null on failure. */
-    private static String hscanString(int txn) {
-        try {
-            IBinder b = hscan();
-            if (b == null) {
-                return null;
-            }
-            Parcel data = Parcel.obtain();
-            Parcel reply = Parcel.obtain();
-            try {
-                data.writeInterfaceToken(HCAN_TOKEN);
-                if (!b.transact(txn, data, reply, 0)) {
-                    return null;
-                }
-                reply.readException();
-                return reply.readString();
-            } finally {
-                data.recycle();
-                reply.recycle();
-            }
-        } catch (Throwable t) {
-            sHcan = null;
-            return null;
         }
     }
 
@@ -444,7 +422,8 @@ final class EvCar {
 
     private static float climateUncached(int flag) {
         try {
-            IBinder b = datc();
+            int tx = tx(DATC_TOKEN, DATC_GET_VR_CLIMATE_STATUS);
+            IBinder b = tx < 0 ? null : datc();
             if (b == null) {
                 return Float.NaN;
             }
@@ -453,7 +432,7 @@ final class EvCar {
             try {
                 data.writeInterfaceToken(DATC_TOKEN);
                 data.writeInt(flag);
-                if (!b.transact(DATC_TX_GET_VR_CLIMATE_STATUS, data, reply, 0)) {
+                if (!b.transact(tx, data, reply, 0)) {
                     return Float.NaN;
                 }
                 reply.readException();
@@ -472,7 +451,8 @@ final class EvCar {
     /** IDATCService.isUnitCelsius(unit): 1 yes, 0 no, -1 unknown. */
     static int climateUnitIsCelsius(int unitRaw) {
         try {
-            IBinder b = datc();
+            int tx = tx(DATC_TOKEN, DATC_IS_UNIT_CELSIUS);
+            IBinder b = tx < 0 ? null : datc();
             if (b == null) {
                 return -1;
             }
@@ -481,7 +461,7 @@ final class EvCar {
             try {
                 data.writeInterfaceToken(DATC_TOKEN);
                 data.writeInt(unitRaw);
-                if (!b.transact(DATC_TX_IS_UNIT_CELSIUS, data, reply, 0)) {
+                if (!b.transact(tx, data, reply, 0)) {
                     return -1;
                 }
                 reply.readException();
@@ -499,6 +479,7 @@ final class EvCar {
     // ---- BCM drive mode (passive listener) --------------------------------------
 
     private static volatile int sDriveMode = -1;
+    private static volatile int sBcmLtxDriveMode = -1;
     private static volatile IBinder sBcmRegisteredWith;
     private static Binder sBcmListener;
     private static long sBcmTriedAt;
@@ -528,6 +509,11 @@ final class EvCar {
     private static void registerBcm() {
         try {
             sDriveMode = -1;
+            int tx = tx(BCM_TOKEN, BCM_REGISTER_LISTENER);
+            sBcmLtxDriveMode = tx(BCM_LISTENER, BCM_ON_DRIVE_MODE_CHANGED);
+            if (tx < 0 || sBcmLtxDriveMode < 0) {
+                return;
+            }
             IBinder bcm = service(BCM_SERVICE);
             if (bcm == null || !BCM_TOKEN.equals(bcm.getInterfaceDescriptor())) {
                 return;
@@ -541,7 +527,7 @@ final class EvCar {
                 data.writeInterfaceToken(BCM_TOKEN);
                 data.writeStrongBinder(sBcmListener);
                 data.writeStrongBinder(new Binder());
-                if (!bcm.transact(BCM_TX_REGISTER_LISTENER, data, reply, 0)) {
+                if (!bcm.transact(tx, data, reply, 0)) {
                     return;
                 }
                 reply.readException();
@@ -566,7 +552,7 @@ final class EvCar {
         protected boolean onTransact(int code, Parcel data, Parcel reply, int flags) {
             try {
                 if (code >= FIRST_CALL_TRANSACTION && code <= LAST_CALL_TRANSACTION) {
-                    if (code == BCM_LTX_ON_DRIVE_MODE_CHANGED) {
+                    if (code == sBcmLtxDriveMode) {
                         data.enforceInterface(BCM_LISTENER);
                         int m = data.readInt();
                         sDriveMode = m >= 0 && m <= 0xff ? m : -1;
@@ -612,6 +598,90 @@ final class EvCar {
             return l.getAltitude();
         } catch (Throwable t) {
             return Double.NaN;
+        }
+    }
+
+    // ---- transaction numbers, by method name ------------------------------------
+
+    private static final java.util.HashMap<String, Integer> sTx =
+            new java.util.HashMap<String, Integer>();
+
+    /**
+     * The binder transaction number of iface.method, from the car's own
+     * interface class (iface$Stub.TRANSACTION_method); -1 if it isn't there.
+     * Looked up once per name.
+     */
+    static int tx(String iface, String method) {
+        String k = iface + "." + method;
+        synchronized (sTx) {
+            Integer v = sTx.get(k);
+            if (v != null) {
+                return v.intValue();
+            }
+        }
+        int n = stubTx(iface, method);
+        synchronized (sTx) {
+            sTx.put(k, Integer.valueOf(n));
+        }
+        Log.i(TAG, "transaction " + k + " = " + (n < 0 ? "not found (reads unknown)" : String.valueOf(n)));
+        return n;
+    }
+
+    static int stubTx(String iface, String method) {
+        try {
+            Class<?> c = Class.forName(iface + "$Stub", false, EvCar.class.getClassLoader());
+            java.lang.reflect.Field f = c.getDeclaredField("TRANSACTION_" + method);
+            f.setAccessible(true);
+            int n = f.getInt(null);
+            return n >= 1 && n <= 0x00ffffff ? n : -1;
+        } catch (Throwable t) {
+            return -1;
+        }
+    }
+
+    private static volatile Boolean sHcanKnown;  // null = not checked yet
+
+    /**
+     * hscan's number for method: by name, or, when GPM can't see the telematics
+     * interface class, the number verified on the Ioniq 5 US 260507, only if
+     * com.hkmc.ext.hcan.odex is that firmware's file; -1 otherwise.
+     */
+    static int hscanTx(String method, int verified260507) {
+        int n = tx(HCAN_TOKEN, method);
+        if (n >= 0) {
+            return n;
+        }
+        Boolean known = sHcanKnown;
+        if (known == null) {
+            boolean ok = HCAN_MD5.equals(md5(HCAN_ODEX));
+            known = Boolean.valueOf(ok);
+            sHcanKnown = known;
+            Log.i(TAG, "telematics library " + (ok ? "is" : "isn't") + " the Ioniq 5 US 260507 one");
+        }
+        return known.booleanValue() ? verified260507 : -1;
+    }
+
+    /** md5 of a file, lower-case hex; "" if it can't be read. */
+    static String md5(String path) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            java.io.FileInputStream in = new java.io.FileInputStream(path);
+            try {
+                byte[] buf = new byte[16384];
+                int n;
+                while ((n = in.read(buf)) != -1) {
+                    md.update(buf, 0, n);
+                }
+            } finally {
+                in.close();
+            }
+            StringBuilder sb = new StringBuilder();
+            for (byte x : md.digest()) {
+                sb.append(Character.forDigit((x >> 4) & 0xf, 16)).append(Character.forDigit(x & 0xf, 16));
+            }
+            return sb.toString();
+        } catch (Throwable t) {
+            return "";
         }
     }
 

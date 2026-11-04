@@ -32,6 +32,7 @@ jobs:
       ev6aac: ${{ steps.f.outputs.ev6aac }}
       kits: ${{ steps.f.outputs.kits }}
       package: ${{ steps.f.outputs.package }}
+      ev: ${{ steps.f.outputs.ev }}
 
     steps:
       - name: Checkout repository
@@ -70,6 +71,7 @@ jobs:
           out ev6aac  '^(src/ev6aac/|packages/wireless-carplay-aa/comp/4_audio/files/libev6aac\.so)'
           out kits    '^(kits/|docs/downloads/|recipes/|tools/build-kit\.sh|tools/check-downloads\.sh|tools/lpatch/lpatch$)'
           out package '^(packages/|patches/|recipes/|tools/build-package\.sh|tools/lpatch/lpatch$|tools/compat-built\.py|docs/data/compat\.json)'
+          out ev      '^(ev/|packages/wireless-carplay-aa/(scripts/build\.sh|svc/)|tools/test-ev-select\.sh|tools/test-evlog-offload\.sh)'
 
   build-lpatch:
     name: Build and Test Lpatch
@@ -179,3 +181,36 @@ jobs:
         with:
           name: wireless-carplay-aa
           path: ./dist/*.zip
+
+  test-ev:
+    name: Test EV Features
+    needs: changes
+    if: needs.changes.outputs.ev == 'true'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install mksh (the head unit's shell) and the Android 4.4 platform
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mksh
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-19" > /dev/null
+
+      - name: EV build selection (+ev manifest lines, EVERGREEN-NO-EV)
+        run: |
+          sh tools/test-ev-select.sh
+          sh tools/test-ev-select.sh mksh
+
+      - name: EV log copier service
+        run: |
+          sh tools/test-evlog-offload.sh
+          sh tools/test-evlog-offload.sh mksh
+
+      - name: EV code on the JVM (preconditioning, log rows, capacity scaling)
+        run: sh ev/gpm-ev/test/run.sh
+
+      - name: EV log tool (check and clean)
+        run: sh ev/tools/test_evlog.sh

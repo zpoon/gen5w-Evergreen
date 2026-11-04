@@ -40,11 +40,12 @@ public final class SenderRowTest {
         pass++;
         // the header lists every column once, after the v2 magic line
         String h = EvDriveLog.header("NEEV.USA.0000.V015.012.260507",
-                "wp_daudioplus_neev_us", "KM8KRDAFN", "bms", "2026-10-29");
+                "wp_daudioplus_neev_us", "bms", "2026-10-29");
         String[] lines = h.split("\n");
         if (!lines[0].equals("# egmp-aa-ev-log v2")
                 || !lines[lines.length - 1].equals(String.join(",", EvDriveLog.COLUMNS))
-                || !h.contains("# period_s=5\n") || !h.contains("# sample_s=1\n")) {
+                || !h.contains("# period_s=5\n") || !h.contains("# sample_s=1\n")
+                || h.contains("vin")) {
             throw new AssertionError("header:\n" + h);
         }
         if (new java.util.HashSet<String>(java.util.Arrays.asList(

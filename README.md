@@ -5,7 +5,7 @@
 > [!NOTE]
 > **Evergreen is an unofficial community fork** of [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes, which was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. Evergreen keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
-> **What Evergreen is for:** keeping Leafia's existing features working, not adding new ones. That means support for new firmware and cars that can use the existing builds, bug fixes, and keeping up with NEMESIS. New features are out of scope; for those, see [HMG-API](https://github.com/VysseCodes/HMG-API).
+> **What Evergreen is for:** keeping Leafia's existing features working, and bringing community features that patch the same files into the one package, so they don't conflict. That means support for new firmware and cars that can use the existing builds, bug fixes, keeping up with NEMESIS, and features like [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat)'s EV routing, built in rather than stacked on top. Brand-new features are out of scope; for those, see [HMG-API](https://github.com/VysseCodes/HMG-API).
 >
 > **Already using Leafia?** Evergreen is the same package (`wireless.carplay.aa`), so it replaces Leafia rather than installing beside it. It also keeps the **Leafia kit** and its `LEAFIA-…` files and reports unchanged, so existing instructions and reports still work.
 >
@@ -37,6 +37,7 @@ Firmware differs between models, regions and versions, so whole-file checksums r
 | Projection settings menu | On US/Canada units, Settings > Phone Projection keeps opening Device Connections (CarPlay split screen, connected phones), as on stock firmware; applied only where the Bluetooth settings app is the stock one the fix was made for | `patches/common/optional` (`HKMC_BtSettings`) |
 | CarPlay Bluetooth bridge | Starts wireless CarPlay over Bluetooth/iAP2 | Rebuilt on the unit from its stock apps (`patches/<car>`) |
 | Turn-by-turn | Projection navigation on the cluster and HUD | Rebuilt on the unit from its stock apps (`patches/<car>`). Uses only the standard cluster calls, so cars without a HUD are fine. The installer refuses if the firmware lacks any call it needs. |
+| EV features (from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat)) | For Android Auto with Google Maps: an energy model from the car's live battery data, so Maps plans charging stops and shows arrival %; battery preconditioning when the next stop is a fast charger (only when the car's own *battery conditioning* setting is on); EV drive logs, copied to a USB drive with an `egmp-aa-ev-logs` folder. On by default where a car has an EV build; an empty `EVERGREEN-NO-EV` file next to `NEMESIS.data` installs without it. The old `aa.ev.model` add-on must be uninstalled first. | Built into the turn-by-turn GPM and Android Auto library (`+ev` lines in `patches/<car>/manifest`); log copying is the package's `evlog-offload` service. Code and docs in `ev/` |
 
 Cars without a patch set yet get **basic mode**: only the wireless projection part, which gives wireless Android Auto on any Gen5W unit with a Wi-Fi module. The installer also saves a report so a full build can be made for that car.
 
@@ -110,7 +111,7 @@ It writes `LEAFIA/` on the drive:
 
 ## Contributing
 
-Evergreen is maintenance only: it keeps the existing features working rather than adding new ones. The most useful help is **reports from new cars and firmware**, **real-car test results**, and **bug reports and fixes**. Ideas for new features are better suited to [HMG-API](https://github.com/VysseCodes/HMG-API), the original author's active project.
+Evergreen keeps the existing features working, and brings community features that patch the same files into one package, rather than adding brand-new ones. The most useful help is **reports from new cars and firmware**, **real-car test results**, and **bug reports and fixes**. Ideas for new features are better suited to [HMG-API](https://github.com/VysseCodes/HMG-API), the original author's active project.
 
 Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, building, testing on the mock head unit, adding a car, and the project rules. Security issues: [SECURITY.md](SECURITY.md).
 
@@ -118,6 +119,7 @@ Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTIN
 
 - Evergreen is a fork of HMG Leafia Plus, created by [VysseCodes](https://github.com/VysseCodes). Evergreen is maintained by [zpoon](https://github.com/zpoon). If the original work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
 - Merged into Evergreen: Hyundai Ioniq 5 US 260903 by [gdonaldson1676](https://github.com/gdonaldson1676) (upstream #179).
+- EV features: [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat) by [willemcvu](https://github.com/willemcvu), taken into Evergreen with their permission (history kept in `ev/`; see `NOTICE.md`).
 - Evergreen, like HMG Leafia Plus, is GPL-3.0 (see `LICENSE`).
 - It runs through [NEMESIS](https://github.com/xwtk/hmg_nemesis) by xwtk, which is AGPL-3.0. Parts derived from NEMESIS packages are listed in `NOTICE.md` and stay under their original licence.
 - Thanks to [W-Floyd](https://github.com/W-Floyd) for their help with this project.

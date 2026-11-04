@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **in progress**. Permission recorded; code imported into `ev/` on branch `ev-import`; vehicle-command review done. Not wired into the package yet.
+Status: **in progress**. Permission recorded; code imported into `ev/` on branch `ev-import`; vehicle-command review done and its three required changes made (2026-11-04). The package side is ready: `+ev` manifest lines, `EVERGREEN-NO-EV`, the log copier service, the refusal while `aa.ev.model` is installed, and CI. **Waiting for:** the EV GPM and library deltas, which need the maintainer's stock files (see "Building").
 
 ## Goal
 
@@ -67,25 +67,27 @@ car gets **one GPM build that already includes turn-by-turn and EV**:
   the stock US library into the TBT+EV library. egmp-aa-ev-feat's library patch
   adds a tail branch to the turn-by-turn library, so the new delta starts from
   stock and includes both.
-- **Manifest lines:** the car's manifest gets lines tagged for an EV variant,
-  for example part `2_tbt`, variant `ev`. `scripts/build.sh` picks the EV lines
-  unless `EVERGREEN-NO-EV` is present. A car with no EV lines gets the plain
-  build, as today.
+- **Manifest lines (done):** an EV build is a manifest line whose part ends in
+  `+ev`, e.g. `2_tbt+ev app HKMC_GPM neev/HKMC_GPM.ev.lpd <md5>`. `scripts/build.sh`
+  uses it in place of the plain line for the same part and file, unless
+  `EVERGREEN-NO-EV` is on the install drive. A car with no `+ev` lines gets the
+  plain build, as today. Tested by `tools/test-ev-select.sh`; the mock head unit
+  takes `MOCK_NO_EV=1`.
 - **Compatibility page:** its `built` lists already accept several md5s per
   file, so both variants count as "already installed".
 
 ### Logging service
 
-egmp-aa-ev-feat's `evlog-offload.sh` becomes a `[service.0]` in Evergreen's
-`NEMESIS.data` (`type=application,service`). It copies logs to a drive with an
+**Done.** egmp-aa-ev-feat's `evlog-offload.sh` is now `svc/evlog-offload.sh`, a `[service.0]` in Evergreen's
+`NEMESIS.data` (`type=application,service`), tested by `tools/test-evlog-offload.sh`. It copies logs to a drive with an
 `egmp-aa-ev-logs/` folder; that name stays, since existing instructions use it.
 It exits straight away on a car without the EV build. The GPM code writes the
 logs itself and keeps at most 100 MB.
 
 ### Conflicts and migration
 
-- **Refuse while the old add-on is installed.** Add `aa.ev.model` to `LEGACY` in
-  `scripts/common.sh`, so the installer refuses to run until it's gone. Both
+- **Refuse while the old add-on is installed (done).** `aa.ev.model` is in `LEGACY` in
+  `scripts/common.sh`, so the installer refuses to run until it's gone, and says why. Both
   patch the same two files.
 - **Migration steps for current users:**
   1. Uninstall `aa.ev.model`.
@@ -120,8 +122,10 @@ The EV GPM is built from a car's stock GPM, which can't live in the repo.
 
 ## Testing
 
-1. **Host tests:** egmp-aa-ev-feat's Java host tests (`gpm-ev/test`) and
-   `tools/test_evlog.sh`, added to CI.
+1. **Host tests (in CI, job "Test EV Features"):** egmp-aa-ev-feat's Java host
+   tests (`ev/gpm-ev/test`, plus `TxTest` for the lookup by name),
+   `ev/tools/test_evlog.sh`, and Evergreen's `tools/test-ev-select.sh` and
+   `tools/test-evlog-offload.sh` under sh and mksh.
 2. **Mock head unit:** Evergreen's `tools/mock/install-test.sh`, run with the
    maintainer's stock tree, with and without `EVERGREEN-NO-EV`. The uninstall
    must leave `/system` byte-identical.

@@ -29,7 +29,7 @@ else
     log "car: $(car_name) ($(getprop ro.build.product 2>/dev/null))"
 fi
 if ! check_legacy; then
-    toast "Install failed: uninstall the separate wireless/projection packages first, reboot, then try again."
+    toast "Install failed: uninstall the separate wireless/projection or AA EV packages first, reboot, then try again."
     exit 1
 fi
 if ! check_remount; then

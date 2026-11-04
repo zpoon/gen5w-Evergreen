@@ -378,20 +378,34 @@ public final class Precond {
 
         @Override
         public int readEnabled() throws Exception {
+            requireCompatible();
             return getter(service(HEV_SERVICE, HEV), HEV, TX_GET_HEV_STATUS,
                     FLAG_BATT_COND);
         }
 
         @Override
         public int readReady() throws Exception {
+            requireCompatible();
             return getter(service(HEV_SERVICE, HEV), HEV, TX_GET_HEV_STATUS,
                     FLAG_READY);
         }
 
         @Override
         public int readIndicator() throws Exception {
+            requireCompatible();
             return getter(service(BCM_SERVICE, BCM), BCM,
                     TX_BCM_COND_INDICATOR, -1);
+        }
+
+        /**
+         * The reads use the same numbers as the commands (HEV 3, BCM 109), so
+         * they're held to the same check: on another framework a getter's
+         * number could belong to a different method.
+         */
+        private void requireCompatible() {
+            if (!compatible()) {
+                throw new IllegalStateException("unverified firmware");
+            }
         }
 
         @Override

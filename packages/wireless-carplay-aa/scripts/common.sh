@@ -20,8 +20,10 @@ LOG=/data/nemesis/wireless.carplay.aa.log
 PARTS="1_projection 2_tbt 3_bridge 4_audio 5_menu"
 PARTS_REV="5_menu 4_audio 3_bridge 2_tbt 1_projection"
 # separate packages that change the same files (the ones this replaces, and
-# NEMESIS's own carplay.session) - they must be uninstalled first
-LEGACY="wireless.projection projection.tbt wireless.carplay.bt carplay.wifi.audio carplay.debuglog carplay.session"
+# NEMESIS's own carplay.session) - they must be uninstalled first. aa.ev.model
+# (egmp-aa-ev-feat) patches the same GPM and Android Auto library; its EV
+# features are built into this package now.
+LEGACY="wireless.projection projection.tbt wireless.carplay.bt carplay.wifi.audio carplay.debuglog carplay.session aa.ev.model"
 # optional add-ons that sit on top of this package - uninstall them before this one
 ADDONS="projection.cardata"
 
@@ -64,6 +66,7 @@ check_legacy() {
     for _id in $LEGACY; do
         if [ -d "/data/nemesis/apps/$_id" ]; then
             log "FAIL: separate package $_id is still installed"
+            [ "$_id" = aa.ev.model ] && log "  (aa.ev.model's EV routing, preconditioning and logs are built into Evergreen now; its logs on the head unit are kept)"
             _bad=1
         fi
     done

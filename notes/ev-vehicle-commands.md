@@ -75,6 +75,8 @@ All in `ev/gpm-ev/src/.../EvCar.java` and `Precond.java`. All are getters.
 
 ## Required changes (before an Evergreen release)
 
+All three are done on branch `ev-import` (2026-11-04); details after each.
+
 1. **Gate the reads like the writes.** `EvCar` calls HEV, BCM, hscan and DATC by
    number with only a descriptor check. On a firmware where the numbers moved,
    a "getter" number could land on a different method, maybe a setter, which
@@ -86,17 +88,33 @@ All in `ev/gpm-ev/src/.../EvCar.java` and `Precond.java`. All are getters.
      `com.hkmc.ext.hcan.odex` (where hscan is defined) before hscan calls, or
      look the hscan getters up by name. With no match, EV routing still works
      from the cluster packet, with fewer inputs.
+   - **Done:** `EvCar` looks every number up by method name in the car's own
+     interface classes (`IHEVService$Stub.TRANSACTION_getHEVStatus`, the same
+     for `IDATCService`, `IBCMService` and `IBCMListener`), so the reads need no
+     hash: on any framework they reach the method they name, or read "unknown"
+     if it isn't there. The telematics interface (hscan) lives in
+     `com.hkmc.ext.hcan`, which GPM may not load. If it can't be found by name,
+     the 260507 numbers are used only when that library's md5 is the Ioniq 5 US
+     260507 one (`c4638b2b…`, from HMG-API's map). `Precond`'s own reads (HEV 3,
+     BCM 109) now go through its firmware check, like its commands.
 2. **No VIN.** `EvCar` reads the VIN (`getVIN`, hscan 0x2f) and logs characters
    1–8 and 10. Those identify the model and year, not the car, and the serial
    is never stored. But Evergreen's rules say never collect the VIN.
    - **Fix:** remove the `getVIN` call, and take `vin_model` from the firmware
      product id (`ro.build.product`, already in the log header), or drop the
      field. The log format version and `tools/evlog.py` change with it.
+   - **Done:** no `getVIN` call; the header has no `vin_model` (the product id
+     already names the car). `tools/evlog.py` still reads older files that
+     have it. The format stays v2: the key was always optional.
 3. **One log-offload service for Evergreen.** `evlog-offload.sh` becomes
    Evergreen's `[service.0]`, using names from Evergreen's package
    (`wireless.carplay.aa`) rather than `aa.ev.model`. It copies only
    `egmp-*.csv` logs to a drive folder named `egmp-aa-ev-logs/` (name kept, as
    users know it).
+   - **Done:** `packages/wireless-carplay-aa/svc/evlog-offload.sh`, declared as
+     `[service.0]` (`wireless.carplay.aa/evlog-offload`). Without an EV log
+     folder it touches nothing and shows no pop-up; it idles rather than
+     exiting, since NEMESIS gives up on a service that exits five times.
 
 ## Not changed (noted)
 

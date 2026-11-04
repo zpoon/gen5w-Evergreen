@@ -3,7 +3,7 @@
 # vehicle and journal, plain JVM), the EV log row (EvDriveLog, SenderRowTest;
 # android.jar plus small Log/SystemClock shims in test/shim), the EV log
 # aggregation, folder cap and buffered writer (EvLogTest), and the 4.1/8.1
-# capacity scaling (ScaleTest).
+# capacity scaling (ScaleTest), and the transaction lookup by name (TxTest).
 #   sh gpm-ev/test/run.sh          (VERBOSE=1 to see the EvPrecond log lines)
 set -e
 cd "$(dirname "$0")/.."
@@ -28,10 +28,13 @@ javac -nowarn -d "$SOUT" -cp "$ANDROID_HOME/platforms/android-19/android.jar" \
     src/$PKG/NavProto.java src/$PKG/PrecondCore.java src/$PKG/Precond.java \
     stubs/$PKG/SensorSource.java stubs/com/hkmc/cluster/NavigationCluster.java \
     stubs/com/hkmc/cluster/NavigationClusterListener.java test/SenderRowTest.java \
-    test/ScaleTest.java test/EvLogTest.java
+    test/ScaleTest.java test/EvLogTest.java test/TxTest.java \
+    test/fake/com/hkmc/hev/IHEVService.java
 java -cp "$SOUT:$ANDROID_HOME/platforms/android-19/android.jar" \
     com.google.android.projection.protocol.SenderRowTest
 java -cp "$SOUT:$ANDROID_HOME/platforms/android-19/android.jar" \
     com.google.android.projection.protocol.EvLogTest
 java -cp "$SOUT:$ANDROID_HOME/platforms/android-19/android.jar" \
     com.google.android.projection.protocol.ScaleTest
+java -cp "$SOUT:$ANDROID_HOME/platforms/android-19/android.jar" \
+    com.google.android.projection.protocol.TxTest
