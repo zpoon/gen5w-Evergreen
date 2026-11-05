@@ -36,6 +36,7 @@ function parse(text) {
     else if ((m = line.match(/^api (\S+)=([01])/))) r.api[m[1]] = m[2] === "1";
     else if ((m = line.match(/^permfile (\S+)=([01])/))) r.perm[m[1]] = m[2] === "1";
     else if ((m = line.match(/^feature (.+)$/))) r.features.push(m[1].trim());
+    else if ((m = line.match(/^wificlient (on|off|unknown)/))) r.wificlient = m[1];
   }
   return r;
 }
@@ -124,6 +125,9 @@ function verdict(r) {
   parts.push({ name: "Turn-by-turn on cluster / HUD", state: tbtState, why: tbtWhy });
 
   const allGood = parts.every((p) => p.state === "ok" || p.state === "native");
+  // after allGood: a setting the owner can change, not a reason the car can't be supported
+  if (r.wificlient === "on") parts.push({ name: "Wi-Fi client", state: "build",
+    why: "Wi-Fi is on. It shares the Wi-Fi chip with the hotspot wireless CarPlay and Android Auto use, and can make them drop every minute or two. If that happens, turn Wi-Fi off in the head unit's Wi-Fi settings." });
   let overall;
   if (!r.valid) overall = ["no", "This doesn't look like a Leafia kit report."];
   else if (/\.KOR\./.test(r.props["ro.build.product"] || "")) overall = ["unknown", "Korean head unit: we have yet to confirm a single working Korean car. Every Korean unit checked so far has had no Wi-Fi hardware, which wireless CarPlay and Android Auto need. Please share your report anyway; if this unit has a working Wi-Fi chip, that changes things."];
