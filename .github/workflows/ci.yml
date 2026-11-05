@@ -71,7 +71,7 @@ jobs:
           out ev6aac  '^(src/ev6aac/|packages/wireless-carplay-aa/comp/4_audio/files/libev6aac\.so)'
           out kits    '^(kits/|docs/downloads/|recipes/|tools/build-kit\.sh|tools/check-downloads\.sh|tools/lpatch/lpatch$)'
           out package '^(packages/|patches/|recipes/|tools/build-package\.sh|tools/lpatch/lpatch$|tools/lpatch/lpatch\.c|tools/compat-built\.py|docs/data/compat\.json|tools/test-universal\.sh|tools/mkuniversal\.py)'
-          out ev      '^(ev/|packages/wireless-carplay-aa/(scripts/build\.sh|svc/)|tools/test-ev-select\.sh|tools/test-evlog-offload\.sh)'
+          out ev      '^(ev/|packages/wireless-carplay-aa/(scripts/build\.sh|svc/)|tools/test-ev-select\.sh|tools/test-evlog-offload\.sh|tools/test-wifi-client-warn\.sh)'
 
   build-lpatch:
     name: Build and Test Lpatch
@@ -215,6 +215,11 @@ jobs:
         run: |
           sh tools/test-evlog-offload.sh
           sh tools/test-evlog-offload.sh mksh
+
+      - name: Wi-Fi client warning service
+        run: |
+          sh tools/test-wifi-client-warn.sh
+          sh tools/test-wifi-client-warn.sh mksh
 
       - name: EV code on the JVM (preconditioning, log rows, capacity scaling)
         run: sh ev/gpm-ev/test/run.sh

@@ -115,6 +115,22 @@ check_cluster_api() {
     return 1
 }
 # ---- failure help: on-screen message + automatic report for unknown head units
+# The head unit's Wi-Fi client shares the Wi-Fi chip with the hotspot that wireless
+# CarPlay/AA run over (one channel for both), and owners report drops every minute
+# or two while it is on. Logged at install; svc/wifi-client-warn.sh warns on the car.
+# Read only. Not when the owner chose the client (LEAFIA-WIFI-CLIENT, part 1's marker).
+log_wifi_client() {
+    local _v
+    _v=$(settings get global wifi_on 2>/dev/null) || return 0
+    case "$_v" in
+        1|2)
+            [ -f /data/nemesis/backup/wireless.projection/wifi_client ] && return 0
+            log "WARNING: the head unit's Wi-Fi client is on (wifi_on=$_v). Wireless CarPlay and Android Auto can drop every minute or two while it is; if they do, turn Wi-Fi off in the head unit's Wi-Fi settings."
+            ;;
+    esac
+    return 0
+}
+
 toast() {
     am broadcast -a com.hkmc.intent.action.TOAST \
         -e com.hkmc.intent.extra.TOAST_MESSAGE "$1" \
