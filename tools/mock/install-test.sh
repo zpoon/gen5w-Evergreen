@@ -23,8 +23,12 @@
 #                           leaves it); checks the switch to persist.adb.tcp.port and back
 #   MOCK_WIFI_CLIENT=1      LEAFIA-WIFI-CLIENT on the install drive: part 1 also turns on
 #                           the Wi-Fi client (implies MOCK_USB_DESCRIPTOR=1)
+#   MOCK_WIFI_ON=1          the owner's Wi-Fi client is already on (wifi_on=1): the install
+#                           log must warn about it
 #   MOCK_NO_WIFI=1          a unit whose Wi-Fi chip never responds (no wlan0, driver
 #                           gives up): the install must be refused
+#   MOCK_NO_EV=1            EVERGREEN-NO-EV on the install drive: the plain turn-by-turn
+#                           build instead of the EV one (implies MOCK_USB_DESCRIPTOR=1)
 #
 # Needs: qemu-arm-static (runs the ARM lpatch), unzip, md5sum.
 set -e
@@ -88,6 +92,7 @@ printf '#!/bin/sh\necho "TOAST: $*" >> %s/toasts\n' "$X" > "$X/stub/am"
 printf '#!/bin/sh\nmd5sum "$@"\n' > "$X/stub/md5"
 printf '#!/bin/sh\nexit 0\n' > "$X/stub/chown"; cp "$X/stub/chown" "$X/stub/restorecon"
 printf '#!/bin/sh\ncase "$1" in get) cat %s/set_$3 2>/dev/null || echo null ;; put) echo "$4" > %s/set_$3 ;; delete) rm -f %s/set_$3 ;; esac\n' "$X" "$X" "$X" > "$X/stub/settings"
+[ "$MOCK_WIFI_ON" = 1 ] && echo 1 > "$X/set_wifi_on"
 # pm: every app exists; disable/enable keep a marker per app, so leftovers can be checked
 cat > "$X/stub/pm" <<E
 #!/bin/sh
@@ -117,6 +122,7 @@ find "$X/pkg" -name '*.sh' | while read -r f; do
         -e "s|^\(export PATH=.*\)$|\1:/usr/bin:/bin|" "$f"
 done
 [ "$MOCK_WIFI_CLIENT" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/LEAFIA-WIFI-CLIENT"
+[ "$MOCK_NO_EV" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/EVERGREEN-NO-EV"
 [ "$MOCK_USB_DESCRIPTOR" = 1 ] && printf '[nemesis]\nversion=1.0\ntype=install\npath=packages/wireless.carplay.aa.zip\n' > "$R/storage/usb0/NEMESIS.data"
 
 (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/before.md5"

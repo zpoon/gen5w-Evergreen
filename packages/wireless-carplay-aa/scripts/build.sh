@@ -5,6 +5,13 @@
 # .odex is the exact expected original - and `lpatch zipadd` adds it to the stock
 # APK. Every result must match the md5 in patches/<car>/manifest.
 # Output goes to $BUILD_DIR/<part>/, where the parts pick it up.
+#
+# EV features: a manifest line whose part ends in "+ev" (e.g. "2_tbt+ev app
+# HKMC_GPM neev/HKMC_GPM.ev.lpd <md5>") is the EV build of that file (turn-by-turn
+# plus egmp-aa-ev-feat's EV routing, preconditioning and logging). It replaces the
+# plain line for the same part and file, unless an empty EVERGREEN-NO-EV file sits
+# next to our NEMESIS.data on the install drive. A car with no +ev lines builds as
+# before. $BUILD_DIR/ev records which way it went (1 or 0) for the install log.
 BUILD_DIR=/data/nemesis/build/wireless.carplay.aa
 TBT_BACKUP=/data/nemesis/backup/projection.tbt
 MENU_BACKUP=/data/nemesis/backup/projection.menu
@@ -13,6 +20,7 @@ LP_ROOT=.
 
 CARS_DIR=patches
 . ./scripts/cars.sh
+. ./scripts/universal.sh
 
 lp_md5() {
     local _l
@@ -76,19 +84,62 @@ build_one() {
     return 0
 }
 
+# EV builds wanted? Yes unless EVERGREEN-NO-EV is on the install drive.
+ev_wanted() {
+    local _d
+    for _d in /storage/usb0 /storage/usb1 /storage/usb2 /mnt/media_rw/usb0 /mnt/media_rw/usb1 /mnt/media_rw/usb2; do
+        [ -f "$_d/EVERGREEN-NO-EV" ] || continue
+        grep -q 'wireless\.carplay\.aa\.zip' "$_d/NEMESIS.data" 2>/dev/null && return 1
+    done
+    return 0
+}
+
+# has_ev_line <manifest> <part> <name>: the manifest has an EV build of that file
+has_ev_line() {
+    local _p _k _n _x _s
+    while read -r _p _k _n _x _s; do
+        [ "$_p" = "$2+ev" ] && [ "$_n" = "$3" ] && return 0
+    done < "$1"
+    return 1
+}
+
 build_payloads() {
-    local _v _m _part _kind _name _patch _want
+    local _v _m _part _kind _name _patch _want _ev=0 _evn=0
     _v=$(car_variant) || { log "FAIL: no patch set for this car"; return 1; }
+    if [ "$_v" = auto ]; then   # the universal build (scripts/universal.sh)
+        universal_rebuilt || universal_build || return 1
+        build_optional
+        return 0
+    fi
     _m="patches/$_v/manifest"
     if [ ! -s "$_m" ]; then
         log "FAIL: missing $_m"
         return 1
     fi
     mkdir -p "$BUILD_DIR/2_tbt" "$BUILD_DIR/3_bridge" || return 1
+    if grep -q '^[^ ]*+ev ' "$_m"; then
+        if ev_wanted; then
+            _ev=1
+        else
+            log "EVERGREEN-NO-EV on the install drive: turn-by-turn build without the EV features"
+        fi
+    fi
     while read -r _part _kind _name _patch _want; do
         [ -n "$_part" ] || continue
+        case "$_part" in
+            *+ev)
+                [ $_ev = 1 ] || continue
+                _part=${_part%+ev}
+                _evn=$((_evn + 1))
+                ;;
+            *)
+                [ $_ev = 1 ] && has_ev_line "$_m" "$_part" "$_name" && continue
+                ;;
+        esac
         build_one "$_part" "$_kind" "$_name" "$_patch" "$_want" || return 1
     done < "$_m"
+    echo $_ev > "$BUILD_DIR/ev"
+    [ $_ev = 1 ] && log "EV features: $_evn file(s) built with EV routing, preconditioning and logging"
     build_optional
     return 0
 }

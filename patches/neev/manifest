@@ -5,3 +5,5 @@
 3_bridge app Iap2ServerApp neev/Iap2ServerApp.bridge.lpd 75d7fea4d2009be6aa5c840118f58c94
 3_bridge app HKMC_DiPO neev/HKMC_DiPO.bridge.lpd e7c1f412233482e12bde8543c6c1e24f
 2_tbt file libautoreceiver_infobank.so common/libautoreceiver_infobank.tbt.lpd c08410a8d32a615b1aa805cd8a243d52
+2_tbt+ev app HKMC_GPM neev/HKMC_GPM.ev.lpd b9a641e99756d8f5c9f5febb56dcd60b
+2_tbt+ev file libautoreceiver_infobank.so common/libautoreceiver_infobank.ev.lpd 37cbe6bfe7462444ca1f6d88013383d9

@@ -5,7 +5,7 @@
 > [!NOTE]
 > **Evergreen is an unofficial community fork** of [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by VysseCodes, which was archived in favour of its successor, [HMG-API](https://github.com/VysseCodes/HMG-API), with community pull requests still unmerged. Evergreen keeps a working package available and merges those fixes. It isn't affiliated with or endorsed by the original author.
 >
-> **What Evergreen is for:** keeping Leafia's existing features working, not adding new ones. That means support for new firmware and cars that can use the existing builds, bug fixes, and keeping up with NEMESIS. New features are out of scope; for those, see [HMG-API](https://github.com/VysseCodes/HMG-API).
+> **What Evergreen is for:** keeping Leafia's existing features working, and bringing community features that patch the same files into the one package, so they don't conflict. That means support for new firmware and cars that can use the existing builds, bug fixes, keeping up with NEMESIS, and features like [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat)'s EV routing, built in rather than stacked on top. Brand-new features are out of scope; for those, see [HMG-API](https://github.com/VysseCodes/HMG-API).
 >
 > **Already using Leafia?** Evergreen is the same package (`wireless.carplay.aa`), so it replaces Leafia rather than installing beside it. It also keeps the **Leafia kit** and its `LEAFIA-…` files and reports unchanged, so existing instructions and reports still work.
 >
@@ -14,6 +14,7 @@
 > - Hyundai Ioniq 5 US **2022** on firmware **260903**: same build as the 2023–2024 cars, since a 2022 owner's Leafia kit report shows identical stock files. **Supported**: v1.1.1 confirmed working on a 2022, turn-by-turn included.
 > - Hyundai Ioniq 5 US **2024 special edition** (`NEEV23SE`) on firmware **260507**: the same files as the 2022–2023 cars on 260507, per an owner's Leafia kit report ([upstream #182](https://github.com/VysseCodes/HMG-Leafia-Plus/issues/182)). Not yet confirmed on the car with Evergreen.
 > - Kia **Sportage** US on firmware **260507**: ported from an owner's Leafia kit ([#2](https://github.com/zpoon/gen5w-Evergreen/issues/2)). Its projection apps run the same code as the Ioniq 5 and EV6, so it gets the full build. **Supported**: confirmed working by the owner.
+> - Kia **Sportage Hybrid** US on firmware **260507**: every file our build patches is byte-identical to the Sportage's (owner's kit report, [#6](https://github.com/zpoon/gen5w-Evergreen/issues/6)), so it gets the same full build. **Testing**: not yet confirmed on the car.
 > - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
 >
 > If you'd rather use the original author's maintained project, see [HMG-API](https://github.com/VysseCodes/HMG-API).
@@ -38,8 +39,11 @@ Firmware differs between models, regions and versions, so whole-file checksums r
 | Projection settings menu | On US/Canada units, Settings > Phone Projection keeps opening Device Connections (CarPlay split screen, connected phones), as on stock firmware; applied only where the Bluetooth settings app is the stock one the fix was made for | `patches/common/optional` (`HKMC_BtSettings`) |
 | CarPlay Bluetooth bridge | Starts wireless CarPlay over Bluetooth/iAP2 | Rebuilt on the unit from its stock apps (`patches/<car>`) |
 | Turn-by-turn | Projection navigation on the cluster and HUD | Rebuilt on the unit from its stock apps (`patches/<car>`). Uses only the standard cluster calls, so cars without a HUD are fine. The installer refuses if the firmware lacks any call it needs. |
+| EV features (from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat)) | For Android Auto with Google Maps: an energy model from the car's live battery data, so Maps plans charging stops and shows arrival %; battery preconditioning when the next stop is a fast charger (only when the car's own *battery conditioning* setting is on); EV drive logs, copied to a USB drive with an `egmp-aa-ev-logs` folder. On by default where a car has an EV build (so far: Hyundai Ioniq 5 US on 260507); an empty `EVERGREEN-NO-EV` file next to `NEMESIS.data` installs without it. The old `aa.ev.model` add-on must be uninstalled first. | Built into the turn-by-turn GPM and Android Auto library (`+ev` lines in `patches/<car>/manifest`); log copying is the package's `evlog-offload` service. Code and docs in `ev/` |
 
-Cars without a patch set yet get **basic mode**: only the wireless projection part, which gives wireless Android Auto on any Gen5W unit with a Wi-Fi module. The installer also saves a report so a full build can be made for that car.
+Cars without a patch set of their own get the **universal build** when their projection apps run the same code as a car we support. An app's `.odex` is its code plus checksums of the firmware it was made for, so two cars with identical apps still have different `.odex` files; the universal patches (`patches/universal/`) start from the code inside instead. The installer checks every projection app and the Android Auto library: only if all of them match does it install the full build, which is then byte for byte what a hand-made port would give. The Leafia kit's report lists each app's code (`code` lines), so the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/) can tell from a report alone.
+
+Anything else gets **basic mode**: only the wireless projection part, which gives wireless Android Auto on any Gen5W unit with a Wi-Fi module. The installer also saves a report so a full build can be made for that car.
 
 ## Install
 
@@ -58,6 +62,11 @@ Cars without a patch set yet get **basic mode**: only the wireless projection pa
 **Optional: Wi-Fi client (testing).** By default the head unit's Wi-Fi only runs the hotspot that wireless CarPlay/Android Auto use. To also get the Wi-Fi menu and join a network (for example to reach ADB over your home Wi-Fi), put an empty file named `LEAFIA-WIFI-CLIENT` next to `NEMESIS.data` on the install drive. These units have one Wi-Fi radio, so whether a home network and wireless projection work at the same time is still being tested. Uninstalling turns it off again.
 
 ### Known quirks
+
+- **CarPlay or Android Auto drops every minute or two and reconnects: turn the head unit's Wi-Fi off.** Wireless CarPlay and Android Auto run over the car's own hotspot, and the Wi-Fi chip runs the hotspot and a Wi-Fi client connection on one shared channel. With Wi-Fi switched on in the head unit's Wi-Fi settings (or through NEMESIS Manager's WiFi button), its scans and joins can knock the phone off the hotspot. Turn Wi-Fi off there, forget any saved networks, and restart the head unit. For NEMESIS Manager's Store, switch Wi-Fi on only while parked (home Wi-Fi or your phone's hotspot) and off again before driving, or install packages from a USB drive. Evergreen shows a pop-up when Wi-Fi is on, the install log and the Leafia kit report say so, and the compatibility page flags it.
+
+> [!CAUTION]
+> **Don't use NEMESIS's Settings → Use Telematics Internet.** It sends NEMESIS Manager's traffic over the car's connected-services modem and SIM, which the manufacturer provides for its own services only. Using them for anything else may break the connected-services terms and could get the car's SIM or its connected services suspended.
 
 - **USB drives and Android Auto.** On stock firmware a USB drive in the port makes the head unit try wired Android Auto, which blocks wireless Android Auto until the head unit restarts. Once Leafia is installed, Android Auto ignores USB drives and hubs. Before that (during the install, or on v1.0.4 and older), remove the drive once the head unit restarts.
 - **Switching the car off and on doesn't restart the head unit.** It stays on until the driver's door opens or a timeout passes. For a real restart, switch off, open the driver's door and wait for the screen to go dark, or hold the head unit's power button for about 10 seconds.
@@ -111,7 +120,7 @@ It writes `LEAFIA/` on the drive:
 
 ## Contributing
 
-Evergreen is maintenance only: it keeps the existing features working rather than adding new ones. The most useful help is **reports from new cars and firmware**, **real-car test results**, and **bug reports and fixes**. Ideas for new features are better suited to [HMG-API](https://github.com/VysseCodes/HMG-API), the original author's active project.
+Evergreen keeps the existing features working, and brings community features that patch the same files into one package, rather than adding brand-new ones. The most useful help is **reports from new cars and firmware**, **real-car test results**, and **bug reports and fixes**. Ideas for new features are better suited to [HMG-API](https://github.com/VysseCodes/HMG-API), the original author's active project.
 
 Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, building, testing on the mock head unit, adding a car, and the project rules. Security issues: [SECURITY.md](SECURITY.md).
 
@@ -119,6 +128,7 @@ Reports from new cars, real-car tests and code are all welcome: see [CONTRIBUTIN
 
 - Evergreen is a fork of HMG Leafia Plus, created by [VysseCodes](https://github.com/VysseCodes). Evergreen is maintained by [zpoon](https://github.com/zpoon). If the original work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
 - Merged into Evergreen: Hyundai Ioniq 5 US 260903 by [gdonaldson1676](https://github.com/gdonaldson1676) (upstream #179).
+- EV features: [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat) by [willemcvu](https://github.com/willemcvu), taken into Evergreen with their permission (history kept in `ev/`; see `NOTICE.md`).
 - Evergreen, like HMG Leafia Plus, is GPL-3.0 (see `LICENSE`).
 - It runs through [NEMESIS](https://github.com/xwtk/hmg_nemesis) by xwtk, which is AGPL-3.0. Parts derived from NEMESIS packages are listed in `NOTICE.md` and stay under their original licence.
 - Thanks to [W-Floyd](https://github.com/W-Floyd) for their help with this project.

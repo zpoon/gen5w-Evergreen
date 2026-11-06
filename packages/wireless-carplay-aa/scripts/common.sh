@@ -20,8 +20,10 @@ LOG=/data/nemesis/wireless.carplay.aa.log
 PARTS="1_projection 2_tbt 3_bridge 4_audio 5_menu"
 PARTS_REV="5_menu 4_audio 3_bridge 2_tbt 1_projection"
 # separate packages that change the same files (the ones this replaces, and
-# NEMESIS's own carplay.session) - they must be uninstalled first
-LEGACY="wireless.projection projection.tbt wireless.carplay.bt carplay.wifi.audio carplay.debuglog carplay.session"
+# NEMESIS's own carplay.session) - they must be uninstalled first. aa.ev.model
+# (egmp-aa-ev-feat) patches the same GPM and Android Auto library; its EV
+# features are built into this package now.
+LEGACY="wireless.projection projection.tbt wireless.carplay.bt carplay.wifi.audio carplay.debuglog carplay.session aa.ev.model"
 # optional add-ons that sit on top of this package - uninstall them before this one
 ADDONS="projection.cardata"
 
@@ -64,6 +66,7 @@ check_legacy() {
     for _id in $LEGACY; do
         if [ -d "/data/nemesis/apps/$_id" ]; then
             log "FAIL: separate package $_id is still installed"
+            [ "$_id" = aa.ev.model ] && log "  (aa.ev.model's EV routing, preconditioning and logs are built into Evergreen now; its logs on the head unit are kept)"
             _bad=1
         fi
     done
@@ -112,6 +115,22 @@ check_cluster_api() {
     return 1
 }
 # ---- failure help: on-screen message + automatic report for unknown head units
+# The head unit's Wi-Fi client shares the Wi-Fi chip with the hotspot that wireless
+# CarPlay/AA run over (one channel for both), and owners report drops every minute
+# or two while it is on. Logged at install; svc/wifi-client-warn.sh warns on the car.
+# Read only. Not when the owner chose the client (LEAFIA-WIFI-CLIENT, part 1's marker).
+log_wifi_client() {
+    local _v
+    _v=$(settings get global wifi_on 2>/dev/null) || return 0
+    case "$_v" in
+        1|2)
+            [ -f /data/nemesis/backup/wireless.projection/wifi_client ] && return 0
+            log "WARNING: the head unit's Wi-Fi client is on (wifi_on=$_v). Wireless CarPlay and Android Auto can drop every minute or two while it is; if they do, turn Wi-Fi off in the head unit's Wi-Fi settings."
+            ;;
+    esac
+    return 0
+}
+
 toast() {
     am broadcast -a com.hkmc.intent.action.TOAST \
         -e com.hkmc.intent.extra.TOAST_MESSAGE "$1" \
@@ -218,7 +237,16 @@ decide_mode() {
     MODE_WHY=""
     MODE_UPDATE=""
     if ! car_name >/dev/null; then
-        MODE_WHY="no build for this car/firmware yet ($(getprop ro.build.product 2>/dev/null))"
+        # no patch set of its own: the universal build fits if every projection
+        # app runs code we have patches for (scripts/universal.sh)
+        . ./scripts/build.sh
+        if check_cluster_api && universal_build && build_optional; then
+            log "car: no patch set of its own; universal build ($(getprop ro.build.product 2>/dev/null))"
+        else
+            clean_build
+            rm -rf patches/auto 2>/dev/null
+            MODE_WHY="no build for this car/firmware yet ($(getprop ro.build.product 2>/dev/null))"
+        fi
     elif ! check_cluster_api; then
         MODE_WHY="cluster API missing for turn-by-turn"
     else

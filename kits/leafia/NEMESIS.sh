@@ -60,6 +60,25 @@ COLLECT=$PRIV/collected.txt
 rsay() { echo "$1" >> "$REPORT"; }
 say() { echo "$1" >> "$SUM"; }
 section() { say ""; say "===== $1"; }
+# Wi-Fi client: on / off / unknown (settings answers only with Android up)
+wifi_client() {
+    local _v
+    _v=$(settings get global wifi_on 2>/dev/null) || { echo unknown; return; }
+    case "$_v" in 1|2) echo on ;; 0|3|null) echo off ;; *) echo unknown ;; esac
+}
+# the client's connection state from dumpsys wifi (state only: the line also
+# names the network, which is left out)
+wifi_client_state() {
+    local _l _s=""
+    while IFS= read -r _l; do
+        case "$_l" in
+            *mNetworkInfo*"state: "*) _s=${_l#*state: }; _s=${_s%%,*}; break ;;
+        esac
+    done <<WIFIEOF
+$(dumpsys wifi 2>/dev/null)
+WIFIEOF
+    echo "${_s:-unknown}"
+}
 # copy_file <src> <dst>: quiet, skips what is not there
 copy_file() { [ -f "$1" ] && cat "$1" > "$2" 2>/dev/null; true; }
 sum_file() {
@@ -111,6 +130,19 @@ for _f in /system/app/HKMC_GPM.apk /system/app/HKMC_GPM.odex /system/app/HKMC_Di
     fi
 done
 
+# the code inside each projection app's odex (lpatch odexdex): cars with the same
+# app code have the same md5 here even when their odex files differ, which is what
+# Evergreen's universal build matches on
+for _a in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
+    if "$LP" odexdex "/system/app/$_a.odex" "$TMP/code.dex" >/dev/null 2>&1; then
+        set -- $("$LP" md5 "$TMP/code.dex" 2>/dev/null)
+        rsay "code /system/app/$_a.odex md5=$1"
+    else
+        rsay "code /system/app/$_a.odex none"
+    fi
+    rm -f "$TMP/code.dex"
+done
+
 # byte-level recipe checks (RESULT / SPOT / NATIVE_NOTE lines)
 for _r in "$KIT"/recipes/*.recipe; do
     [ -f "$_r" ] && "$LP" check "$_r" >> "$REPORT" 2>&1
@@ -134,6 +166,9 @@ done
 pm list features 2>/dev/null | while IFS= read -r _l; do
     case "$_l" in *wifi*|*wireless*|*carplay*|*androidauto*|*hotspot*) echo "feature ${_l#feature:}" >> "$REPORT" ;; esac
 done
+
+# Wi-Fi client on? It shares the chip (and channel) with the projection hotspot
+rsay "wificlient $(wifi_client)"
 
 rm -f "$LP"
 rsay "end"
@@ -246,6 +281,19 @@ say "--- ndc tether status"
 ndc tether status >> "$SUM" 2>&1
 say "--- ndc tether interface list"
 ndc tether interface list >> "$SUM" 2>&1
+
+# The Wi-Fi client (Settings > Wi-Fi, NEMESIS Manager's WiFi button) shares the
+# chip with the hotspot, on one channel (no RSDB): its scans and joins can take the
+# hotspot off its channel, and owners report CarPlay dropping every minute or two.
+section "Wi-Fi client"
+_wc=$(wifi_client)
+say "wifi_on: $_wc ($(settings get global wifi_on 2>/dev/null))"
+say "client connection: $(wifi_client_state)"
+say "opted in at install (LEAFIA-WIFI-CLIENT): $([ -f /data/nemesis/backup/wireless.projection/wifi_client ] && echo yes || echo no)"
+say "chanspec: $(wl chanspec 2>&1)"
+if [ "$_wc" = on ]; then
+    say "WARNING: the Wi-Fi client is on. Wireless CarPlay and Android Auto can drop every minute or two while it is: turn Wi-Fi off in the head unit's Wi-Fi settings."
+fi
 
 # Turning on ADB over network (persist.service.adb.tcp.enable=1, e.g. the
 # NEMESIS "Enable ADB" package) makes the stock init give eth0 192.168.0.123,

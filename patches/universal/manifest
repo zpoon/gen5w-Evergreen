@@ -1,0 +1,11 @@
+# Universal patches (tools/mkuniversal.py): for cars without a patch set of their own.
+# app lines: <part> app <App> <md5 of the dex inside the stock .odex> <patch> <md5 of the result dex>
+# file lines: <part> file <library> <md5 of the stock library> <patch> <md5 of the result>
+# A car gets the full build only if every app and the library match a line here.
+2_tbt app HKMC_GPM fcd9285700d766d4a75ef9b089dba1e3 universal/HKMC_GPM.tbt.fcd92857.lpd 6124a666b2ae11883e91de85c19389d2
+2_tbt app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.tbt.77a5160a.lpd 3ed14600c11c6bf661515000ceec3544
+2_tbt app Iap2ServerApp 30a34f8331e3c74a18c0241a28a036ea universal/Iap2ServerApp.tbt.30a34f83.lpd 02368c2553da339abccf22e312d00fce
+2_tbt app HKMC_Navi_ExSL 7dc811232a9171a18c53c337672a4e9c universal/HKMC_Navi_ExSL.tbt.7dc81123.lpd 00a41389619fc7bd5d3ec9ebb967da9f
+3_bridge app Iap2ServerApp 30a34f8331e3c74a18c0241a28a036ea universal/Iap2ServerApp.bridge.30a34f83.lpd a4974bf76ad77c4954815ec94704ec5e
+3_bridge app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.bridge.77a5160a.lpd 5f24681fec4e0ff21f913f3372465524
+2_tbt file libautoreceiver_infobank.so 48ee793af8b86052503b8c952b034731 common/libautoreceiver_infobank.tbt.lpd c08410a8d32a615b1aa805cd8a243d52

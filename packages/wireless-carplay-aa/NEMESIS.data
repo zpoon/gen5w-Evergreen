@@ -2,11 +2,11 @@
 version=1.1
 id=wireless.carplay.aa
 name=Evergreen - Wireless CarPlay/AA
-type=application
-package-version=1.1.4
+type=application,service
+package-version=1.2.0
 short-desc="Wireless CarPlay and Android Auto, turn-by-turn on the cluster"
 detailed-desc="Evergreen continues the archived HMG Leafia Plus. Wireless CarPlay and Android Auto, with turn-by-turn on the cluster and HUD, on supported Gen5W cars. Other units with Wi-Fi get wireless Android Auto only. Uninstall restores stock files."
-os="CVEV.USA.*.260507,NEEV.USA.*.260507,NEEV.USA.*.260903,NEEV23.USA.*.260507,NEEV23.USA.*.260903,NEEV23SE.USA.*.260507,NEEV23SE.USA.*.260903,CVEV.CAN.*.260206,NEEV.CAN.*.260206,NQ5.USA.*.260507"
+os="CVEV.USA.*.260507,NEEV.USA.*.260507,NEEV.USA.*.260903,NEEV23.USA.*.260507,NEEV23.USA.*.260903,NEEV23SE.USA.*.260507,NEEV23SE.USA.*.260903,CVEV.CAN.*.260206,NEEV.CAN.*.260206,NQ5.USA.*.260507,NQ5HEV.USA.*.260507"
 models=any
 repository=https://github.com/zpoon/gen5w-Evergreen
 preinstall=scripts/pre.sh
@@ -17,3 +17,19 @@ preuninstall=scripts/preun.sh
 kind=sh
 path=bin/status.sh
 uid=root
+
+# EV logs to a USB drive with an egmp-aa-ev-logs folder (EV build only; idle otherwise)
+[service.0]
+name=evlog-offload
+kind=sh
+path=svc/evlog-offload.sh
+uid=root
+mode=restart
+
+# pop-up when the head unit's Wi-Fi client is on (it can make wireless CarPlay/AA drop)
+[service.1]
+name=wifi-client-warn
+kind=sh
+path=svc/wifi-client-warn.sh
+uid=root
+mode=restart

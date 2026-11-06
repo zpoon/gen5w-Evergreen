@@ -2,6 +2,9 @@ name: Release
 
 # Publishes a GitHub Release when a version tag is pushed:
 #   git tag -a v1.2.0 -m "v1.2.0" && git push origin v1.2.0
+# A beta tag, v<package-version>-beta.N (e.g. v1.2.0-beta.1), may be on any branch and
+# is published as a pre-release, which GitHub never shows as the latest release (the
+# site and README link to releases/latest). Plain v<package-version> tags must be on main.
 # CI runs in full first; nothing is published unless every check passes. The
 # release carries the installable package, the four Leafia kit sizes and SHA256SUMS, all
 # built from exactly the tagged commit.
@@ -31,7 +34,22 @@ jobs:
         with:
           fetch-depth: 0   # tags and history, so the package's BUILD stamp names the version
 
+      - name: Release kind
+        id: kind
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v*-beta.*)
+              n=${GITHUB_REF_NAME##*-beta.}
+              case "$n" in ''|*[!0-9]*) echo "beta tags end in -beta.<number>: $GITHUB_REF_NAME"; exit 1 ;; esac
+              echo "beta=true" >> "$GITHUB_OUTPUT"
+              echo "version=${GITHUB_REF_NAME%-beta.*}" >> "$GITHUB_OUTPUT" ;;
+            *-*) echo "unknown tag form $GITHUB_REF_NAME (use v<version> or v<version>-beta.<n>)"; exit 1 ;;
+            *)   echo "beta=false" >> "$GITHUB_OUTPUT"
+                 echo "version=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT" ;;
+          esac
+
       - name: Tag must be on main
+        if: steps.kind.outputs.beta != 'true'
         run: |
           git fetch origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
@@ -40,7 +58,7 @@ jobs:
       - name: Tag must match the package version
         run: |
           v=$(sed -n 's/^package-version=//p' packages/wireless-carplay-aa/NEMESIS.data | tr -d '"')
-          [ "$GITHUB_REF_NAME" = "v$v" ] || {
+          [ "${{ steps.kind.outputs.version }}" = "v$v" ] || {
             echo "tag $GITHUB_REF_NAME does not match package-version $v in packages/wireless-carplay-aa/NEMESIS.data"; exit 1; }
 
       - name: Build the package and the kit
@@ -59,6 +77,7 @@ jobs:
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
+          BETA: ${{ steps.kind.outputs.beta }}
         run: |
           cat > notes.md <<EOF
           ## Install
@@ -77,13 +96,16 @@ jobs:
           # attach the files to it and add the install notes under its own text, once.
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" release/* --clobber
+            # a beta stays a pre-release (and never "latest") even if the box was missed
+            [ "$BETA" = true ] && gh release edit "$GITHUB_REF_NAME" --prerelease --latest=false
             gh release view "$GITHUB_REF_NAME" --json body --jq .body > body.md
             if ! grep -q 'sha256sum -c SHA256SUMS' body.md; then
               { cat body.md; echo; cat notes.md; } > full.md
               gh release edit "$GITHUB_REF_NAME" --notes-file full.md
             fi
           else
-            gh release create "$GITHUB_REF_NAME" release/* \
+            pre=; [ "$BETA" = true ] && pre="--prerelease --latest=false"
+            gh release create "$GITHUB_REF_NAME" release/* $pre \
               --verify-tag --title "Evergreen $GITHUB_REF_NAME" \
               --notes-file notes.md --generate-notes
           fi

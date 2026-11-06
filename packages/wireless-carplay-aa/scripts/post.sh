@@ -3,7 +3,7 @@
 # every way out of this run starts again whatever it, or an earlier run, stopped
 trap apps_release EXIT
 log "postinstall wireless.carplay.aa"
-check_legacy || { toast "Install failed: uninstall the separate wireless/projection packages first, reboot, then try again."; exit 1; }
+check_legacy || { toast "Install failed: uninstall the separate wireless/projection or AA EV packages first, reboot, then try again."; exit 1; }
 check_remount || { toast "Install failed: could not unlock the system partition. Reboot the head unit and try again."; exit 1; }
 decide_mode
 if [ "$MODE" = basic ]; then
@@ -43,6 +43,7 @@ done
 clean_build
 echo "$PARTS" > "$PARTS_FILE" || log "WARN: could not record installed parts in $PARTS_FILE"
 adb_net_fix
+log_wifi_client
 apps_release
 sync
 if [ -n "$EV6_TEST_ROOT" ]; then log "test mode - not rebooting"; exit 0; fi
