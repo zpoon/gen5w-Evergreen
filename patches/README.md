@@ -9,7 +9,7 @@ One folder per car, plus `common/`. The head unit rebuilds the modified projecti
 | `neev/` | Hyundai Ioniq 5, US (`NEEV.USA.*`, `NEEV23.USA.*`) | 260507 |
 | `neev23_260903/` | Hyundai Ioniq 5, US (`NEEV23.USA.*`, `NEEV23SE.USA.*`, and 2022 `NEEV.USA.*` with the same stock files): ported from `neev/` | 260903 |
 | `neev_ca/` | Hyundai Ioniq 5, Canada (`NEEV.CAN.*`): its Android Auto library differs from the US one, so it carries its own library delta | 260206 |
-| `nq5/` | Kia Sportage, US (`NQ5.USA.*`): ported with `tools/port.py` from an owner's kit, with the Ioniq 5 as reference; every class is identical, only the APK/odex wrappers differ | 260507 |
+| `nq5/` | Kia Sportage and Sportage Hybrid, US (`NQ5.USA.*`, `NQ5HEV.USA.*`; the hybrid's stock files are identical): ported with `tools/port.py` from an owner's kit, with the Ioniq 5 as reference; every class is identical, only the APK/odex wrappers differ | 260507 |
 | `dl3hev/` | Kia K5 Hybrid, Korea: kept, not in `cars` (no Korean unit has shown Wi-Fi hardware) | 260902 |
 | `neev_kr/` | Hyundai Ioniq 5, Korea: kept, not in `cars` (as above) | 260902 |
 | `common/` | `libautoreceiver_infobank.so` for every car with the US stock library (a car with a different one has its own delta in its folder); `optional`: fixes applied wherever the stock file matches | |

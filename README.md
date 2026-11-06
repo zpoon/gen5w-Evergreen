@@ -14,6 +14,7 @@
 > - Hyundai Ioniq 5 US **2022** on firmware **260903**: same build as the 2023–2024 cars, since a 2022 owner's Leafia kit report shows identical stock files. **Supported**: v1.1.1 confirmed working on a 2022, turn-by-turn included.
 > - Hyundai Ioniq 5 US **2024 special edition** (`NEEV23SE`) on firmware **260507**: the same files as the 2022–2023 cars on 260507, per an owner's Leafia kit report ([upstream #182](https://github.com/VysseCodes/HMG-Leafia-Plus/issues/182)). Not yet confirmed on the car with Evergreen.
 > - Kia **Sportage** US on firmware **260507**: ported from an owner's Leafia kit ([#2](https://github.com/zpoon/gen5w-Evergreen/issues/2)). Its projection apps run the same code as the Ioniq 5 and EV6, so it gets the full build. **Supported**: confirmed working by the owner.
+> - Kia **Sportage Hybrid** US on firmware **260507**: every file our build patches is byte-identical to the Sportage's (owner's kit report, [#6](https://github.com/zpoon/gen5w-Evergreen/issues/6)), so it gets the same full build. **Testing**: not yet confirmed on the car.
 > - Package info in the NEMESIS 1.16 format, listing the firmware each car is supported on.
 >
 > If you'd rather use the original author's maintained project, see [HMG-API](https://github.com/VysseCodes/HMG-API).
