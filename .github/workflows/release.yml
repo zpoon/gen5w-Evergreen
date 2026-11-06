@@ -82,7 +82,7 @@ jobs:
           cat > notes.md <<EOF
           ## Install
 
-          1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) 1.15 or newer on the head unit (1.16 or newer recommended). Coming from the original Leafia (v1.0.5 or older)? Uninstall it in NEMESIS Manager and restart first.
+          1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) 1.15 or newer on the head unit (1.16 or newer recommended). Updating Evergreen on NEMESIS 1.16 or newer? Install over the old version, no need to uninstall first. Coming from the original Leafia (v1.0.5 or older)? Uninstall it in NEMESIS Manager and restart first.
           2. Unzip **Evergreen_Wireless_CarPlay_AA-$GITHUB_REF_NAME.zip** onto the root of an empty exFAT or FAT32 USB drive.
           3. Car on, plug in the drive and confirm the install. It takes a few minutes. When the head unit restarts, remove the drive: leaving it in can stop CarPlay or Android Auto connecting the first time.
 
