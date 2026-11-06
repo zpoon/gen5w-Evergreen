@@ -49,6 +49,7 @@ The Korean sets (`patches/dl3hev`, `patches/neev_kr`) are kept but not in `cars`
 | `NEEV.USA.` / `NEEV23.USA.` / `NEEV23SE.USA.` | neev | Hyundai Ioniq 5 US 2022/2023, 2024 SE (260507) | app code identical to EV6, different APK wrappers. The 2024 SE on 260507 has identical stock files (kit report, upstream #182); not yet tested on that car |
 | `NEEV23.USA.0000.V016.010.260903` / `NEEV23SE.USA.0000.V016.010.260903` / `NEEV.USA.0000.V016.010.260903` | neev23_260903 | Hyundai Ioniq 5 US 260903 (2022–2024) | ported from neev; listed first so it wins over `NEEV23.USA.` / `NEEV.USA.`. The 2022 (`NEEV.USA.`) has identical stock files (kit report); v1.1.1 confirmed on a 2022 (turn-by-turn) |
 | `NQ5.USA.` | nq5 | Kia Sportage US 260507 | ported with `port.py` (reference: the Ioniq 5, `--ref-variant neev`) from an owner's port kit (issue #2): every class identical, only APK/odex wrappers differ, so the builds reuse the Ioniq 5's dex; own menu fix (`HKMC_BtSettings.menu.8c6f5012`); owner confirmed the v1.1.4 test build works (2023 Sportage) |
+| `NQ5HEV.USA.` | nq5 | Kia Sportage Hybrid US 260507 | every stock file the nq5 set patches (and BtSettings, so the menu fix fits) byte-identical to the Sportage's (kit report, issue #6); not yet tested on that car |
 | `NEEV.CAN.` | neev_ca | Hyundai Ioniq 5 Canada 260206 | apps ported with `port.py`; its AA library (a0bea1c4) differs from the US one, so the library patch was hand-ported (`neev_ca/libautoreceiver_infobank.tbt.lpd`); not yet tested on a real car |
 
 ## Gotchas learned the hard way

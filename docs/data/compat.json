@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25",
+  "updated": "2026-11-05",
   "repo": "zpoon/gen5w-Evergreen",
   "variants": [
     {
@@ -341,6 +341,58 @@
         "Sandbox install and uninstall on this firmware's own files"
       ],
       "notes": "Ported from an owner's Leafia kit (issue #2): its projection apps run the same code as the Ioniq 5 and EV6 on 260507, only the APK and odex wrappers differ.",
+      "stock": {
+        "/system/app/HKMC_DiPO.apk": "0b04c9d790dfe80e5d33c3be4f3b3f3b",
+        "/system/app/HKMC_DiPO.odex": "6953fa525b2a2fe4252250f38296c837",
+        "/system/app/HKMC_GPM.apk": "c62af648f758dcb01a0acb6c2b901ebf",
+        "/system/app/HKMC_GPM.odex": "c4f751a36be916e72cf93df0436d63c2",
+        "/system/app/HKMC_Navi_ExSL.apk": "19559e742b1d21550aa8f0324e8e6d36",
+        "/system/app/HKMC_Navi_ExSL.odex": "5b55bdee8821d049cedc162b862f64f9",
+        "/system/app/Iap2ServerApp.apk": "fde208439f993986a60396e759797a01",
+        "/system/app/Iap2ServerApp.odex": "f3e22d94150de40f4ed603798358b0e3",
+        "/system/lib/libautoreceiver_infobank.so": "48ee793af8b86052503b8c952b034731"
+      },
+      "built": {
+        "/system/app/HKMC_BtSettings.apk": [
+          "575ac7eb4e01e0111b444697b9f6a4e8",
+          "93ecaa97597a79be2a10728e45c72b33",
+          "b977e268fbe73cb5637c4413647a7dea",
+          "cd98c36db6857ed174757c6010a36494",
+          "e7c90e78f45f7e6b9c90ddd7a238b566"
+        ],
+        "/system/app/HKMC_DiPO.apk": [
+          "00447fe4ec7b0f6c3cab38c0d7a944bf",
+          "fc86ee3c9a530274e63c059e70fb5451"
+        ],
+        "/system/app/HKMC_GPM.apk": [
+          "429a1205e0d7430a04c9b08d1c64c78b"
+        ],
+        "/system/app/HKMC_Navi_ExSL.apk": [
+          "b1fc88d42954c41e7944e9247647e9ad"
+        ],
+        "/system/app/Iap2ServerApp.apk": [
+          "75d7fea4d2009be6aa5c840118f58c94",
+          "7e90fa7d8a161ade71e11dc15e56c410"
+        ],
+        "/system/lib/libautoreceiver_infobank.so": [
+          "c08410a8d32a615b1aa805cd8a243d52"
+        ]
+      }
+    },
+    {
+      "id": "kia-sportage-hybrid-us-260507",
+      "name": "Kia Sportage Hybrid",
+      "region": "US",
+      "chip": "TCC803x",
+      "product_prefix": "NQ5HEV.USA.",
+      "years": "2023",
+      "firmware": "V015.012.260507",
+      "status": "testing",
+      "verified": [
+        "Owner's kit report (issue #6): every file the build patches is byte-identical to the Sportage's on 260507",
+        "Sandbox install and uninstall on the Sportage's files under this car's product id"
+      ],
+      "notes": "Same projection files as the Sportage on 260507, so it uses the Sportage's build. Not yet confirmed on the car.",
       "stock": {
         "/system/app/HKMC_DiPO.apk": "0b04c9d790dfe80e5d33c3be4f3b3f3b",
         "/system/app/HKMC_DiPO.odex": "6953fa525b2a2fe4252250f38296c837",
