@@ -103,6 +103,8 @@ It writes `LEAFIA/` on the drive:
 | `private/stock/` | Stock framework, CarPlay/projection apps and libraries (Hyundai/Kia files), used to port the package | **Privately, only when asked** |
 | `private/keys/` | Firmware key files | **Privately, only when asked; never posted** |
 
+**Sending the `private/` folder:** zip the whole `LEAFIA/private` folder and upload it to the [Evergreen upload link](https://www.dropbox.com/request/qyn2fyjbavw0h0iely9u). It's upload-only: nobody else can see or download what you send, and no email address is needed. Name the zip after your issue (for example `issue-9-palisade.zip`), then comment "sent" on your issue. Never attach it to an issue or post its link there: anything on an issue is public.
+
 ### Data policy
 
 - **Public** (issues, this repo): the kit's `public/` folder, recipes, checksums, compatibility data.

@@ -23,7 +23,10 @@ crash record). Use the one a maintainer asked for.
                       it to your GitHub issue.
 
    LEAFIA/private   Never post this. Only send it privately, and only when a
-                    maintainer asks for it:
+                    maintainer asks for it: zip the folder and upload it to
+                    https://www.dropbox.com/request/qyn2fyjbavw0h0iely9u
+                    (upload-only: nobody else can see it), then comment
+                    "sent" on your GitHub issue.
                     - logs/   Android and kernel logs: can include your
                               phone's name or Bluetooth address
                     - stock/  Hyundai/Kia system files, used to port the
