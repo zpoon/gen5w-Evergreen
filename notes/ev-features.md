@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **built, waiting for a car test**. The EV GPM and library for the Ioniq 5 US 260507 (`neev` set, so the 2022, 2023 and 2024 SE on 260507) were built from the maintainer's stock files on 2026-11-04 and are in `patches/neev/manifest` as `+ev` lines; package-version 1.2.0. Off-car: the mock head unit installs the EV build by default and the plain one with `EVERGREEN-NO-EV`, and both uninstall to byte-identical stock (mksh). Every other car builds as before.
+Status: **released in 1.2.0, confirmed on a car** (EV routing, preconditioning, drive log). The EV GPM and library for the Ioniq 5 US 260507 (`neev` set, so the 2022, 2023 and 2024 SE on 260507) were built from the maintainer's stock files on 2026-11-04 and are in `patches/neev/manifest` as `+ev` lines; package-version 1.2.0. Off-car: the mock head unit installs the EV build by default and the plain one with `EVERGREEN-NO-EV`, and both uninstall to byte-identical stock (mksh). Every other car builds as before.
 
 ## Goal
 

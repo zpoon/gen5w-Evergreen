@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-05",
+  "updated": "2026-11-06",
   "repo": "zpoon/gen5w-Evergreen",
   "variants": [
     {
@@ -387,12 +387,12 @@
       "product_prefix": "NQ5HEV.USA.",
       "years": "2023",
       "firmware": "V015.012.260507",
-      "status": "testing",
+      "status": "supported",
       "verified": [
-        "Owner's kit report (issue #6): every file the build patches is byte-identical to the Sportage's on 260507",
-        "Sandbox install and uninstall on the Sportage's files under this car's product id"
+        "Confirmed working on the car with 1.2.0",
+        "Owner's kit report (issue #6): every file the build patches is byte-identical to the Sportage's on 260507"
       ],
-      "notes": "Same projection files as the Sportage on 260507, so it uses the Sportage's build. Not yet confirmed on the car.",
+      "notes": "Same projection files as the Sportage on 260507, so it uses the Sportage's build.",
       "stock": {
         "/system/app/HKMC_DiPO.apk": "0b04c9d790dfe80e5d33c3be4f3b3f3b",
         "/system/app/HKMC_DiPO.odex": "6953fa525b2a2fe4252250f38296c837",
