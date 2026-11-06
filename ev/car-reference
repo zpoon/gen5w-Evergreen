@@ -1,0 +1,16 @@
+# What the EV build was made and checked on: Hyundai Ioniq 5 US 260507 (neev set).
+# md5 of each file as the Leafia kit reports it (its "file" and "code" lines).
+# tools/ev-check.py compares a car's kit report with these.
+#
+# framework: the EV code sends commands and reads the battery only when these match
+#   (Precond.compatible() checks automotive.odex and automotive-service.odex by
+#   sha256, EvCar.HCAN_MD5 checks hcan by md5). Another framework needs its numbers
+#   found and its own vehicle-command review.
+# code: the code inside the stock GPM odex (lpatch odexdex); the same code means the
+#   EV GPM dex fits that car unchanged.
+# file: the stock Android Auto library the EV library patch is made from.
+framework /system/framework/automotive.odex 85f94dc6b9f7b331b8edcb0ec2183261
+framework /system/framework/automotive-service.odex 23e123f1cc296943b32391a70b2f20f5
+framework /system/framework/com.hkmc.ext.hcan.odex c4638b2befbabce418d2664f4e7ec304
+code /system/app/HKMC_GPM.odex fcd9285700d766d4a75ef9b089dba1e3
+file /system/lib/libautoreceiver_infobank.so 48ee793af8b86052503b8c952b034731
