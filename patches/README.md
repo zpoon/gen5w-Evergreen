@@ -10,6 +10,7 @@ One folder per car, plus `common/`. The head unit rebuilds the modified projecti
 | `neev23_260903/` | Hyundai Ioniq 5, US (`NEEV23.USA.*`, `NEEV23SE.USA.*`, and 2022 `NEEV.USA.*` with the same stock files): ported from `neev/` | 260903 |
 | `neev_ca/` | Hyundai Ioniq 5, Canada (`NEEV.CAN.*`): its Android Auto library differs from the US one, so it carries its own library delta | 260206 |
 | `nq5/` | Kia Sportage and Sportage Hybrid, US (`NQ5.USA.*`, `NQ5HEV.USA.*`; the hybrid's stock files are identical): ported with `tools/port.py` from an owner's kit, with the Ioniq 5 as reference; every class is identical, only the APK/odex wrappers differ | 260507 |
+| `lx2pe/` | Hyundai Palisade, US (`LX2PE.USA.*`, 260903): CarPlay and Android Auto apps ported from the Ioniq 5 US 260507 build with `port.py`; its navigation app is the same code as the Ioniq 5's on 260903, so it takes that build (DiPO `service/q` merged by hand: accessor renames only around our fix). Own menu fix (`HKMC_BtSettings.menu.04adbc53`). |
 | `dl3hev/` | Kia K5 Hybrid, Korea: kept, not in `cars` (no Korean unit has shown Wi-Fi hardware) | 260902 |
 | `neev_kr/` | Hyundai Ioniq 5, Korea: kept, not in `cars` (as above) | 260902 |
 | `universal/` | For cars with no set of their own: patches keyed to the **code inside** each stock `.odex` (`lpatch odexdex`) rather than the `.odex` file, so they fit every car whose apps run that code, whatever its framework. `manifest`: `<part> app <App> <code md5> <patch> <result dex md5>` and `<part> file <library> <stock md5> <patch> <result md5>`. Made with `tools/mkuniversal.py <stock dir> <set>`; the installer (`scripts/universal.sh`) uses them only if every app and the library match, and then writes the car's own set to `patches/auto/` on the unit | any |
@@ -53,6 +54,8 @@ A car's own set rebuilds each app from that car's exact stock `.odex`. An `.odex
 On a unit whose product id isn't in `cars`, the installer takes the code md5 of each app the universal manifest names, and the library's md5. If every one has a line, it builds those apps (`odexdex` → `delta` → `zipadd` with the unit's own APK) and writes `patches/auto/{stock,manifest,product}`, this unit's own checksums in the usual set format, so the parts install and uninstall as for any car. One mismatch and nothing is generated: basic mode, as before.
 
 After a new port, add its code to the universal list too: `tools/mkuniversal.py <stock dir> <set>` (lines for code already listed are replaced). EV builds (`+ev`) stay per car.
+
+The list holds more than one version of an app: 260507 (from `neev`) and 260903 (from `lx2pe`: GPM, DiPO and the navigation app; iAP2 is the same code on both). Each app is matched on its own, so a car whose apps mix versions (as the Palisade's do: 260903 GPM, DiPO and navigation with the 260507 iAP2) still gets the full build, each app patched for its own code.
 
 ## Optional fixes (`common/optional`)
 

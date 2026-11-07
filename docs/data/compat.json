@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06",
+  "updated": "2026-11-07",
   "repo": "zpoon/gen5w-Evergreen",
   "variants": [
     {
@@ -30,6 +30,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -81,6 +82,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -139,6 +141,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -191,6 +194,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -249,6 +253,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -302,6 +307,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -354,6 +360,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -406,6 +413,7 @@
       },
       "built": {
         "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
           "b977e268fbe73cb5637c4413647a7dea",
@@ -430,17 +438,72 @@
           "c08410a8d32a615b1aa805cd8a243d52"
         ]
       }
+    },
+    {
+      "id": "hyundai-palisade-us-260903",
+      "name": "Hyundai Palisade",
+      "region": "US",
+      "chip": "TCC803x",
+      "product_prefix": "LX2PE.USA.",
+      "years": "2025",
+      "firmware": "V016.010.260903",
+      "status": "testing",
+      "verified": [
+        "Sandbox install and uninstall on this car's own files (owner's port kit, issue #9)"
+      ],
+      "notes": "Ported from the Ioniq 5: its CarPlay and Android Auto apps from the US 260507 build, and its navigation app, which is the same code as the Ioniq 5's on 260903, from that build. Not yet confirmed on the car.",
+      "stock": {
+        "/system/app/HKMC_GPM.apk": "1178836900cbd662b6d26e0ffd8bbab4",
+        "/system/app/HKMC_GPM.odex": "d85a9abde998f310ba287b7c8a91293f",
+        "/system/app/HKMC_DiPO.apk": "088ab6f262e45fba6d22ca3eeb0783da",
+        "/system/app/HKMC_DiPO.odex": "fd5cb1fc065bac2743424f364dc830ac",
+        "/system/app/Iap2ServerApp.apk": "fde208439f993986a60396e759797a01",
+        "/system/app/Iap2ServerApp.odex": "0da50cf18b3a555997507c0312adc061",
+        "/system/app/HKMC_Navi_ExSL.apk": "98ed8950556d945e37de1176cbb01f9e",
+        "/system/app/HKMC_Navi_ExSL.odex": "0e210f57d1c322812762b2b6158d98f2",
+        "/system/lib/libautoreceiver_infobank.so": "48ee793af8b86052503b8c952b034731"
+      },
+      "built": {
+        "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
+          "575ac7eb4e01e0111b444697b9f6a4e8",
+          "93ecaa97597a79be2a10728e45c72b33",
+          "b977e268fbe73cb5637c4413647a7dea",
+          "cd98c36db6857ed174757c6010a36494",
+          "e7c90e78f45f7e6b9c90ddd7a238b566"
+        ],
+        "/system/app/HKMC_DiPO.apk": [
+          "53e916ed48e860da5f95edf91dfdfa46",
+          "9a60b437a44164cee068d0c2d429c193"
+        ],
+        "/system/app/HKMC_GPM.apk": [
+          "04c8464542e3c6e371b70bc59a167f23"
+        ],
+        "/system/app/HKMC_Navi_ExSL.apk": [
+          "e01f7ef64d1d824930b656129f77c6bc"
+        ],
+        "/system/app/Iap2ServerApp.apk": [
+          "75d7fea4d2009be6aa5c840118f58c94",
+          "7e90fa7d8a161ade71e11dc15e56c410"
+        ],
+        "/system/lib/libautoreceiver_infobank.so": [
+          "c08410a8d32a615b1aa805cd8a243d52"
+        ]
+      }
     }
   ],
   "universal": {
     "code": {
       "/system/app/HKMC_DiPO.odex": [
-        "77a5160a52ab0f93ab2b14db884b3343"
+        "77a5160a52ab0f93ab2b14db884b3343",
+        "8a71b8287cdc9683495ff19dab6c932b"
       ],
       "/system/app/HKMC_GPM.odex": [
+        "b0a8811e819ffa2cdb87a2dbc54905ec",
         "fcd9285700d766d4a75ef9b089dba1e3"
       ],
       "/system/app/HKMC_Navi_ExSL.odex": [
+        "16e7883de1f5382e086cadca85f73800",
         "7dc811232a9171a18c53c337672a4e9c"
       ],
       "/system/app/Iap2ServerApp.odex": [
