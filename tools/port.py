@@ -226,6 +226,11 @@ def main():
                 if c in ce:
                     m = rename_map(norm_lines(os.path.join(E, c)), norm_lines(os.path.join(K, c)))
                     if m is not None: gmap.update(m); renamed.add(c)
+            # a class we changed that the reference car has but this car doesn't was renamed or
+            # removed here (e.g. the 260903 navigation app's b/i -> util/NaviConfig): carrying the
+            # reference's copy over would leave the edit in a class nothing on this car uses
+            for c in sorted(c for c in changed if c in ce and c not in ck):
+                manual.append('%s %s: %s (not on this car: renamed or removed)' % (part, n, c))
             out = os.path.join(work, '%s_%s_new' % (part, n))
             if os.path.isdir(out): shutil.rmtree(out)
             shutil.copytree(T, out)
