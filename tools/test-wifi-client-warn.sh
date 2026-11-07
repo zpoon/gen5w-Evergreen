@@ -22,7 +22,7 @@ run() {   # run <states...>: first state before pass 1, the rest after each pass
     rm -f "$T/toasts" "$T/out"; echo 0 > "$T/n"
     : > "$T/states"; for s in "$@"; do echo "$s" >> "$T/states"; done
     "$T/bin/sleep"
-    WIFIWARN_PASSES=$# "$SH" "$T/warn.sh" >> "$T/out" 2>&1
+    WIFIWARN_REPEAT=1 WIFIWARN_PASSES=$# "$SH" "$T/warn.sh" >> "$T/out" 2>&1
 }
 toasts() { [ -f "$T/toasts" ] && grep -c TOAST "$T/toasts" || echo 0; }
 
@@ -46,4 +46,8 @@ ok "pop-up says what to do" 'run 0 1 1; grep -q "turn Wi-Fi off" "$T/toasts"'
 mkdir -p "$T/data/nemesis/backup/wireless.projection"; : > "$T/data/nemesis/backup/wireless.projection/wifi_client"
 run 0 1 1 1
 ok "opted in with LEAFIA-WIFI-CLIENT: no pop-up" '[ "$(toasts)" = 0 ]'
+rm -f "$T/data/nemesis/backup/wireless.projection/wifi_client"
+rm -f "$T/toasts"; echo 0 > "$T/n"; printf '0\n1\n1\n' > "$T/states"; "$T/bin/sleep"
+WIFIWARN_PASSES=3 "$SH" "$T/warn.sh" > "$T/out" 2>&1
+ok "default: each warning is sent 3 times in a row (about 10 s on screen)" '[ "$(toasts)" = 3 ]'
 [ $fail = 0 ]
