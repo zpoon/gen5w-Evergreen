@@ -81,7 +81,7 @@ See the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/). The data
 
 **Navigation trims only.** Gen5W is the head unit in trims with built-in navigation. Trims without navigation have a different head unit ("Display Audio", for example "Display Audio Gen2V" on the Tucson) that NEMESIS and this package don't support.
 
-**Korea:** reports from Korean head units are welcome, but we have yet to confirm a single working Korean car. Every Korean unit checked so far has had no Wi-Fi hardware, which wireless CarPlay and Android Auto need.
+**Korea:** the Kia EV6 on 260902 is the first Korean head unit with a working Wi-Fi chip ([#11](https://github.com/zpoon/gen5w-Evergreen/issues/11)). It has a build in testing: wireless CarPlay with turn-by-turn on the cluster and HUD, and wireless Android Auto. Android Auto turn-by-turn on the cluster isn't in it yet, because its Android Auto library is a Korean build that needs its own patch. Every other Korean unit checked so far (Kia K5 Hybrid, Hyundai Ioniq 5) had no Wi-Fi hardware. Reports from Korean cars are welcome.
 
 ## The Leafia kit (run from a USB drive through NEMESIS)
 

@@ -440,7 +440,11 @@ apply_perm() {
 
 # the stock featurexml.cfg removed the hotspot feature at boot (an active
 # "-.../com.hkmc.software.wifihotspot.xml" line; US firmware has it commented out)
+# The hotspot feature is missing: featurexml.cfg removes it (a "-" line, Korean K5 /
+# Ioniq 5), or the firmware never ships the file at all (Korean EV6 260902, where the
+# line is already commented "#-" and the file is just absent). US units have it.
 hotspot_was_removed() {
+    [ -f "$BACKUP_DIR/perm.$HOTSPOT_XML.absent" ] && return 0
     [ -s "$BACKUP_DIR/featurexml.cfg" ] && grep -q '^-.*wifihotspot\.xml' "$BACKUP_DIR/featurexml.cfg"
 }
 
@@ -545,7 +549,7 @@ apply_all() {
         putline 1 > "$BACKUP_DIR/wifi_client" 2>/dev/null || true
         log "Wi-Fi client on (LEAFIA-WIFI-CLIENT on the install drive): Wi-Fi menu and client + wireless mode"
     fi
-    # Firmware that removed the hotspot feature (Korean) also lacks the Wi-Fi feature
+    # Firmware without the hotspot feature (Korean) also lacks the Wi-Fi feature
     # files: add the missing ones there, so the hotspot (and the Wi-Fi chip) can start.
     # US units already have both, and are left as they are.
     if hotspot_was_removed; then
