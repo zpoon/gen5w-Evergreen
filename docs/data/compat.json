@@ -495,12 +495,15 @@
   "universal": {
     "code": {
       "/system/app/HKMC_DiPO.odex": [
-        "77a5160a52ab0f93ab2b14db884b3343"
+        "77a5160a52ab0f93ab2b14db884b3343",
+        "8a71b8287cdc9683495ff19dab6c932b"
       ],
       "/system/app/HKMC_GPM.odex": [
+        "b0a8811e819ffa2cdb87a2dbc54905ec",
         "fcd9285700d766d4a75ef9b089dba1e3"
       ],
       "/system/app/HKMC_Navi_ExSL.odex": [
+        "16e7883de1f5382e086cadca85f73800",
         "7dc811232a9171a18c53c337672a4e9c"
       ],
       "/system/app/Iap2ServerApp.odex": [

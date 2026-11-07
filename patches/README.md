@@ -55,6 +55,8 @@ On a unit whose product id isn't in `cars`, the installer takes the code md5 of 
 
 After a new port, add its code to the universal list too: `tools/mkuniversal.py <stock dir> <set>` (lines for code already listed are replaced). EV builds (`+ev`) stay per car.
 
+The list holds more than one version of an app: 260507 (from `neev`) and 260903 (from `lx2pe`: GPM, DiPO and the navigation app; iAP2 is the same code on both). Each app is matched on its own, so a car whose apps mix versions (as the Palisade's do: 260903 GPM, DiPO and navigation with the 260507 iAP2) still gets the full build, each app patched for its own code.
+
 ## Optional fixes (`common/optional`)
 
 Fixes that aren't tied to one car's projection apps, listed in `common/optional` in the manifest's line format. The head unit applies each one only when its stock file is the exact one the `.lpd` was made from; otherwise it logs a skip and the install carries on.
