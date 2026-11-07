@@ -18,7 +18,9 @@ for _name in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
         exit 1
     fi
 done
-if [ ! -s "$FILES/libautoreceiver_infobank.so" ]; then
+if no_lib; then
+    log "no library patch for this car yet: the receiver library stays stock"
+elif [ ! -s "$FILES/libautoreceiver_infobank.so" ]; then
     log "FAIL: missing $FILES/libautoreceiver_infobank.so"
     exit 1
 fi

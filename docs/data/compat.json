@@ -33,6 +33,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -85,6 +86,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -144,6 +146,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -197,6 +200,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -256,6 +260,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -310,6 +315,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -363,6 +369,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -416,6 +423,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -468,6 +476,7 @@
           "4b56912c836261cafecad6ae2b1407a6",
           "575ac7eb4e01e0111b444697b9f6a4e8",
           "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
           "b977e268fbe73cb5637c4413647a7dea",
           "cd98c36db6857ed174757c6010a36494",
           "e7c90e78f45f7e6b9c90ddd7a238b566"
@@ -488,6 +497,56 @@
         ],
         "/system/lib/libautoreceiver_infobank.so": [
           "c08410a8d32a615b1aa805cd8a243d52"
+        ]
+      }
+    },
+    {
+      "id": "kia-ev6-kr-260902",
+      "name": "Kia EV6",
+      "region": "KR",
+      "chip": "TCC803x",
+      "product_prefix": "CVEV.KOR.",
+      "firmware": "V039.001.260902",
+      "status": "testing",
+      "verified": [
+        "Wi-Fi chip starts and runs the hotspot (owner's kernel log, issue #11)",
+        "Sandbox install and uninstall on this car's own files (owner's port kit, issue #11)"
+      ],
+      "notes": "The first Korean car with working Wi-Fi. CarPlay and Android Auto apps ported from the Ioniq 5 US 260507 build. Android Auto turn-by-turn on the cluster isn't in this build yet: its Android Auto library is a Korean build and needs its own patch. Wireless CarPlay with turn-by-turn, and wireless Android Auto, are. Not yet confirmed on the car.",
+      "stock": {
+        "/system/app/HKMC_GPM.apk": "9d7a6b5f74f2fbb56130e7269c9cf5a0",
+        "/system/app/HKMC_GPM.odex": "c060a43d7a9234acf3319fa05dd263b1",
+        "/system/app/HKMC_DiPO.apk": "3573b51da6d4407466594226d9368c2e",
+        "/system/app/HKMC_DiPO.odex": "caf67d3b49d8f8e5cbed4d46062bdf62",
+        "/system/app/Iap2ServerApp.apk": "fde208439f993986a60396e759797a01",
+        "/system/app/Iap2ServerApp.odex": "a44a337b979f2af5251d7d30b75fe5e4",
+        "/system/app/HKMC_Navi_ExSL.apk": "b813acef42403787ed887c94981b32d4",
+        "/system/app/HKMC_Navi_ExSL.odex": "77e3b46f64b0caac5ee9b9946b70ee94",
+        "/system/lib/libautoreceiver_infobank.so": "c4fbccdf63f7d823f24010afec43c937"
+      },
+      "built": {
+        "/system/app/HKMC_BtSettings.apk": [
+          "4b56912c836261cafecad6ae2b1407a6",
+          "575ac7eb4e01e0111b444697b9f6a4e8",
+          "93ecaa97597a79be2a10728e45c72b33",
+          "a8ca2abd8235c57a50d580aed8a2de3e",
+          "b977e268fbe73cb5637c4413647a7dea",
+          "cd98c36db6857ed174757c6010a36494",
+          "e7c90e78f45f7e6b9c90ddd7a238b566"
+        ],
+        "/system/app/HKMC_DiPO.apk": [
+          "adf8cbc2dea37f9da4da7e24ca5305e2",
+          "dafd803df6f6819954028083ca0904d4"
+        ],
+        "/system/app/HKMC_GPM.apk": [
+          "fb13ee12a2da13e48c2530aeb1acda24"
+        ],
+        "/system/app/HKMC_Navi_ExSL.apk": [
+          "6e8ca89dfe7e2c9b4d2e2802596106bd"
+        ],
+        "/system/app/Iap2ServerApp.apk": [
+          "75d7fea4d2009be6aa5c840118f58c94",
+          "7e90fa7d8a161ade71e11dc15e56c410"
         ]
       }
     }

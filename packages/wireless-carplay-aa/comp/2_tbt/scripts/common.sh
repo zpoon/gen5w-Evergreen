@@ -116,8 +116,15 @@ receiver_patched() {
     grep navbridge1 "$1" >/dev/null 2>&1
 }
 
+# no-lib: scripts/build.sh found no library line for this car (its Android Auto library
+# has no patch yet), so the library is left stock
+no_lib() {
+    [ -f "$FILES/no-lib" ]
+}
+
 snapshot_lib() {
     local _bak
+    no_lib && return 0
     _bak="$BACKUP_DIR/$LIB_BASE"
     if [ -s "$_bak" ]; then
         log "snapshot exists for receiver - keeping original"
@@ -140,6 +147,10 @@ snapshot_lib() {
 apply_lib() {
     local _src
     _src="$FILES/$LIB_BASE"
+    if no_lib; then
+        log "receiver library left stock (no library patch for this car yet)"
+        return 0
+    fi
     if [ ! -s "$_src" ]; then
         log "FAIL: missing $_src"
         return 1
