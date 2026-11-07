@@ -26,8 +26,18 @@ log() {
     echo "$(date) $1"
 }
 
+# The head unit's pop-up (automotive-service MiscService) is a plain Android toast
+# with a fixed length (LENGTH_LONG, about 3.5 s) and no duration setting. Toasts
+# queue and play back to back, so the warning is sent REPEAT times in a row to stay
+# on screen longer (3 = about 10 s).
+REPEAT=${WIFIWARN_REPEAT:-3}
+
 toast() {
-    am broadcast -a com.hkmc.intent.action.TOAST -e com.hkmc.intent.extra.TOAST_MESSAGE "$1" --ez com.hkmc.intent.extra.TOAST_POPUPSHOWING true >/dev/null 2>&1 || true
+    local _i=0
+    while [ "$_i" -lt "$REPEAT" ]; do
+        am broadcast -a com.hkmc.intent.action.TOAST -e com.hkmc.intent.extra.TOAST_MESSAGE "$1" --ez com.hkmc.intent.extra.TOAST_POPUPSHOWING true >/dev/null 2>&1 || true
+        _i=$((_i + 1))
+    done
 }
 
 # on / off / empty (no answer: Android down). 1 = on, 2 = on despite airplane
