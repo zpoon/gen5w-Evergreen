@@ -130,7 +130,7 @@ function verdict(r) {
     why: "Wi-Fi is on. It shares the Wi-Fi chip with the hotspot wireless CarPlay and Android Auto use, and can make them drop every minute or two. If that happens, turn Wi-Fi off in the head unit's Wi-Fi settings." });
   let overall;
   if (!r.valid) overall = ["no", "This doesn't look like a Leafia kit report."];
-  else if (/\.KOR\./.test(r.props["ro.build.product"] || "")) overall = ["unknown", "Korean head unit: we have yet to confirm a single working Korean car. Every Korean unit checked so far has had no Wi-Fi hardware, which wireless CarPlay and Android Auto need. Please share your report anyway; if this unit has a working Wi-Fi chip, that changes things."];
+  else if (/\.KOR\./.test(r.props["ro.build.product"] || "")) overall = ["unknown", "Korean head unit: not supported yet. Some Korean units have no Wi-Fi hardware, which wireless CarPlay and Android Auto need, but a Korean Hyundai Palisade has working Wi-Fi and runs wireless Android Auto after some manual fixes, and we're working on making that automatic. Please share your report."];
   else if (allGood && leafiaInstalled(r, v)) overall = ["ok", "Evergreen (or HMG Leafia Plus) is already installed on this unit, with its build for the " + v.name + "."];
   else if (v && !(r.props["ro.build.product"] || "").endsWith(v.firmware)) overall = ["build", "This head unit runs firmware "
     + (r.props["ro.build.product"] || "?").split(".").pop() + ". We only support each car's newest firmware (" + v.firmware.split(".").pop()

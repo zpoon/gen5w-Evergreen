@@ -67,7 +67,7 @@ See the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/) for the f
 
 **Navigation trims only.** Cars without built-in navigation have a different head unit ("Display Audio") that isn't supported.
 
-**Korea:** no Korean car has been confirmed working yet. Every Korean head unit checked so far had no Wi-Fi hardware. Reports are still welcome.
+**Korea:** not supported yet, but it's possible. Some Korean head units have no Wi-Fi hardware (the K5 Hybrid we checked), but a Korean Hyundai Palisade has working Wi-Fi, and its owner got wireless Android Auto running with some manual fixes. We're working on making that automatic; until then, Evergreen installs basic mode on Korean cars. Reports are welcome.
 
 ## Install
 
