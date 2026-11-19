@@ -458,6 +458,11 @@ done
 for n in HKMC_DiPO Iap2ServerApp HKMC_GPM HKMC_Navi_ExSL PhoneProjection HKMC_BtSettings; do
     for e in apk odex; do [ -f "/system/app/$n.$e" ] && grab "/system/app/$n.$e" "$STOCK/app/"; done
 done
+# the system pop-ups (com.mobis.system), including the phone projection "continue setup
+# on car screen" one, which opens a settings screen some builds don't have
+for f in /system/app/Mobis_System*.apk /system/app/Mobis_System*.odex; do
+    [ -f "$f" ] && grab "$f" "$STOCK/app/"
+done
 ls -l /system/app > "$STOCK/app/listing.txt" 2>&1
 
 # feature flags and config (stock system files only)
