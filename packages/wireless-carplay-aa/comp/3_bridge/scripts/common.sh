@@ -440,12 +440,18 @@ restore_all() {
     return 0
 }
 
-# ---- libCarPlayCore.so: let AirPlayReceiverSessionStart accept Wi-Fi sessions ----
-# Applied with lpatch from recipes/carplay-core-wifi.recipe: only when every
-# original byte matches. Firmware that already accepts Wi-Fi sessions is
-# recognised as NATIVE and left alone. Wired paths are unchanged.
+# ---- libCarPlayCore.so ----
+# Applied with lpatch, only where every original byte matches:
+# - recipes/carplay-core-wifi.recipe (needed): let AirPlayReceiverSessionStart accept
+#   Wi-Fi sessions. Firmware that already does is recognised as NATIVE and left alone.
+# - the screen recipes (optional, at most one fits a library): the screen frame reads
+#   wait 10 s instead of 200 ms once a frame has started arriving. The stock 200 ms
+#   ended the CarPlay picture after a short Wi-Fi gap in the middle of a frame (#43).
+#   A library neither fits is left as it is.
+# Wired paths are unchanged.
 . "${LP_ROOT:-../..}/scripts/lpatch.sh"
 CORE_RECIPE=carplay-core-wifi
+CORE_EXTRA="carplay-core-screen-260507 carplay-core-screen-260903"
 
 core_path() {
     local _p
@@ -458,26 +464,52 @@ core_path() {
     return 1
 }
 
+# core_state [file]: the Wi-Fi recipe's state
 core_state() {
-    local _p
-    _p=$(core_path) || { echo MISSING; return 0; }
+    local _p=$1
+    [ -n "$_p" ] || _p=$(core_path) || { echo MISSING; return 0; }
     lp_state "$CORE_RECIPE" "$_p"
+}
+
+# core_extra [file]: "<recipe> <PATCHABLE|APPLIED>" for the screen recipe that fits, or "none"
+core_extra() {
+    local _p=$1 _r _st
+    [ -n "$_p" ] || _p=$(core_path) || { echo none; return 0; }
+    for _r in $CORE_EXTRA; do
+        _st=$(lp_state "$_r" "$_p")
+        case "$_st" in PATCHABLE|APPLIED) echo "$_r $_st"; return 0 ;; esac
+    done
+    echo none
+}
+
+# core_todo: the recipes still to apply to the live library (empty: nothing to do)
+core_todo() {
+    local _x
+    [ "$(core_state)" = PATCHABLE ] && echo "$CORE_RECIPE"
+    _x=$(core_extra)
+    case "$_x" in *" PATCHABLE") echo "${_x%% *}" ;; esac
+    return 0
 }
 
 # done = nothing left to do for the core (patched by us, or native support)
 core_done() {
-    case "$(core_state)" in APPLIED|NATIVE) return 0 ;; esac
-    return 1
+    [ -z "$(core_todo)" ]
 }
 
 check_core() {
-    local _st
+    local _st _x
     _st=$(core_state)
     case "$_st" in
         PATCHABLE) log "libCarPlayCore.so: Wi-Fi patch fits this firmware - ok" ;;
         APPLIED) log "libCarPlayCore.so already patched" ;;
         NATIVE) log "libCarPlayCore.so already accepts Wi-Fi sessions on this firmware - no patch needed" ;;
         *) log "FAIL: libCarPlayCore.so status $_st - the Wi-Fi patch does not fit this firmware"; return 1 ;;
+    esac
+    _x=$(core_extra)
+    case "$_x" in
+        none) log "libCarPlayCore.so: no screen-timeout fix for this library - left as it is" ;;
+        *" APPLIED") log "libCarPlayCore.so: screen-timeout fix already in (${_x%% *})" ;;
+        *) log "libCarPlayCore.so: screen-timeout fix fits (${_x%% *}) - ok" ;;
     esac
     return 0
 }
@@ -490,7 +522,7 @@ snapshot_core() {
         log "snapshot exists for libCarPlayCore.so - keeping original"
         return 0
     fi
-    if [ "$(core_state)" != PATCHABLE ]; then
+    if core_done; then
         log "libCarPlayCore.so needs no patch - no snapshot"
         return 0
     fi
@@ -527,45 +559,62 @@ put_lib() {
 }
 
 apply_core() {
-    local _p _st
+    local _p _r _w _done=""
     _p=$(core_path) || return 1
-    _st=$(core_state)
-    case "$_st" in
-        APPLIED) log "libCarPlayCore.so already patched"; return 0 ;;
-        NATIVE) log "libCarPlayCore.so accepts Wi-Fi natively - skipped"; return 0 ;;
-        PATCHABLE) ;;
-        *) log "FAIL: libCarPlayCore.so status $_st"; return 1 ;;
+    case "$(core_state)" in
+        PATCHABLE|APPLIED|NATIVE) ;;
+        *) log "FAIL: libCarPlayCore.so status $(core_state)"; return 1 ;;
     esac
-    if ! lp_apply "$CORE_RECIPE" "$_p" "$BACKUP_DIR/libCarPlayCore.patched"; then
-        log "FAIL: lpatch could not patch $_p"
-        return 1
+    if core_done; then
+        log "libCarPlayCore.so: nothing to patch"
+        return 0
     fi
-    if ! put_lib "$BACKUP_DIR/libCarPlayCore.patched" "$_p"; then
-        rm -f "$BACKUP_DIR/libCarPlayCore.patched"
+    # each recipe in turn on a work copy, then one swap
+    _w=$BACKUP_DIR/libCarPlayCore.work
+    cp -f "$_p" "$_w" || return 1
+    for _r in $(core_todo); do
+        if ! lp_apply "$_r" "$_w" "$_w.next"; then
+            rm -f "$_w" "$_w.next"
+            log "FAIL: lpatch could not apply $_r to $_p"
+            return 1
+        fi
+        mv -f "$_w.next" "$_w" || return 1
+        _done="$_done $_r"
+    done
+    if ! put_lib "$_w" "$_p"; then
+        rm -f "$_w"
         log "FAIL: could not write $_p"
         return 1
     fi
-    rm -f "$BACKUP_DIR/libCarPlayCore.patched"
-    if [ "$(core_state)" != APPLIED ]; then
-        log "FAIL: $_p did not verify after patching"
-        return 1
-    fi
-    log "OK: $_p patched with lpatch (Wi-Fi CarPlay sessions allowed)"
+    rm -f "$_w"
+    for _r in $_done; do
+        if [ "$(lp_state "$_r" "$_p")" != APPLIED ]; then
+            log "FAIL: $_p did not verify after patching ($_r)"
+            return 1
+        fi
+    done
+    echo "$_done" > "$BACKUP_DIR/libCarPlayCore.applied" || return 1
+    log "OK: $_p patched with lpatch:$_done"
     return 0
 }
 
 restore_core() {
-    local _p
+    local _p _r _rs
     if [ ! -s "$BACKUP_DIR/libCarPlayCore.so" ]; then
         log "no libCarPlayCore.so snapshot - nothing to restore"
         return 0
     fi
     _p=$(cat "$BACKUP_DIR/libCarPlayCore.path" 2>/dev/null)
     [ -n "$_p" ] || _p=$(core_path) || return 1
-    if [ "$(core_state)" != APPLIED ]; then
-        log "WARN: live libCarPlayCore.so is not this package's patch - leaving it alone"
-        return 0
-    fi
+    # what this package applied (an install from before the screen fix: the Wi-Fi recipe)
+    _rs=$(cat "$BACKUP_DIR/libCarPlayCore.applied" 2>/dev/null)
+    [ -n "$_rs" ] || _rs=$CORE_RECIPE
+    for _r in $_rs; do
+        if [ "$(lp_state "$_r" "$_p")" != APPLIED ]; then
+            log "WARN: live libCarPlayCore.so is not this package's patch ($_r) - leaving it alone"
+            return 0
+        fi
+    done
     if ! sys_rw; then
         log "FAIL: remount /system rw"
         return 1
