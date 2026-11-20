@@ -121,7 +121,8 @@ for _f in /system/app/HKMC_GPM.apk /system/app/HKMC_GPM.odex /system/app/HKMC_Di
           /system/app/HKMC_BtSettings.apk /system/app/HKMC_BtSettings.odex \
           /system/lib/libautoreceiver_infobank.so /system/lib/libCarPlayCore.so /system/lib/libCarPlayAudio.so \
           /system/lib/libCarPlayUtils.so /system/lib/libstagefright_soft_aacdec.so /system/lib/libopus.so \
-          /system/framework/automotive.odex /system/framework/framework.odex; do
+          /system/framework/automotive.odex /system/framework/automotive-service.odex \
+          /system/framework/com.hkmc.ext.hcan.odex /system/framework/framework.odex; do
     if [ -f "$_f" ]; then
         set -- $("$LP" md5 "$_f" 2>/dev/null)
         rsay "file $_f md5=$1"
@@ -224,7 +225,8 @@ for _f in /system/app/HKMC_GPM.apk /system/app/HKMC_GPM.odex /system/app/HKMC_Di
           /system/app/HKMC_BtSettings.apk /system/app/HKMC_BtSettings.odex \
           /system/lib/libautoreceiver_infobank.so /system/lib/libCarPlayCore.so /system/lib/libCarPlayAudio.so \
           /system/lib/libCarPlayUtils.so /system/lib/libev6aac.so /system/lib/libstagefright_soft_aacdec.so \
-          /system/lib/libopus.so /system/framework/automotive.odex /system/framework/framework.odex; do
+          /system/lib/libopus.so /system/framework/automotive.odex /system/framework/automotive-service.odex \
+          /system/framework/com.hkmc.ext.hcan.odex /system/framework/framework.odex; do
     sum_file "$_f"
 done
 say "--- dalvik-cache entries"

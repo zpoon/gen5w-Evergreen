@@ -139,6 +139,13 @@ build_payloads() {
         build_one "$_part" "$_kind" "$_name" "$_patch" "$_want" || return 1
     done < "$_m"
     echo $_ev > "$BUILD_DIR/ev"
+    # a set without a library line (the car's Android Auto library has no patch yet):
+    # part 2 leaves the library stock, so only Android Auto turn-by-turn on the cluster is missing
+    rm -f "$BUILD_DIR/2_tbt/no-lib" 2>/dev/null
+    if ! grep -q '^2_tbt[^ ]* file libautoreceiver_infobank.so ' "$_m"; then
+        : > "$BUILD_DIR/2_tbt/no-lib" || return 1
+        log "no Android Auto library patch for this car yet: the library stays stock (Android Auto turn-by-turn on the cluster isn't in this build)"
+    fi
     [ $_ev = 1 ] && log "EV features: $_evn file(s) built with EV routing, preconditioning and logging"
     build_optional
     return 0

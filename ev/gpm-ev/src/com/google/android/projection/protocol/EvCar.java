@@ -26,11 +26,12 @@ import com.hkmc.cluster.NavigationClusterListener;
  * a firmware whose framework numbers its methods differently can't send a
  * read to another method. A name that isn't found makes that read "unknown".
  * The telematics interface (hscan) is in com.hkmc.ext.hcan, which GPM may not
- * load: then the numbers verified on the Ioniq 5 US 260507 (0x0b, 0xd6) are
- * used only if that library is byte for byte the 260507 one (HCAN_MD5).
+ * load: then the numbers verified on the Ioniq 5 US 260507 and 260903 (0x0b,
+ * 0xd6) are used only if that library is byte for byte one of those files
+ * (HCAN_MD5 / HCAN_260903_MD5).
  * No VIN is read (Evergreen collects no per-car identity).
  *
- * Sources (numbers as on the Ioniq 5 US 260507):
+ * Sources (numbers as on the Ioniq 5 US 260507 and 260903):
  *  - HEV getHEVStatus(flag) (com.hkmc.micom.hev txn 3), cached per flag so a
  *    second caller within maxAgeMs gets the same value without a binder call
  *  - hscan (tm_hscan_service): getCarSpeed 0x0b, getXEV_Bms_GDS_SOH 0xd6
@@ -59,16 +60,17 @@ final class EvCar {
     private static final String HCAN_SERVICE = "tm_hscan_service";
     private static final String HCAN_TOKEN =
             "com.hkmc.telematics.hscan.tm_interface.ITM_HSCANService";
-    private static final String HCAN_GET_CAR_SPEED = "getCarSpeed";        // (B)F, 0x0b on 260507
-    private static final String HCAN_GET_SOH = "getXEV_Bms_GDS_SOH";       // ()I, 0xd6 on 260507
-    // com.hkmc.ext.hcan.odex of the Ioniq 5 US 260507, where 0x0b and 0xd6 were verified
+    private static final String HCAN_GET_CAR_SPEED = "getCarSpeed";        // (B)F, 0x0b on 260507/260903
+    private static final String HCAN_GET_SOH = "getXEV_Bms_GDS_SOH";       // ()I, 0xd6 on 260507/260903
+    // com.hkmc.ext.hcan.odex of the Ioniq 5 US 260507 and 260903, where 0x0b and 0xd6 were verified
     static final String HCAN_ODEX = "/system/framework/com.hkmc.ext.hcan.odex";
     static final String HCAN_MD5 = "c4638b2befbabce418d2664f4e7ec304";
+    static final String HCAN_260903_MD5 = "1cab9265954bbf48a5dddb67a1e6f2bc";
 
     private static final String DATC_SERVICE = "com.hkmc.micom.datc";
     private static final String DATC_TOKEN = "com.hkmc.datc.IDATCService";
-    private static final String DATC_IS_UNIT_CELSIUS = "isUnitCelsius";            // 0x06 on 260507
-    private static final String DATC_GET_VR_CLIMATE_STATUS = "getVRClimateStatus"; // 0x29 on 260507
+    private static final String DATC_IS_UNIT_CELSIUS = "isUnitCelsius";            // 0x06 on 260507/260903
+    private static final String DATC_GET_VR_CLIMATE_STATUS = "getVRClimateStatus"; // 0x29 on 260507/260903
     // DATCFlag values getVRClimateStatus answers (DATCService.smali)
     static final int DATC_TEMP = 0x2;         // driver set temp, display unit
     static final int DATC_BLOWER_LEVEL = 0x5; // MainBlowerDisp
@@ -81,8 +83,8 @@ final class EvCar {
     private static final String BCM_SERVICE = "com.hkmc.micom.bcm";
     private static final String BCM_TOKEN = "com.hkmc.bcm.IBCMService";
     private static final String BCM_LISTENER = "com.hkmc.bcm.IBCMListener";
-    private static final String BCM_REGISTER_LISTENER = "registerBCMListener";      // 1 on 260507
-    private static final String BCM_ON_DRIVE_MODE_CHANGED = "onDriveModeChanged";  // 0x11 on 260507
+    private static final String BCM_REGISTER_LISTENER = "registerBCMListener";      // 1 on 260507/260903
+    private static final String BCM_ON_DRIVE_MODE_CHANGED = "onDriveModeChanged";  // 0x11 on 260507/260903
 
     // Navigation.BATTERY_INFO_RX packet indices (see
     // com.hkmc.micom.protocol.Navigation$BATTERY_INFO_RX).
@@ -643,22 +645,23 @@ final class EvCar {
 
     /**
      * hscan's number for method: by name, or, when GPM can't see the telematics
-     * interface class, the number verified on the Ioniq 5 US 260507, only if
-     * com.hkmc.ext.hcan.odex is that firmware's file; -1 otherwise.
+     * interface class, the number verified on the Ioniq 5 US 260507 / 260903,
+     * only if com.hkmc.ext.hcan.odex is one of those firmware files; -1 otherwise.
      */
-    static int hscanTx(String method, int verified260507) {
+    static int hscanTx(String method, int verifiedTx) {
         int n = tx(HCAN_TOKEN, method);
         if (n >= 0) {
             return n;
         }
         Boolean known = sHcanKnown;
         if (known == null) {
-            boolean ok = HCAN_MD5.equals(md5(HCAN_ODEX));
+            String h = md5(HCAN_ODEX);
+            boolean ok = HCAN_MD5.equals(h) || HCAN_260903_MD5.equals(h);
             known = Boolean.valueOf(ok);
             sHcanKnown = known;
-            Log.i(TAG, "telematics library " + (ok ? "is" : "isn't") + " the Ioniq 5 US 260507 one");
+            Log.i(TAG, "telematics library " + (ok ? "is" : "isn't") + " a verified Ioniq 5 US one");
         }
-        return known.booleanValue() ? verified260507 : -1;
+        return known.booleanValue() ? verifiedTx : -1;
     }
 
     /** md5 of a file, lower-case hex; "" if it can't be read. */

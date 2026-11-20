@@ -29,11 +29,17 @@
 #                           gives up): the install must be refused
 #   MOCK_NO_EV=1            EVERGREEN-NO-EV on the install drive: the plain turn-by-turn
 #                           build instead of the EV one (implies MOCK_USB_DESCRIPTOR=1)
+#   MOCK_OWNER_WIFI=1       after the install the owner turns the Wi-Fi client on
+#                           (android.hardware.wifi.xml, persist.wifi.state=3, wifi_on=1):
+#                           the uninstall must leave it on and everything else stock (#17)
+#   MOCK_UPDATE=1           the uninstall is the first half of an update (NEMESIS has
+#                           staged the new version, here the same package again): ADB over
+#                           network stays as the install left it, for the new version (#17)
 #
 # Needs: qemu-arm-static (runs the ARM lpatch), unzip, md5sum.
 set -e
 if [ $# -ne 4 ] || [ "$1" = -h ] || [ "$1" = --help ]; then
-    sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,/^[^#]/s/^# \{0,1\}//p' "$0"
     exit 2
 fi
 for t in qemu-arm-static unzip md5sum; do
@@ -41,6 +47,7 @@ for t in qemu-arm-static unzip md5sum; do
 done
 ZIP=$(cd "$(dirname "$1")" && pwd)/$(basename "$1"); PROD=$2; TD=$3; SRC=$4
 SH=${MOCK_SH:-/bin/sh}
+[ "$MOCK_OWNER_WIFI" = 1 ] && [ "$MOCK_WIFI_CLIENT" = 1 ] && { echo "MOCK_OWNER_WIFI and MOCK_WIFI_CLIENT: the package already turns the client on" >&2; exit 2; }
 X=$(mktemp -d "${TMPDIR:-/tmp}/mock-hu.XXXX"); R=$X/root
 mkdir -p "$R/data/nemesis" "$R/data/dalvik-cache" "$R/storage/usb0" "$R/sys/class/net" "$X/stub" "$X/pkg"
 if [ "$MOCK_NO_WIFI" = 1 ]; then
@@ -133,14 +140,21 @@ fi
 stopped_left() { ls "$X" | grep '^pm_disabled_' | sed 's/^pm_disabled_//' | tr '\n' ' '; }
 [ "$MOCK_ADB_TCP" = 1 ] && echo 1 > "$X/prop_persist.service.adb.tcp.enable"
 adb_props() { echo "enable=$(cat "$X/prop_persist.service.adb.tcp.enable" 2>/dev/null) port=$(cat "$X/prop_persist.adb.tcp.port" 2>/dev/null)"; }
+# NEMESIS unpacks the package here first and removes it after the postinstall hook,
+# unless the hook rebooted the head unit (post.sh does): then nothing removes it
+STAGE=$R/data/local/tmp/nemesis/stage/wireless.carplay.aa
+stage() { rm -rf "$STAGE"; mkdir -p "$STAGE"; cp -R "$X/pkg/." "$STAGE/"; }
+stage
 cd "$X/pkg"; export LPATCH="$X/stub/lpatch_q"
 ok=1
 if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
     "$SH" scripts/post.sh > "$X/post.log" 2>&1 || true
     if grep -q 'all parts installed' "$X/post.log"; then
         echo "INSTALL OK $(grep -o -E "(full|basic) mode[^)]*" "$X/post.log" | head -1)"
+        if [ -e "$STAGE" ]; then echo "NEMESIS stage left after the reboot: an uninstall would look like an update"; ok=0; fi
     else
         echo "INSTALL FAILED"; grep -i 'fail' "$X/post.log" | head; ok=0
+        rm -rf "$STAGE"
     fi
     if [ "$MOCK_ADB_TCP" = 1 ]; then
         _a=$(adb_props); echo "adb after install: $_a"; [ "$_a" = "enable=0 port=5555" ] || ok=0
@@ -156,10 +170,32 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         cmp -s "$_c" "$R/system/app/$_n.odex" || { echo "dalvik cache for $_n differs from its odex"; ok=0; }
     done
     echo "dalvik cache after install:${_dc:- none}"
+    if [ "$MOCK_OWNER_WIFI" = 1 ]; then
+        # what Tilepad / NEMESIS's WiFi button / stock settings leave after turning the client on
+        cp "$X/pkg/comp/1_projection/files/permissions/android.hardware.wifi.xml" "$R/system/etc/permissions/" 2>/dev/null \
+            || cp "$(find "$X/pkg" -name android.hardware.wifi.xml | head -1)" "$R/system/etc/permissions/"
+        echo 3 > "$X/prop_persist.wifi.state"; echo 1 > "$X/set_wifi_on"
+        echo "owner turned the Wi-Fi client on after the install"
+    fi
+    [ "$MOCK_UPDATE" = 1 ] && stage
     "$SH" scripts/preun.sh > "$X/preun.log" 2>&1 || true
     (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/after.md5"
+    if [ "$MOCK_OWNER_WIFI" = 1 ]; then
+        _w=$(grep -c 'etc/permissions/android.hardware.wifi.xml$' "$X/after.md5" || true)
+        echo "owner's Wi-Fi client after uninstall: xml=$_w wifi_on=$(cat "$X/set_wifi_on" 2>/dev/null) persist.wifi.state=$(cat "$X/prop_persist.wifi.state" 2>/dev/null)"
+        [ "$_w" = 1 ] && [ "$(cat "$X/set_wifi_on" 2>/dev/null)" = 1 ] && [ "$(cat "$X/prop_persist.wifi.state")" = 3 ] || ok=0
+        # the rest must be stock: compare without the owner's file
+        grep -v 'etc/permissions/android.hardware.wifi.xml$' "$X/after.md5" > "$X/after.tmp" && mv "$X/after.tmp" "$X/after.md5"
+        grep -v 'etc/permissions/android.hardware.wifi.xml$' "$X/before.md5" > "$X/before.tmp" && mv "$X/before.tmp" "$X/before.md5"
+    fi
     if [ "$MOCK_ADB_TCP" = 1 ]; then
-        _a=$(adb_props); echo "adb after uninstall: $_a"; [ "$_a" = "enable=1 port=" ] || ok=0
+        _a=$(adb_props)
+        if [ "$MOCK_UPDATE" = 1 ]; then
+            echo "adb after the update's uninstall half: $_a"; [ "$_a" = "enable=0 port=5555" ] || ok=0
+            [ -s "$R/data/nemesis/wireless.carplay.aa.adb" ] || { echo "the ADB record must stay for the new version"; ok=0; }
+        else
+            echo "adb after uninstall: $_a"; [ "$_a" = "enable=1 port=" ] || ok=0
+        fi
     fi
     _l=$(stopped_left); [ -z "$_l" ] || if [ "$MOCK_ANDROID_DOWN" = 1 ]; then echo "apps still stopped after uninstall (Android down: started on the next run with Android up): $_l"; else echo "apps left stopped after uninstall: $_l"; ok=0; fi
     _left=$(ls "$R/data/dalvik-cache" | grep '^system@app@' | tr '\n' ' ')

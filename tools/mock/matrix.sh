@@ -11,7 +11,7 @@
 # to every car. Exits 1 if any car fails.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
-[ -n "$1" ] || { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+[ -n "$1" ] || { sed -n '2,/^[^#]/s/^# \{0,1\}//p' "$0"; exit 2; }
 ZIP=$1
 LIST=${2:-$HERE/cars.local}
 [ -s "$LIST" ] || { echo "no car list: $LIST (see: $0 with no arguments)" >&2; exit 2; }

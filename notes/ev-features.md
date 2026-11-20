@@ -1,6 +1,6 @@
 # Initiative: EV features in Evergreen (from egmp-aa-ev-feat)
 
-Status: **released in 1.2.0, confirmed on a car** (EV routing, preconditioning, drive log). The EV GPM and library for the Ioniq 5 US 260507 (`neev` set, so the 2022, 2023 and 2024 SE on 260507) were built from the maintainer's stock files on 2026-11-04 and are in `patches/neev/manifest` as `+ev` lines; package-version 1.2.0. Off-car: the mock head unit installs the EV build by default and the plain one with `EVERGREEN-NO-EV`, and both uninstall to byte-identical stock (mksh). Every other car builds as before.
+Status: **released in 1.2.0, confirmed on a car** (EV routing, preconditioning, drive log). The EV GPM and library for the Ioniq 5 US 260507 (`neev` set, so the 2022, 2023 and 2024 SE on 260507) were built from the maintainer's stock files on 2026-11-04 and are in `patches/neev/manifest` as `+ev` lines; package-version 1.2.0. The Ioniq 5 US 260903 (`neev23_260903`) has its own EV GPM, the same EV edits on that set's turn-by-turn GPM, with the same library patch; its framework's numbers are checked in `notes/ev-vehicle-commands.md`. That build is not yet released or confirmed on a car: an earlier build with the same edits ran on a US 260903 car (#17). Off-car: the mock head unit installs the EV build by default and the plain one with `EVERGREEN-NO-EV`, and both uninstall to byte-identical stock (mksh). Every other car builds as before.
 
 ## Goal
 
@@ -165,12 +165,13 @@ the Ioniq 5 US 260507 on 2026-11-04; to redo it (or for another car):
 
 ## Later
 
-- **Ioniq 5 260903:** rebuild the EV smali edits onto the 260903 GPM, using a
-  260903 owner's port kit. egmp-aa-ev-feat's `patch_gpm_smali.py` works from
-  the turn-by-turn smali tree, so this is a rebuild, not new code.
-  **Re-verify the HEV/BCM transaction numbers on that firmware first.** Better
-  still, look them up by name, the way Battery Watchdog's `TxnResolver` does,
-  instead of hard-coding them.
+- **Ioniq 5 260903 (done):** the EV smali edits rebuilt onto the 260903
+  turn-by-turn GPM (steps 3 and 5 above, from `patches/neev23_260903/HKMC_GPM.tbt.lpd`);
+  the `.lpd` carries its whole result, like the set's other patches. The
+  HEV/BCM numbers were re-checked on that firmware first
+  (`notes/ev-vehicle-commands.md`). `patches/neev/HKMC_GPM.ev.lpd` still holds
+  the EV classes built before `Precond` and `EvCar` knew the 260903 hashes;
+  they behave the same on 260507.
 - **Kia EV6:** needs its own energy model (`build_model_template.py` has a
   generic path), a check that its data sources match, and its own testing.
 - **Model improvements:** egmp-aa-ev-feat's roadmap (log analysis, a model that

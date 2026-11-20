@@ -39,6 +39,11 @@ if len(kv.get("short-desc", "")) > 64:
     errs.append("short-desc is over 64 characters")
 if len(kv.get("detailed-desc", "")) > 256:
     errs.append("detailed-desc is over 256 characters")
+# NEMESIS keeps os= and models= in 256-byte fields and refuses the whole package
+# ("os is too long") when a value doesn't fit (native/meta.c set_field)
+for k in ("os", "models"):
+    if len(kv.get(k, "").encode("utf-8")) > 255:
+        errs.append("%s= is %d characters; NEMESIS takes at most 255" % (k, len(kv[k].encode("utf-8"))))
 pid = kv.get("id", "")
 if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", pid) or ".." in pid:
     errs.append("bad id %r" % pid)
@@ -51,7 +56,9 @@ if "any" not in os_items:
             continue
         prefix = line.split()[0]
         if prefix.endswith("."):
-            ok = any(i.startswith(prefix) for i in os_items)
+            # the item's leading fields (as many as the prefix has) must match it
+            n = prefix.count(".")
+            ok = any(fnmatch.fnmatchcase(prefix, ".".join(i.split(".")[:n]) + ".") for i in os_items)
         else:
             ok = any(fnmatch.fnmatchcase(prefix, i) for i in os_items)
         if not ok:

@@ -3,7 +3,7 @@
 
 const $ = (id) => document.getElementById(id);
 let DB = null;
-let lastReport = "";
+let lastReport = "";  // the report as a block ready to paste into an issue
 
 const STATUS = {
   ok: ["s-ok", "Ready"],
@@ -130,7 +130,7 @@ function verdict(r) {
     why: "Wi-Fi is on. It shares the Wi-Fi chip with the hotspot wireless CarPlay and Android Auto use, and can make them drop every minute or two. If that happens, turn Wi-Fi off in the head unit's Wi-Fi settings." });
   let overall;
   if (!r.valid) overall = ["no", "This doesn't look like a Leafia kit report."];
-  else if (/\.KOR\./.test(r.props["ro.build.product"] || "")) overall = ["unknown", "Korean head unit: we have yet to confirm a single working Korean car. Every Korean unit checked so far has had no Wi-Fi hardware, which wireless CarPlay and Android Auto need. Please share your report anyway; if this unit has a working Wi-Fi chip, that changes things."];
+  else if (!v && /\.KOR\./.test(r.props["ro.build.product"] || "")) overall = ["unknown", "Korean head unit: only one Korean car (the EV6) has shown working Wi-Fi so far. Every other Korean unit checked so far has had no Wi-Fi hardware, which wireless CarPlay and Android Auto need. Please share your report anyway; if this unit has a working Wi-Fi chip, that changes things."];
   else if (allGood && leafiaInstalled(r, v)) overall = ["ok", "Evergreen (or HMG Leafia Plus) is already installed on this unit, with its build for the " + v.name + "."];
   else if (v && !(r.props["ro.build.product"] || "").endsWith(v.firmware)) overall = ["build", "This head unit runs firmware "
     + (r.props["ro.build.product"] || "?").split(".").pop() + ". We only support each car's newest firmware (" + v.firmware.split(".").pop()
@@ -154,7 +154,6 @@ function chip(state) {
 
 function render(text) {
   const r = parse(text);
-  lastReport = text;
   const { v, parts, overall } = verdict(r);
   $("result").classList.remove("hidden");
   $("carTitle").textContent = v ? v.name + " (" + v.region + ")" : "Unrecognised head unit";
@@ -177,10 +176,14 @@ function render(text) {
   }
   const summary = parts.map((p) => "- " + p.name + ": " + (STATUS[p.state] || STATUS.unknown)[1]).join("\n");
   const title = "Report: " + (r.props["ro.build.product"] || "unknown head unit");
-  let body = "**Verdict:** " + overall[1] + "\n\n" + summary + "\n\n<details><summary>LEAFIA-REPORT.txt</summary>\n\n```\n" + text.trim() + "\n```\n</details>\n";
+  lastReport = "<details><summary>LEAFIA-REPORT.txt</summary>\n\n```\n" + text.trim() + "\n```\n</details>\n";
+  let body = "**Verdict:** " + overall[1] + "\n\n" + summary + "\n\n" + lastReport;
   const base = "https://github.com/" + DB.repo + "/issues/new?title=" + encodeURIComponent(title) + "&body=";
-  if ((base + encodeURIComponent(body)).length > 7800) {
-    body = "**Verdict:** " + overall[1] + "\n\n" + summary + "\n\nThe report was too long for a link. Please attach LEAFIA-REPORT.txt to this issue.\n";
+  // A long issue link can fail when the visitor isn't signed in to GitHub: the link goes
+  // through the sign-in page, which drops it or errors ("internal server error", #19), so a
+  // long report goes on the clipboard (Share copies it) and the link stays short.
+  if ((base + encodeURIComponent(body)).length > 4500) {
+    body = "**Verdict:** " + overall[1] + "\n\n" + summary + "\n\n**Report:** paste it below this line (Share copied it; or press Copy report on the compatibility page).\n\n";
   }
   $("share").href = base + encodeURIComponent(body);
   $("result").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -235,6 +238,10 @@ async function init() {
   document.querySelectorAll("[data-sample]").forEach((b) => b.addEventListener("click", async () => {
     render(await (await fetch(b.dataset.sample)).text());
   }));
+  // Share: put the report on the clipboard too, for the short link's paste step
+  $("share").addEventListener("click", () => {
+    try { navigator.clipboard.writeText(lastReport).catch(() => {}); } catch (e) { /* no clipboard: Copy report is there */ }
+  });
   $("copy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(lastReport); $("copy").textContent = "Copied"; }
     catch (e) { $("copy").textContent = "Copy failed"; }

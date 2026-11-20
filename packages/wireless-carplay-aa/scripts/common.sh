@@ -349,6 +349,16 @@ adb_net_fix() {
     setprop persist.service.adb.tcp.enable 0
     log "ADB over network: switched to persist.adb.tcp.port=$(getprop persist.adb.tcp.port) (the stock switch puts eth0 in the hotspot's range and breaks wireless projection)"
 }
+# Where NEMESIS unpacks a package to install it. An update runs the old version's
+# preuninstall after NEMESIS has unpacked the new one here; an uninstall has no staged
+# copy. NEMESIS removes it only after the postinstall hook returns, and post.sh ends
+# in a reboot, so post.sh removes it itself (left behind, every later uninstall would
+# look like an update).
+NEMESIS_STAGE=/data/local/tmp/nemesis/stage/wireless.carplay.aa
+updating() {
+    [ -f "$NEMESIS_STAGE/NEMESIS.data" ] && return 0
+    ls "$NEMESIS_STAGE"/*/NEMESIS.data >/dev/null 2>&1
+}
 adb_net_restore() {
     local _k
     [ -s "$ADB_FILE" ] || return 0

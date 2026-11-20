@@ -30,8 +30,8 @@ route, and nothing overrides the car's own logic.
   65/66 with one value.
 - **Firmware match:** writes are sent only when `automotive.odex` and
   `automotive-service.odex` (the files that define these numbers) match the
-  SHA-256 of the verified Ioniq 5 US 260507 files, and the SDK is 19. On any
-  other firmware the feature never sends a command.
+  SHA-256 of a verified Ioniq 5 US pair (260507 or 260903), and the SDK is
+  19. On any other firmware the feature never sends a command.
 - **Right service:** every call checks the binder's interface descriptor
   first.
 - **Car-side off switch:** Start needs the car's own *battery conditioning*
@@ -94,8 +94,9 @@ All three are done on branch `ev-import` (2026-11-04); details after each.
      hash: on any framework they reach the method they name, or read "unknown"
      if it isn't there. The telematics interface (hscan) lives in
      `com.hkmc.ext.hcan`, which GPM may not load. If it can't be found by name,
-     the 260507 numbers are used only when that library's md5 is the Ioniq 5 US
-     260507 one (`c4638b2b…`, from HMG-API's map). `Precond`'s own reads (HEV 3,
+     the verified numbers are used only when that library's md5 is a verified
+     Ioniq 5 US one (`c4638b2b…` on 260507, from HMG-API's map; `1cab9265…` on
+     260903). `Precond`'s own reads (HEV 3,
      BCM 109) now go through its firmware check, like its commands.
 2. **No VIN.** `EvCar` reads the VIN (`getVIN`, hscan 0x2f) and logs characters
    1–8 and 10. Those identify the model and year, not the car, and the serial
@@ -125,3 +126,24 @@ All three are done on branch `ev-import` (2026-11-04); details after each.
   model to Google Maps over Android Auto (sensor 23). That isn't a car command.
   It carries battery capacity, energy and outside temperature, which Maps uses
   for EV routing.
+
+## The Ioniq 5 US 260903 framework
+
+Deodexed from a US 260903 unit's framework (`baksmali x -a 18`, the full
+BOOTCLASSPATH plus the other framework odex files), checked against what the
+EV code uses:
+
+- **Hashes** (`Precond`'s pair and `EvCar.HCAN_260903_MD5`):
+  `automotive.odex` SHA-256 `c52e0825956880d627b32979022705a618200f059476c094d729133d1ff6a3be`,
+  `automotive-service.odex` SHA-256 `bf17e682d1beb349ae8ef2acaae6d6e908fe42e88853d7145ee16b29bb4d9ec1`,
+  `com.hkmc.ext.hcan.odex` md5 `1cab9265954bbf48a5dddb67a1e6f2bc`.
+- **Transaction numbers, the same as on 260507:** `IHEVService` getHEVStatus 3,
+  setBattCondEvStation 62, setBattCondRouteDis 65, setBattCondRemainTime 66;
+  `IBCMService` registerBCMListener 1, getBattCondIndSta 109; `IBCMListener`
+  onDriveModeChanged 0x11; `IDATCService` isUnitCelsius 6, getVRClimateStatus
+  0x29; `ITM_HSCANService` getCarSpeed 0x0b, getXEV_Bms_GDS_SOH 0xd6. Each
+  interface's descriptor is the string the code checks.
+- **Flags and packet layout, the same:** every `HEVFlag` the EV code reads
+  (EV_RDY 44, EV_BATTERYCONDITIONING 94, DISPLAY_SOC 0x19, ENERGYMAP_1000MS 0x31,
+  ODOMETER, VCMS_PWRDIS and the log's trip and charge flags), the `DATCFlag`
+  values, and the `Navigation$BATTERY_INFO_RX` indices 1, 2, 4, 6 and 7.

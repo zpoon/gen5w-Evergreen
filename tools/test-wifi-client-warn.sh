@@ -11,23 +11,27 @@ ok() { if eval "$2"; then echo "ok    $1"; else echo "FAIL  $1"; fail=1; fi; }
 
 mkdir -p "$T/bin"
 printf '#!/bin/sh\necho "TOAST $*" >> %s/toasts\n' "$T" > "$T/bin/am"
-printf '#!/bin/sh\n[ -f %s/wifi_on ] || exit 1\ncat %s/wifi_on\n' "$T" "$T" > "$T/bin/settings"
+printf '#!/bin/sh\necho asked >> %s/asked\n[ -f %s/wifi_on ] || exit 1\ncat %s/wifi_on\n' "$T" "$T" "$T" > "$T/bin/settings"
 chmod +x "$T/bin/am" "$T/bin/settings"
+# sleep as a function: in an mksh with a builtin sleep, the stand-in below would never run
 sed -e "s|/data/nemesis/|$T/data/nemesis/|g" -e "s|^export PATH=.*|export PATH=$T/bin:/usr/bin:/bin|" \
+    -e "/^export PATH=/a sleep() { \"$T/bin/sleep\" \"\$@\"; }" \
     "$ROOT/packages/wireless-carplay-aa/svc/wifi-client-warn.sh" > "$T/warn.sh"
 # script of states, one per pass ("down" = no answer); the stubbed sleep moves to the next
 printf '#!/bin/sh\nn=$(cat %s/n); n=$((n+1)); echo $n > %s/n\nl=$(sed -n "${n}p" %s/states)\nif [ "$l" = down ]; then rm -f %s/wifi_on; else echo "$l" > %s/wifi_on; fi\n' \
     "$T" "$T" "$T" "$T" "$T" > "$T/bin/sleep"; chmod +x "$T/bin/sleep"
 run() {   # run <states...>: first state before pass 1, the rest after each pass
-    rm -f "$T/toasts" "$T/out"; echo 0 > "$T/n"
+    rm -f "$T/toasts" "$T/out" "$T/asked"; echo 0 > "$T/n"
     : > "$T/states"; for s in "$@"; do echo "$s" >> "$T/states"; done
     "$T/bin/sleep"
-    WIFIWARN_PASSES=$# "$SH" "$T/warn.sh" >> "$T/out" 2>&1
+    WIFIWARN_REPEAT=1 WIFIWARN_PASSES=$# "$SH" "$T/warn.sh" >> "$T/out" 2>&1
 }
 toasts() { [ -f "$T/toasts" ] && grep -c TOAST "$T/toasts" || echo 0; }
+asked() { [ -f "$T/asked" ] && grep -c asked "$T/asked" || echo 0; }
 
 run 0 0 0
 ok "client off: no pop-up" '[ "$(toasts)" = 0 ]'
+ok "not opted in: Android asked once a pass" '[ "$(asked)" = 3 ]'
 run down down 0
 ok "Android down: no pop-up and no error" '[ "$(toasts)" = 0 ] && ! grep -qi "not found\|error" "$T/out"'
 run 1 1 1 1
@@ -46,4 +50,9 @@ ok "pop-up says what to do" 'run 0 1 1; grep -q "turn Wi-Fi off" "$T/toasts"'
 mkdir -p "$T/data/nemesis/backup/wireless.projection"; : > "$T/data/nemesis/backup/wireless.projection/wifi_client"
 run 0 1 1 1
 ok "opted in with LEAFIA-WIFI-CLIENT: no pop-up" '[ "$(toasts)" = 0 ]'
+ok "opted in: Android never asked (settings starts a VM)" '[ "$(asked)" = 0 ]'
+rm -f "$T/data/nemesis/backup/wireless.projection/wifi_client"
+rm -f "$T/toasts"; echo 0 > "$T/n"; printf '0\n1\n1\n' > "$T/states"; "$T/bin/sleep"
+WIFIWARN_PASSES=3 "$SH" "$T/warn.sh" > "$T/out" 2>&1
+ok "default: each warning is sent 3 times in a row (about 10 s on screen)" '[ "$(toasts)" = 3 ]'
 [ $fail = 0 ]

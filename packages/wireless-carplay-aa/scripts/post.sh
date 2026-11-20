@@ -59,6 +59,9 @@ else
     toast "Installed. Restarting now: remove the USB drive while it restarts. Leaving it in can stop CarPlay or Android Auto connecting the first time."
 fi
 mirror_logs
+# NEMESIS's unpacked copy of this package: the reboot comes before NEMESIS would
+# remove it (see updating)
+rm -rf "$NEMESIS_STAGE"
 exec /system/bin/reboot
 log "FAIL: reboot returned"
 exit 1

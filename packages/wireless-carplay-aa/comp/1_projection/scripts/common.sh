@@ -440,7 +440,11 @@ apply_perm() {
 
 # the stock featurexml.cfg removed the hotspot feature at boot (an active
 # "-.../com.hkmc.software.wifihotspot.xml" line; US firmware has it commented out)
+# The hotspot feature is missing: featurexml.cfg removes it (a "-" line, Korean K5 /
+# Ioniq 5), or the firmware never ships the file at all (Korean EV6 260902, where the
+# line is already commented "#-" and the file is just absent). US units have it.
 hotspot_was_removed() {
+    [ -f "$BACKUP_DIR/perm.$HOTSPOT_XML.absent" ] && return 0
     [ -s "$BACKUP_DIR/featurexml.cfg" ] && grep -q '^-.*wifihotspot\.xml' "$BACKUP_DIR/featurexml.cfg"
 }
 
@@ -524,7 +528,7 @@ apply_all() {
     #   wifi_on=1                  starts Wi-Fi client at boot
     #   persist.wifi.state=3       Wi-Fi mode "client + wireless"
     #   wpa_supplicant p2p edits   Wi-Fi Direct, unused by either projection
-    # They are still snapshotted, so uninstall restores exactly what was there.
+    # They are still snapshotted, but restore_all puts back only what was changed.
     set_prop_line "$BP" persist.ium.support carplay || return 1
     if [ -f "$BACKUP_DIR/featurexml.path" ]; then
         IFS= read -r _fx < "$BACKUP_DIR/featurexml.path" || true
@@ -538,6 +542,9 @@ apply_all() {
     fi
     apply_perm "$AA_XML" || return 1
     apply_perm "$CP_XML" || return 1
+    # what this install does to the Wi-Fi client pieces, for restore_all (#17):
+    # wifi_client (client mode on), added.<xml> (a missing feature file added)
+    rm -f "$BACKUP_DIR/wifi_client" "$BACKUP_DIR/added.$WIFI_XML" 2>/dev/null || true
     if wifi_client_wanted; then
         set_prop_line "$BP" persist.wifi.state 3 || return 1
         apply_perm "$WIFI_XML" || return 1
@@ -545,12 +552,15 @@ apply_all() {
         putline 1 > "$BACKUP_DIR/wifi_client" 2>/dev/null || true
         log "Wi-Fi client on (LEAFIA-WIFI-CLIENT on the install drive): Wi-Fi menu and client + wireless mode"
     fi
-    # Firmware that removed the hotspot feature (Korean) also lacks the Wi-Fi feature
+    # Firmware without the hotspot feature (Korean) also lacks the Wi-Fi feature
     # files: add the missing ones there, so the hotspot (and the Wi-Fi chip) can start.
     # US units already have both, and are left as they are.
     if hotspot_was_removed; then
         [ -f "$BACKUP_DIR/perm.$HOTSPOT_XML.absent" ] && { apply_perm "$HOTSPOT_XML" || return 1; }
-        [ -f "$BACKUP_DIR/perm.$WIFI_XML.absent" ] && { apply_perm "$WIFI_XML" || return 1; }
+        if [ -f "$BACKUP_DIR/perm.$WIFI_XML.absent" ] && [ ! -f "$PERM/$WIFI_XML" ]; then
+            apply_perm "$WIFI_XML" || return 1
+            putline 1 > "$BACKUP_DIR/added.$WIFI_XML" 2>/dev/null || true
+        fi
     fi
     setprop persist.ium.support carplay 2>/dev/null || log "WARN: setprop persist.ium.support failed"
     kick_apps
@@ -583,7 +593,15 @@ restore_all() {
     fi
     mkdir -p "$PERM" || _rc=1
     restore_prop_line "$BP" persist.ium.support "$BACKUP_DIR/bp.persist.ium.support" || _rc=1
-    restore_prop_line "$BP" persist.wifi.state "$BACKUP_DIR/bp.persist.wifi.state" || _rc=1
+    # The Wi-Fi client pieces (android.hardware.wifi.xml, persist.wifi.state,
+    # wifi_on, the wpa_supplicant files) are snapshotted but only changed with
+    # LEAFIA-WIFI-CLIENT (wifi_client), or the feature file added where the
+    # firmware lacks it (added.<xml>). Anything else is the owner's: turned on
+    # later (Tilepad, NEMESIS's WiFi button, stock settings), it stays on through
+    # an update or uninstall (#17).
+    if [ -f "$BACKUP_DIR/wifi_client" ]; then
+        restore_prop_line "$BP" persist.wifi.state "$BACKUP_DIR/bp.persist.wifi.state" || _rc=1
+    fi
     if [ -f "$BACKUP_DIR/featurexml.path" ]; then
         IFS= read -r _fx < "$BACKUP_DIR/featurexml.path" || true
         restore_edited_file "$_fx" "$BACKUP_DIR/featurexml.cfg" "$BACKUP_DIR/featurexml.absent" || _rc=1
@@ -593,9 +611,11 @@ restore_all() {
         log "FAIL: no featurexml snapshot"
         _rc=1
     fi
-    restore_edited_file "$WPA" "$BACKUP_DIR/wpa_supplicant.conf" "$BACKUP_DIR/wpa_supplicant.conf.absent" || _rc=1
-    restore_edited_file "$OVERLAY" "$BACKUP_DIR/wpa_supplicant_overlay.conf" "$BACKUP_DIR/wpa_supplicant_overlay.conf.absent" || _rc=1
-    restore_owned_file "$PERM/$WIFI_XML" "$BACKUP_DIR/perm.$WIFI_XML" "$BACKUP_DIR/perm.$WIFI_XML.absent" || _rc=1
+    if [ -f "$BACKUP_DIR/wifi_client" ] || [ -f "$BACKUP_DIR/added.$WIFI_XML" ]; then
+        restore_owned_file "$PERM/$WIFI_XML" "$BACKUP_DIR/perm.$WIFI_XML" "$BACKUP_DIR/perm.$WIFI_XML.absent" || _rc=1
+    else
+        log "Wi-Fi client pieces left as they are (this package didn't change them)"
+    fi
     restore_owned_file "$PERM/$AA_XML" "$BACKUP_DIR/perm.$AA_XML" "$BACKUP_DIR/perm.$AA_XML.absent" || _rc=1
     restore_owned_file "$PERM/$CP_XML" "$BACKUP_DIR/perm.$CP_XML" "$BACKUP_DIR/perm.$CP_XML.absent" || _rc=1
     # snapshots made before this file was handled have neither; nothing of ours to undo then
@@ -603,8 +623,9 @@ restore_all() {
         restore_owned_file "$PERM/$HOTSPOT_XML" "$BACKUP_DIR/perm.$HOTSPOT_XML" "$BACKUP_DIR/perm.$HOTSPOT_XML.absent" || _rc=1
     fi
     restore_getprop persist.ium.support "$BACKUP_DIR/gp.persist.ium.support" || _rc=1
-    restore_getprop persist.wifi.state "$BACKUP_DIR/gp.persist.wifi.state" || _rc=1
-    restore_setting || _rc=1
+    if [ -f "$BACKUP_DIR/wifi_client" ]; then
+        restore_getprop persist.wifi.state "$BACKUP_DIR/gp.persist.wifi.state" || _rc=1
+    fi
     kick_apps
     rm -f "$BACKUP_DIR/rewrite.tmp" 2>/dev/null || true
     if [ "$_rc" -ne 0 ]; then
@@ -613,6 +634,7 @@ restore_all() {
         return 1
     fi
     putline 1 > "$BACKUP_DIR/restored" 2>/dev/null || true
+    rm -f "$BACKUP_DIR/wifi_client" "$BACKUP_DIR/added.$WIFI_XML" 2>/dev/null || true
     sync
     sys_ro
     log "restore complete"
