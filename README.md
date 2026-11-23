@@ -90,6 +90,7 @@ See the [compatibility page](https://zpoon.github.io/gen5w-Evergreen/) for the f
 
 ## Tips and known issues
 
+- **Wired CarPlay only charges the phone after uninstalling?** The head unit's own Phone Projection settings can switch it off while Evergreen is installed. From 1.3.1, uninstalling puts those settings back. After uninstalling an earlier version, put it back by hand from a NEMESIS root script or adb: `settings put system carplay_information 1` on US and Canadian cars, `settings put system phoneprojection_setting_enable_usb_cable 1` elsewhere (and the same names with `_dr1` and `_dr2`), then restart.
 - **CarPlay or Android Auto drops every minute or two? Turn the head unit's Wi-Fi off.** The car's Wi-Fi can run either the hotspot your phone uses or a connection to another network, but doing both at once disrupts the hotspot. Turn Wi-Fi off in the head unit's Wi-Fi settings (or NEMESIS Manager's WiFi button), forget any saved networks, and restart. If you use NEMESIS Manager's Store, turn Wi-Fi on only while parked.
 - **Won't connect after installing?** Restart the head unit. If that doesn't help, pair again from scratch: on the phone, forget the car in CarPlay/Android Auto, Bluetooth and Wi-Fi; on the car, delete the phone.
 - **Turning the car off and on doesn't restart the head unit.** For a real restart, switch off, open the driver's door and wait for the screen to go dark, or hold the power button for about 10 seconds.

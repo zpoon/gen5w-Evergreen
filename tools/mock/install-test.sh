@@ -35,6 +35,9 @@
 #   MOCK_UPDATE=1           the uninstall is the first half of an update (NEMESIS has
 #                           staged the new version, here the same package again): ADB over
 #                           network stays as the install left it, for the new version (#17)
+#   MOCK_PP_SETTINGS=1      while installed, the head unit's Phone Projection pages rewrite
+#                           its projection settings (wired CarPlay off): the uninstall must put
+#                           the stock values back, or leave them for the new version on an update
 #
 # Needs: qemu-arm-static (runs the ARM lpatch), unzip, md5sum.
 set -e
@@ -100,6 +103,8 @@ printf '#!/bin/sh\nmd5sum "$@"\n' > "$X/stub/md5"
 printf '#!/bin/sh\nexit 0\n' > "$X/stub/chown"; cp "$X/stub/chown" "$X/stub/restorecon"
 printf '#!/bin/sh\ncase "$1" in get) cat %s/set_$3 2>/dev/null || echo null ;; put) echo "$4" > %s/set_$3 ;; delete) rm -f %s/set_$3 ;; esac\n' "$X" "$X" "$X" > "$X/stub/settings"
 [ "$MOCK_WIFI_ON" = 1 ] && echo 1 > "$X/set_wifi_on"
+# stock: wired CarPlay on (carplay_information=1), the wireless-mode settings never written
+[ "$MOCK_PP_SETTINGS" = 1 ] && echo 1 > "$X/set_carplay_information"
 # pm: every app exists; disable/enable keep a marker per app, so leftovers can be checked
 cat > "$X/stub/pm" <<E
 #!/bin/sh
@@ -177,6 +182,11 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         echo 3 > "$X/prop_persist.wifi.state"; echo 1 > "$X/set_wifi_on"
         echo "owner turned the Wi-Fi client on after the install"
     fi
+    if [ "$MOCK_PP_SETTINGS" = 1 ]; then
+        echo 0 > "$X/set_carplay_information"; echo 0 > "$X/set_phoneprojection_setting_enable_usb_cable"
+        echo 1 > "$X/set_phoneprojection_setting_enable_wireless"
+        echo "head unit rewrote its projection settings after the install (wired CarPlay off)"
+    fi
     [ "$MOCK_UPDATE" = 1 ] && stage
     "$SH" scripts/preun.sh > "$X/preun.log" 2>&1 || true
     (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/after.md5"
@@ -187,6 +197,18 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         # the rest must be stock: compare without the owner's file
         grep -v 'etc/permissions/android.hardware.wifi.xml$' "$X/after.md5" > "$X/after.tmp" && mv "$X/after.tmp" "$X/after.md5"
         grep -v 'etc/permissions/android.hardware.wifi.xml$' "$X/before.md5" > "$X/before.tmp" && mv "$X/before.tmp" "$X/before.md5"
+    fi
+    if [ "$MOCK_PP_SETTINGS" = 1 ]; then
+        _p="carplay_information=$(cat "$X/set_carplay_information" 2>/dev/null || echo unset)"
+        _p="$_p usb_cable=$(cat "$X/set_phoneprojection_setting_enable_usb_cable" 2>/dev/null || echo unset)"
+        _p="$_p wireless=$(cat "$X/set_phoneprojection_setting_enable_wireless" 2>/dev/null || echo unset)"
+        if [ "$MOCK_UPDATE" = 1 ]; then
+            echo "projection settings after the update's uninstall half: $_p"; [ "$_p" = "carplay_information=0 usb_cable=0 wireless=1" ] || ok=0
+        elif [ "$MOCK_ANDROID_DOWN" = 1 ]; then
+            echo "projection settings after uninstall (Android down: not readable at install, left as they are): $_p"
+        else
+            echo "projection settings after uninstall: $_p"; [ "$_p" = "carplay_information=1 usb_cable=unset wireless=unset" ] || ok=0
+        fi
     fi
     if [ "$MOCK_ADB_TCP" = 1 ]; then
         _a=$(adb_props)
