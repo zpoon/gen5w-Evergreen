@@ -190,13 +190,15 @@ public final class EvModelSender {
         float roadA = coldRoadLoadA(outOk ? Math.round(outC)
                 : Integer.MIN_VALUE);
         writeFloatLe(msg, EvModelTemplate.ROAD_A_OFFSET, roadA);
+        writeFloatLe(msg, EvModelTemplate.ROAD_C_OFFSET, roadC());
         int rc = sSource.sendRawMessage(msg);
         sRoadA = roadA;
         Log.i(TAG, "energy model sent: " + wh + " Wh of " + cap
                 + " Wh (" + capacitySource() + "), soc=" + halfPct
                 + "/200, enrg=" + sEnergyRaw + ", rc=" + rc
                 + ", out=" + (outOk ? String.valueOf(outC) : "?")
-                + "C, A=" + Math.round(roadA) + "N, " + EvCar.navSummary());
+                + "C, A=" + Math.round(roadA) + "N, C=" + roadC() + ", "
+                + EvCar.navSummary());
     }
 
     private static int sTickFailures;
@@ -227,9 +229,63 @@ public final class EvModelSender {
             sColdTempC = outC;
         }
         if (sColdTempC == Integer.MIN_VALUE) {
-            return EvModelTemplate.ROAD_A_N;
+            return baseRoadA();
         }
-        return EvModelTemplate.ROAD_A_N + coldDeltaA(sColdTempC);
+        return baseRoadA() + coldDeltaA(sColdTempC);
+    }
+
+    // ---- road load per car ---------------------------------------------------
+
+    // The template's road load is the Ioniq 5's (roll-down test: A 196 N, C 0.493).
+    // Cars listed here get their own A (N) and C (N/(m/s)^2), picked once from
+    // ro.build.product; any other car keeps the template's. Kia EV6: A 180, C 0.40
+    // (CdA ~0.65 m2 against the Ioniq 5's ~0.80), fitted to a 2022 US EV6 owner's
+    // ~1000 km of highway logs in AwsomeFox's egmp-aa-ev-hmg-api, as carried by
+    // KSubedi's Ultimate Wireless Projection; with the Ioniq 5's values the model
+    // came out ~22 % high on energy for that car.
+    static final String[] ROAD_CAR_PREFIX = {"CVEV."};
+    static final float[] ROAD_CAR_A_N = {180.0f};
+    static final float[] ROAD_CAR_C = {0.40f};
+    private static int sRoadCar = -2;  // -2 not looked up yet, -1 the template's
+
+    /** Index into ROAD_CAR_* for a ro.build.product, or -1 for the template's. */
+    static int roadCar(String product) {
+        if (product != null) {
+            for (int i = 0; i < ROAD_CAR_PREFIX.length; i++) {
+                if (product.startsWith(ROAD_CAR_PREFIX[i])) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static int roadCar() {
+        if (sRoadCar == -2) {
+            String product = "";
+            try {
+                product = (String) Class.forName("android.os.SystemProperties")
+                        .getMethod("get", String.class, String.class)
+                        .invoke(null, "ro.build.product", "");
+            } catch (Throwable t) {
+                // the template's values
+            }
+            sRoadCar = roadCar(product);
+            Log.i(TAG, "road load: " + (sRoadCar < 0 ? "the model's (Ioniq 5)"
+                    : "A=" + ROAD_CAR_A_N[sRoadCar] + "N C=" + ROAD_CAR_C[sRoadCar]
+                    + " for " + ROAD_CAR_PREFIX[sRoadCar]));
+        }
+        return sRoadCar;
+    }
+
+    static float baseRoadA() {
+        int i = roadCar();
+        return i < 0 ? EvModelTemplate.ROAD_A_N : ROAD_CAR_A_N[i];
+    }
+
+    static float roadC() {
+        int i = roadCar();
+        return i < 0 ? EvModelTemplate.ROAD_C : ROAD_CAR_C[i];
     }
 
     /** Extra road load (N) at temp C; COLD_TEMPS_C runs warm to cold. */
@@ -477,7 +533,7 @@ public final class EvModelSender {
     }
 
     /**
-     * The generated offsets match the template: placeholders, road A, and
+     * The generated offsets match the template: placeholders, road A and C, and
      * every scaled varint holding its reference value.
      */
     static boolean checkPlaceholders(byte[] template) {
@@ -492,6 +548,12 @@ public final class EvModelSender {
             writeFloatLe(aWant, 0, EvModelTemplate.ROAD_A_N);
             for (int i = 0; i < 4; i++) {
                 if (template[EvModelTemplate.ROAD_A_OFFSET + i] != aWant[i]) {
+                    return false;
+                }
+            }
+            writeFloatLe(aWant, 0, EvModelTemplate.ROAD_C);
+            for (int i = 0; i < 4; i++) {
+                if (template[EvModelTemplate.ROAD_C_OFFSET + i] != aWant[i]) {
                     return false;
                 }
             }

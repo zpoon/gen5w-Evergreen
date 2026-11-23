@@ -147,3 +147,30 @@ EV code uses:
   (EV_RDY 44, EV_BATTERYCONDITIONING 94, DISPLAY_SOC 0x19, ENERGYMAP_1000MS 0x31,
   ODOMETER, VCMS_PWRDIS and the log's trip and charge flags), the `DATCFlag`
   values, and the `Navigation$BATTERY_INFO_RX` indices 1, 2, 4, 6 and 7.
+
+## The Kia EV6 US 260507 framework (signed off from another project's review)
+
+We have no EV6 stock files, so this one was **not** deodexed here. The check was
+done in KSubedi's Ultimate Wireless Projection fork of Evergreen (GPL-3.0,
+`notes/ev-vehicle-commands.md` there, 2026-11-22), from a US EV6's own framework
+deodexed the same way: the same three preconditioning commands with the same
+arguments and the same reads as on the Ioniq 5, namely `IHEVService` 3 / 0x3e /
+0x41 / 0x42; `HEVService.setBattCondEvStation` MICOM 0xc68 with two bytes `& 0xf`,
+reset to (7,7) after 120 ms; `setBattCondRouteDis` / `setBattCondRemainTime` MICOM
+0xc66 / 0xc65; `IBCMService` 1 and BCM 109 a getter; `IBCMListener` 0x11;
+`IDATCService` 6 / 0x29; hscan 0x0b / 0xd6. Its GPM app code (`fcd92857…`, the dex
+inside `HKMC_GPM.odex`) and Android Auto library (`48ee793a…`) are the Ioniq 5 US
+260507's. egmp-aa-ev-feat's original field tests of these commands were on an EV6 of
+the same 260507 family.
+
+The maintainer signed off on using that review (2026-11-23): the gates now also
+accept the EV6's files, and nothing else.
+
+- **Hashes** (`Precond`'s `*_EV6_SHA256` pair and `EvCar.HCAN_EV6_MD5`):
+  `automotive.odex` SHA-256 `b9e7e02b81e1a8cfcf767c6b8bbb28bcf1d2c411a208fbf6a465e7f0c662774a`,
+  `automotive-service.odex` SHA-256 `8af745b41aa28f490953d61531215cd94e059f104b31f6236a8f6c7af23b8062`,
+  `com.hkmc.ext.hcan.odex` md5 `b9ed02d077649b7c2a589d665f33e2e0`. On any other file
+  set the EV code still reads and sends nothing.
+- **Still to do when an EV6 port kit comes in:** deodex its framework here and
+  confirm the numbers above; build the EV6's own GPM patch instead of the code line.
+- The car's own *battery conditioning* setting stays the off switch.

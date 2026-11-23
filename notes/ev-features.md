@@ -172,7 +172,14 @@ the Ioniq 5 US 260507 on 2026-11-04; to redo it (or for another car):
   (`notes/ev-vehicle-commands.md`). `patches/neev/HKMC_GPM.ev.lpd` still holds
   the EV classes built before `Precond` and `EvCar` knew the 260903 hashes;
   they behave the same on 260507.
-- **Kia EV6:** needs its own energy model (`build_model_template.py` has a
-  generic path), a check that its data sources match, and its own testing.
+- **Kia EV6 US 260507 (in testing):** its GPM app code is the Ioniq 5 US 260507's
+  (`fcd92857…`), so the EV GPM is built on the unit from the code in its own
+  `.odex` (`universal/HKMC_GPM.ev.fcd92857.lpd`, a `code` line in `patches/ev6/manifest`);
+  if the code doesn't match, the car gets the plain build. Same library patch. Gates:
+  the EV6's framework hashes, from another project's review (`notes/ev-vehicle-commands.md`).
+  Road load: A 180 N, C 0.40 (`EvModelSender.ROAD_CAR_*`, picked from `ro.build.product`),
+  fitted to a 2022 US EV6's highway logs in AwsomeFox's egmp-aa-ev-hmg-api; the rest
+  of the model (charge curve, capacity learning) is the Ioniq 5's. The template now
+  also carries the road load C patch point (`ROAD_C_OFFSET`).
 - **Model improvements:** egmp-aa-ev-feat's roadmap (log analysis, a model that
   adjusts itself) moves to Evergreen issues.

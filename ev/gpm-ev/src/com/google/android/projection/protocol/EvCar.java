@@ -28,7 +28,8 @@ import com.hkmc.cluster.NavigationClusterListener;
  * The telematics interface (hscan) is in com.hkmc.ext.hcan, which GPM may not
  * load: then the numbers verified on the Ioniq 5 US 260507 and 260903 (0x0b,
  * 0xd6) are used only if that library is byte for byte one of those files
- * (HCAN_MD5 / HCAN_260903_MD5).
+ * (HCAN_MD5 / HCAN_260903_MD5), or the Kia EV6 US 260507's (HCAN_EV6_MD5: the same
+ * numbers, checked from its own framework in KSubedi's Ultimate Wireless Projection fork).
  * No VIN is read (Evergreen collects no per-car identity).
  *
  * Sources (numbers as on the Ioniq 5 US 260507 and 260903):
@@ -66,6 +67,8 @@ final class EvCar {
     static final String HCAN_ODEX = "/system/framework/com.hkmc.ext.hcan.odex";
     static final String HCAN_MD5 = "c4638b2befbabce418d2664f4e7ec304";
     static final String HCAN_260903_MD5 = "1cab9265954bbf48a5dddb67a1e6f2bc";
+    // the Kia EV6 US 260507's (same 0x0b/0xd6; review in notes/ev-vehicle-commands.md)
+    static final String HCAN_EV6_MD5 = "b9ed02d077649b7c2a589d665f33e2e0";
 
     private static final String DATC_SERVICE = "com.hkmc.micom.datc";
     private static final String DATC_TOKEN = "com.hkmc.datc.IDATCService";
@@ -656,10 +659,10 @@ final class EvCar {
         Boolean known = sHcanKnown;
         if (known == null) {
             String h = md5(HCAN_ODEX);
-            boolean ok = HCAN_MD5.equals(h) || HCAN_260903_MD5.equals(h);
+            boolean ok = HCAN_MD5.equals(h) || HCAN_260903_MD5.equals(h) || HCAN_EV6_MD5.equals(h);
             known = Boolean.valueOf(ok);
             sHcanKnown = known;
-            Log.i(TAG, "telematics library " + (ok ? "is" : "isn't") + " a verified Ioniq 5 US one");
+            Log.i(TAG, "telematics library " + (ok ? "is" : "isn't") + " a verified one (Ioniq 5 US, Kia EV6 US)");
         }
         return known.booleanValue() ? verifiedTx : -1;
     }

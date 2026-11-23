@@ -38,6 +38,27 @@ public final class TxTest {
                 Precond.HkmcVehicle.FRAMEWORK_260903_SHA256,
                 Precond.HkmcVehicle.SERVICE_SHA256), "reverse mismatched framework rejected");
         pass++;
+        check(Precond.HkmcVehicle.isVerifiedFramework(
+                Precond.HkmcVehicle.FRAMEWORK_EV6_SHA256,
+                Precond.HkmcVehicle.SERVICE_EV6_SHA256), "Kia EV6 US 260507 framework verified");
+        pass++;
+        check(!Precond.HkmcVehicle.isVerifiedFramework(
+                Precond.HkmcVehicle.FRAMEWORK_EV6_SHA256,
+                Precond.HkmcVehicle.SERVICE_SHA256), "EV6 framework with the Ioniq 5 service rejected");
+        pass++;
+        check(Precond.HkmcVehicle.FRAMEWORK_EV6_SHA256.equals("b9e7e02b81e1a8cfcf767c6b8bbb28bcf1d2c411a208fbf6a465e7f0c662774a")
+                && Precond.HkmcVehicle.SERVICE_EV6_SHA256.equals("8af745b41aa28f490953d61531215cd94e059f104b31f6236a8f6c7af23b8062")
+                && EvCar.HCAN_EV6_MD5.equals("b9ed02d077649b7c2a589d665f33e2e0"),
+                "EV6 automotive / automotive-service SHA-256 and hcan md5");
+        pass++;
+        check(EvModelSender.roadCar("CVEV.USA.0000.V015.012.260507") == 0
+                && EvModelSender.ROAD_CAR_A_N[0] == 180.0f && EvModelSender.ROAD_CAR_C[0] == 0.40f,
+                "Kia EV6 gets its own road load");
+        pass++;
+        check(EvModelSender.roadCar("NEEV23.USA.0000.V015.012.260507") == -1
+                && EvModelSender.roadCar("") == -1 && EvModelSender.roadCar(null) == -1,
+                "other cars keep the model's road load");
+        pass++;
         check(!Precond.HkmcVehicle.isVerifiedFramework(
                 "0000000000000000000000000000000000000000000000000000000000000000",
                 "0000000000000000000000000000000000000000000000000000000000000000"), "unknown framework rejected");

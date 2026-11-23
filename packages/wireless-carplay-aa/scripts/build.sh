@@ -12,6 +12,16 @@
 # plain line for the same part and file, unless an empty EVERGREEN-NO-EV file sits
 # next to our NEMESIS.data on the install drive. A car with no +ev lines builds as
 # before. $BUILD_DIR/ev records which way it went (1 or 0) for the install log.
+# EV is all or nothing: if a +ev line can't be built (a "code" line whose code
+# doesn't match), every EV file is dropped and the car gets the plain build.
+#
+# Code lines: "<part> code <App> <patch> <md5 of the result dex>" build an app from
+# the dex inside the car's own stock .odex (`lpatch odexdex`, as the universal build
+# does), so a set can use a patch made from another car with the same app code
+# without that car's stock APK here. The patch's own header checks the code; the
+# part's stock check still pins the exact .odex and APK. A code line that doesn't
+# fit is not an error: the next line for the same part and app is tried instead,
+# so a code line must always be followed by a plain line for the same file.
 BUILD_DIR=/data/nemesis/build/wireless.carplay.aa
 TBT_BACKUP=/data/nemesis/backup/projection.tbt
 MENU_BACKUP=/data/nemesis/backup/projection.menu
@@ -42,19 +52,49 @@ stock_src() {
 # build_one <part> <kind> <name> <patch> <md5> [optional]: rebuild one file into
 # $BUILD_DIR/<part>/ (an optional one logs a mismatch as a skip, not a failure)
 build_one() {
-    local _part="$1" _kind="$2" _name="$3" _patch="$4" _want="$5" _out _src _odex _tmp _f="FAIL:"
+    local _part="$1" _kind="$2" _name="$3" _patch="$4" _want="$5" _out _src _odex _tmp _code _f="FAIL:"
     [ "$6" = optional ] && _f="skip (optional):"
+    [ "$_kind" = code ] && _f="not used (the next line for $_name is tried):"
     _tmp="$BUILD_DIR/classes.dex"
     mkdir -p "$BUILD_DIR/$_part" || return 1
     case "$_kind" in
-        app) _out="$BUILD_DIR/$_part/$_name.apk" ;;
+        app|code) _out="$BUILD_DIR/$_part/$_name.apk" ;;
         file) _out="$BUILD_DIR/$_part/$_name" ;;
         *) log "FAIL: bad manifest line ($_part $_kind)"; return 1 ;;
     esac
-    if [ -s "$_out" ] && [ "$(lp_md5 "$_out")" = "$_want" ]; then
+    if [ "$_kind" != code ] && [ -s "$_out" ] && [ "$(lp_md5 "$_out")" = "$_want" ]; then
         return 0
     fi
     rm -f "$_out" "$_tmp" 2>/dev/null
+    if [ "$_kind" = code ]; then
+        _src=$(stock_src "/system/app/$_name.apk")
+        _odex=$(stock_src "/system/app/$_name.odex")
+        _code="$BUILD_DIR/$_name.code.dex"
+        if ! "$(lp_bin)" odexdex "$_odex" "$_code" >> "$LOG" 2>&1; then
+            rm -f "$_code"
+            log "$_f $_odex is missing or not an odex"
+            return 1
+        fi
+        if ! "$(lp_bin)" delta "patches/$_patch" "$_code" "$_tmp" >> "$LOG" 2>&1; then
+            rm -f "$_code" "$_tmp"
+            log "$_f the code in $_odex is not the code ${_patch##*/} needs"
+            return 1
+        fi
+        rm -f "$_code"
+        if [ "$(lp_md5 "$_tmp")" != "$_want" ]; then
+            rm -f "$_tmp"
+            log "$_f rebuilt $_name code does not match the expected result"
+            return 1
+        fi
+        if ! "$(lp_bin)" zipadd "$_src" "$_tmp" "$_out" >> "$LOG" 2>&1; then
+            rm -f "$_tmp" "$_out"
+            log "$_f could not assemble $_name.apk"
+            return 1
+        fi
+        rm -f "$_tmp"
+        log "built $_part/${_out##*/} from the code in the stock .odex (${_patch##*/})"
+        return 0
+    fi
     if [ "$_kind" = app ]; then
         _src=$(stock_src "/system/app/$_name.apk")
         _odex=$(stock_src "/system/app/$_name.odex")
@@ -94,17 +134,18 @@ ev_wanted() {
     return 0
 }
 
-# has_ev_line <manifest> <part> <name>: the manifest has an EV build of that file
-has_ev_line() {
+# ev_complete <manifest> <done list>: every file with a +ev line got an EV build
+ev_complete() {
     local _p _k _n _x _s
     while read -r _p _k _n _x _s; do
-        [ "$_p" = "$2+ev" ] && [ "$_n" = "$3" ] && return 0
+        case "$_p" in *+ev) ;; *) continue ;; esac
+        case "$2" in *" ${_p%+ev}/$_n "*) ;; *) return 1 ;; esac
     done < "$1"
-    return 1
+    return 0
 }
 
 build_payloads() {
-    local _v _m _part _kind _name _patch _want _ev=0 _evn=0
+    local _v _m _part _kind _name _patch _want _l _ev=0 _evn=0 _done=" "
     _v=$(car_variant) || { log "FAIL: no patch set for this car"; return 1; }
     if [ "$_v" = auto ]; then   # the universal build (scripts/universal.sh)
         universal_rebuilt || universal_build || return 1
@@ -124,19 +165,37 @@ build_payloads() {
             log "EVERGREEN-NO-EV on the install drive: turn-by-turn build without the EV features"
         fi
     fi
+    # the EV lines first: all of them or none
+    if [ $_ev = 1 ]; then
+        while read -r _part _kind _name _patch _want; do
+            case "$_part" in *+ev) ;; *) continue ;; esac
+            _part=${_part%+ev}
+            case "$_done" in *" $_part/$_name "*) continue ;; esac
+            if build_one "$_part" "$_kind" "$_name" "$_patch" "$_want"; then
+                _done="$_done$_part/$_name "
+                _evn=$((_evn + 1))
+            elif [ "$_kind" != code ]; then
+                return 1
+            fi
+        done < "$_m"
+        if ! ev_complete "$_m" "$_done"; then
+            log "the EV build doesn't fit this car's files: building without the EV features"
+            for _l in $_done; do
+                rm -f "$BUILD_DIR/$_l.apk" "$BUILD_DIR/$_l" 2>/dev/null
+            done
+            _ev=0 _evn=0 _done=" "
+        fi
+    fi
+    # then the plain lines, for each file the first one that fits
     while read -r _part _kind _name _patch _want; do
         [ -n "$_part" ] || continue
-        case "$_part" in
-            *+ev)
-                [ $_ev = 1 ] || continue
-                _part=${_part%+ev}
-                _evn=$((_evn + 1))
-                ;;
-            *)
-                [ $_ev = 1 ] && has_ev_line "$_m" "$_part" "$_name" && continue
-                ;;
-        esac
-        build_one "$_part" "$_kind" "$_name" "$_patch" "$_want" || return 1
+        case "$_part" in *+ev) continue ;; esac
+        case "$_done" in *" $_part/$_name "*) continue ;; esac
+        if build_one "$_part" "$_kind" "$_name" "$_patch" "$_want"; then
+            _done="$_done$_part/$_name "
+        elif [ "$_kind" != code ]; then
+            return 1
+        fi
     done < "$_m"
     echo $_ev > "$BUILD_DIR/ev"
     # a set without a library line (the car's Android Auto library has no patch yet):

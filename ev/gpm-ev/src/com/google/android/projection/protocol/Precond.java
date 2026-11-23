@@ -356,13 +356,22 @@ public final class Precond {
                 "c52e0825956880d627b32979022705a618200f059476c094d729133d1ff6a3be";
         static final String SERVICE_260903_SHA256 =
                 "bf17e682d1beb349ae8ef2acaae6d6e908fe42e88853d7145ee16b29bb4d9ec1";
+        // Kia EV6 US 260507: the same commands and numbers, checked from its own
+        // framework in KSubedi's Ultimate Wireless Projection fork (2026-11-22;
+        // notes/ev-vehicle-commands.md)
+        static final String FRAMEWORK_EV6_SHA256 =
+                "b9e7e02b81e1a8cfcf767c6b8bbb28bcf1d2c411a208fbf6a465e7f0c662774a";
+        static final String SERVICE_EV6_SHA256 =
+                "8af745b41aa28f490953d61531215cd94e059f104b31f6236a8f6c7af23b8062";
 
         private Boolean compatible;  // null = not checked yet
 
         static boolean isVerifiedFramework(String fwSha256, String svcSha256) {
             return (FRAMEWORK_SHA256.equals(fwSha256) && SERVICE_SHA256.equals(svcSha256))
                     || (FRAMEWORK_260903_SHA256.equals(fwSha256)
-                            && SERVICE_260903_SHA256.equals(svcSha256));
+                            && SERVICE_260903_SHA256.equals(svcSha256))
+                    || (FRAMEWORK_EV6_SHA256.equals(fwSha256)
+                            && SERVICE_EV6_SHA256.equals(svcSha256));
         }
 
         @Override
