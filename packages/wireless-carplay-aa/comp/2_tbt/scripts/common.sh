@@ -225,6 +225,7 @@ restore_lib() {
 # lane guidance from the iPhone never reached DiPO. recipes/iap2-lane-guidance.recipe moves
 # it to 0x5204 (one byte), only when every byte around it is the stock one; any other
 # library is left alone (no lanes, nothing else changes). The same file on every car seen.
+# Not applied for now: see apply_all.
 . "${LP_ROOT:-../..}/scripts/lpatch.sh"
 IAP2LIB=/system/lib/libiap2session.so
 IAP2LIB_RECIPE=iap2-lane-guidance
@@ -443,7 +444,11 @@ apply_all() {
         fi
     done
     apply_lib || return 1
-    apply_iap2lib || return 1
+    # apply_iap2lib is off: with the fix the lane guidance messages reach the library's
+    # converter (libIap2Acc.so iAP2NativeMsg2Parcel::convertSubGroup), which crashes on
+    # them (its LaneInformation groups come out with no body), taking Iap2ServerApp and
+    # all CarPlay turn-by-turn with it (US Ioniq 5, 2026-11-24). snapshot_iap2lib and
+    # restore_iap2lib stay, so an install that patched the library gets the stock one back.
     wipe_dalvik
     for _name in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
         prefill_dalvik "$APP_DIR/${_name}.odex" "$APP_DIR/${_name}.apk"
