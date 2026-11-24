@@ -220,6 +220,83 @@ restore_lib() {
     return 0
 }
 
+# ---- libiap2session.so: the iAP2 session library registers its LaneGuidanceInformation
+# handler under message id 0x5202 (RouteGuidanceManeuverUpdate's) instead of 0x5204, so
+# lane guidance from the iPhone never reached DiPO. recipes/iap2-lane-guidance.recipe moves
+# it to 0x5204 (one byte), only when every byte around it is the stock one; any other
+# library is left alone (no lanes, nothing else changes). The same file on every car seen.
+. "${LP_ROOT:-../..}/scripts/lpatch.sh"
+IAP2LIB=/system/lib/libiap2session.so
+IAP2LIB_RECIPE=iap2-lane-guidance
+
+iap2lib_state() {
+    [ -s "$IAP2LIB" ] || { echo MISSING; return 0; }
+    lp_state "$IAP2LIB_RECIPE" "$IAP2LIB"
+}
+
+snapshot_iap2lib() {
+    local _st
+    if [ -s "$BACKUP_DIR/libiap2session.so" ]; then
+        log "snapshot exists for libiap2session.so - keeping original"
+        return 0
+    fi
+    _st=$(iap2lib_state)
+    if [ "$_st" != PATCHABLE ]; then
+        log "libiap2session.so: lane guidance fix $_st - no snapshot"
+        return 0
+    fi
+    cp -f "$IAP2LIB" "$BACKUP_DIR/libiap2session.so" || return 1
+    if ! cmp "$IAP2LIB" "$BACKUP_DIR/libiap2session.so" >/dev/null 2>&1; then
+        log "FAIL: snapshot of libiap2session.so mismatch"
+        return 1
+    fi
+    chmod 644 "$BACKUP_DIR/libiap2session.so" 2>/dev/null || true
+    log "backed up $IAP2LIB"
+    return 0
+}
+
+# never an install failure: without it lane guidance just stays off
+apply_iap2lib() {
+    local _st
+    _st=$(iap2lib_state)
+    case "$_st" in
+        APPLIED) log "libiap2session.so already has the lane guidance fix"; return 0 ;;
+        PATCHABLE) ;;
+        *) log "WARN: libiap2session.so: lane guidance fix $_st - library left as it is (no CarPlay lanes)"; return 0 ;;
+    esac
+    [ -s "$BACKUP_DIR/libiap2session.so" ] || { log "WARN: no libiap2session.so snapshot - lane guidance fix skipped"; return 0; }
+    if ! lp_apply "$IAP2LIB_RECIPE" "$IAP2LIB" "$BACKUP_DIR/libiap2session.patched"; then
+        log "WARN: lpatch could not patch $IAP2LIB - lane guidance fix skipped"
+        return 0
+    fi
+    if ! put_lib "$BACKUP_DIR/libiap2session.patched" "$IAP2LIB"; then
+        rm -f "$BACKUP_DIR/libiap2session.patched"
+        log "FAIL: could not write $IAP2LIB"
+        return 1
+    fi
+    rm -f "$BACKUP_DIR/libiap2session.patched"
+    if [ "$(iap2lib_state)" != APPLIED ]; then
+        log "FAIL: $IAP2LIB did not verify after patching"
+        return 1
+    fi
+    log "OK: $IAP2LIB patched (lane guidance message id)"
+    return 0
+}
+
+restore_iap2lib() {
+    if [ ! -s "$BACKUP_DIR/libiap2session.so" ]; then
+        log "no libiap2session.so snapshot - nothing to restore"
+        return 0
+    fi
+    if [ "$(iap2lib_state)" != APPLIED ]; then
+        log "WARN: live libiap2session.so is not this package's patch - leaving it alone"
+        return 0
+    fi
+    put_lib "$BACKUP_DIR/libiap2session.so" "$IAP2LIB" || { log "FAIL: restore $IAP2LIB"; return 1; }
+    log "restored stock $IAP2LIB"
+    return 0
+}
+
 wipe_dalvik() {
     rm -f /data/dalvik-cache/*HKMC_GPM* 2>/dev/null || true
     rm -f /data/dalvik-cache/*HKMC_DiPO* 2>/dev/null || true
@@ -271,6 +348,7 @@ snapshot_all() {
         fi
     done
     snapshot_lib || return 1
+    snapshot_iap2lib || return 1
     return 0
 }
 
@@ -365,6 +443,7 @@ apply_all() {
         fi
     done
     apply_lib || return 1
+    apply_iap2lib || return 1
     wipe_dalvik
     for _name in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
         prefill_dalvik "$APP_DIR/${_name}.odex" "$APP_DIR/${_name}.apk"
@@ -391,6 +470,10 @@ restore_all() {
         return 1
     fi
     if ! restore_lib; then
+        sys_ro
+        return 1
+    fi
+    if ! restore_iap2lib; then
         sys_ro
         return 1
     fi
