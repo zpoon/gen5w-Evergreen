@@ -139,9 +139,12 @@ log_wifi_client() {
 #    which the kit copies to its private logs.
 #  EVERGREEN-SCREEN-RECOVER: a frozen CarPlay picture that a key frame didn't bring
 #    back in 4 s gets the screen borrowed and given back (telechips/LeafiaScreen).
+#  EVERGREEN-LANES-ID: the iAP2 identification tells the iPhone the head unit takes
+#    lane guidance (Iap2ServerApp's LeafiaLaneId), so it sends the lanes themselves.
 TRACE_FLAG=/data/nemesis/wireless.carplay.aa.trace
 TRACE_DIR=/data/nemesis/logs/evergreen-trace
 SCREEN_FLAG=/data/nemesis/wireless.carplay.aa.screenrecover
+LANEID_FLAG=/data/nemesis/wireless.carplay.aa.laneid
 
 # drive_has <marker>: the marker is on our install drive
 drive_has() {
@@ -167,6 +170,7 @@ opt_flag() {
 trace_setup() {
     opt_flag EVERGREEN-TRACE "$TRACE_FLAG" "turn-by-turn trace (logs in $TRACE_DIR)"
     opt_flag EVERGREEN-SCREEN-RECOVER "$SCREEN_FLAG" "CarPlay frozen-picture screen recovery"
+    opt_flag EVERGREEN-LANES-ID "$LANEID_FLAG" "CarPlay lane guidance in the iAP2 identification"
     return 0
 }
 
