@@ -1,0 +1,454 @@
+{
+  "releases": [
+    "v1.0.0",
+    "v1.0.1",
+    "v1.0.2",
+    "v1.0.3",
+    "v1.0.4",
+    "v1.0.5",
+    "v1.1.0",
+    "v1.1.1",
+    "v1.1.3",
+    "v1.1.4",
+    "v1.2.0",
+    "v1.3.0"
+  ],
+  "cars": {
+    "hyundai-ioniq5-2022-us-260903": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "589e6e7ae6ac05b1865e8e4c0868aed1",
+        "59f68c0d484c6fb5d3889f382859d8e4",
+        "982a62795fd9ddba8842e41e5f78db5a",
+        "9a73d5ae6354e2f980de775741bdddd3",
+        "e7c1f412233482e12bde8543c6c1e24f",
+        "fe7112ddc94f7cd0e36abbd89f00aff4"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "0308224b94c7e1b81d372a8ea1535aed",
+        "458a3009b786d4ca014ff59d37d541c3",
+        "56557618b55fc606ad2b50a113e6f519",
+        "e35d5d465e856ba7eb5064073ada75fa",
+        "eaaf50bb30953b0fcaf59b2cf211d709",
+        "fa51631fb59a7a08ea025d32788339d6"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "54e16b7f067c4924aa1422f59ca1b457",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "37cbe6bfe7462444ca1f6d88013383d9",
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "hyundai-ioniq5-ca-260206": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "4150a328e5447ad4511a92cccd49ce10",
+        "b7c041ed4448ab6d0e07d6c9f6733e51"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "1d5d0c1aeb6263af4e0c0d69e10bef26",
+        "809271dd02117c24d0b3c6c55dc8c691",
+        "e99223a2f17723660345205242054b12"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "5afa7611235c0960fb82ad4b4329f516",
+        "ae47bc1ea21d6ed24ac12978d72216a3"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "84321500e6921b9222d5b91ff3ca75b2"
+      ]
+    },
+    "hyundai-ioniq5-ca-260903": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "4150a328e5447ad4511a92cccd49ce10",
+        "59f68c0d484c6fb5d3889f382859d8e4",
+        "982a62795fd9ddba8842e41e5f78db5a",
+        "b7c041ed4448ab6d0e07d6c9f6733e51"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "1d5d0c1aeb6263af4e0c0d69e10bef26",
+        "458a3009b786d4ca014ff59d37d541c3",
+        "809271dd02117c24d0b3c6c55dc8c691",
+        "e99223a2f17723660345205242054b12",
+        "eaaf50bb30953b0fcaf59b2cf211d709"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "54e16b7f067c4924aa1422f59ca1b457",
+        "5afa7611235c0960fb82ad4b4329f516",
+        "ae47bc1ea21d6ed24ac12978d72216a3"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "37cbe6bfe7462444ca1f6d88013383d9",
+        "84321500e6921b9222d5b91ff3ca75b2",
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "hyundai-ioniq5-us-260507": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "40677612d9fd109eba7016cc92911a6e",
+        "589e6e7ae6ac05b1865e8e4c0868aed1",
+        "9a73d5ae6354e2f980de775741bdddd3",
+        "b157967fe400b59632eb6080dd22569d",
+        "e7c1f412233482e12bde8543c6c1e24f",
+        "fe7112ddc94f7cd0e36abbd89f00aff4"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "0308224b94c7e1b81d372a8ea1535aed",
+        "56557618b55fc606ad2b50a113e6f519",
+        "a6db40d169e62c3b8a07b883e61afe46",
+        "b9a641e99756d8f5c9f5febb56dcd60b",
+        "e35d5d465e856ba7eb5064073ada75fa",
+        "fa51631fb59a7a08ea025d32788339d6",
+        "fb86afbe8ad3ee68102c8a3797a0f6d8"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "11a58afc6ebd937d69fa174f565e5e34",
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "37cbe6bfe7462444ca1f6d88013383d9",
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "hyundai-ioniq5-us-260903": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "589e6e7ae6ac05b1865e8e4c0868aed1",
+        "59f68c0d484c6fb5d3889f382859d8e4",
+        "982a62795fd9ddba8842e41e5f78db5a",
+        "9a73d5ae6354e2f980de775741bdddd3",
+        "e7c1f412233482e12bde8543c6c1e24f",
+        "fe7112ddc94f7cd0e36abbd89f00aff4"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "0308224b94c7e1b81d372a8ea1535aed",
+        "458a3009b786d4ca014ff59d37d541c3",
+        "56557618b55fc606ad2b50a113e6f519",
+        "e35d5d465e856ba7eb5064073ada75fa",
+        "eaaf50bb30953b0fcaf59b2cf211d709",
+        "fa51631fb59a7a08ea025d32788339d6"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "54e16b7f067c4924aa1422f59ca1b457",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "37cbe6bfe7462444ca1f6d88013383d9",
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "hyundai-ioniq6-us-260903": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "5129e93570dde840e563cb9037a1c69c",
+        "97ad28843d5f81b8fd85f06b475d5cd4"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "0a82555e51bbe93a006d813e7e03747c"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "502868fcae205762ce295c8bbedb9177"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "2a7ed397693c411a165a13f5886fffab"
+      ]
+    },
+    "hyundai-palisade-us-260903": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "6d7e482c4519daaae0a740819aea9dd7",
+        "e8866c89b267245a0703b68b3384a3e9"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "5b51bf692196fdffac8a2bf5d0f5a83c"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "54e16b7f067c4924aa1422f59ca1b457"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "kia-ev6-ca-260206": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "83482d5aec90573af95d3bc4e310151f",
+        "c40739d474cd39ff3625ed73bfcd5b1c",
+        "cd240c40c923eaff5da5b41a7aacbbe6",
+        "cd8581e0b11490b4733dbb3299b9f9e1"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "1929356d4d7126b28ffd3a6f13392fcf",
+        "329946b20cd51855d7da6056dbfbc4db",
+        "5af929dc68b0418a106803d6b55e7310",
+        "b6a094c99646a022349a2bf4cceabac4"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "11a58afc6ebd937d69fa174f565e5e34",
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "kia-ev6-kr-260902": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "63ba37527594c3ac398c6d78d707d479",
+        "c40739d474cd39ff3625ed73bfcd5b1c",
+        "cd240c40c923eaff5da5b41a7aacbbe6",
+        "e4a91e835ac8e88280c26f135769fbdd"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "329946b20cd51855d7da6056dbfbc4db",
+        "8c3acd57362292a74f207829e0e5b5f3"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "7c7c4037e2b0d2528ddb0ba0a3ddb435"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "kia-ev6-us-260507": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "154204dd700d02a6d47b4d7b6550c8f6",
+        "4d7452a71fc2c120032ef1734d15f0fb",
+        "c40739d474cd39ff3625ed73bfcd5b1c",
+        "cd240c40c923eaff5da5b41a7aacbbe6"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "329946b20cd51855d7da6056dbfbc4db",
+        "52d533bdcc4680e704731b5a2311ed09",
+        "7c6df0f570677157326b105b6b87bfc2",
+        "f228bca4daaf6f455646cc337f533160"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "11a58afc6ebd937d69fa174f565e5e34",
+        "496ef30d2c7f8260f25bd14d62c646c2",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "kia-sportage-hybrid-us-260507": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "00447fe4ec7b0f6c3cab38c0d7a944bf",
+        "3911c5530259799fee39b61b11129392",
+        "8eca77be91712cbd9c4cdf1603d4153e",
+        "fc86ee3c9a530274e63c059e70fb5451"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "429a1205e0d7430a04c9b08d1c64c78b",
+        "5bef43633d18f77223e4c7e0396c04e0"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "11a58afc6ebd937d69fa174f565e5e34",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    },
+    "kia-sportage-us-260507": {
+      "/system/app/HKMC_BtSettings.apk": [
+        "3a8b442c13259943a8726fbc15a00fb9",
+        "4b56912c836261cafecad6ae2b1407a6",
+        "575ac7eb4e01e0111b444697b9f6a4e8",
+        "596b0e80ad2b807dee899593f1ca17d8",
+        "93ecaa97597a79be2a10728e45c72b33",
+        "a8ca2abd8235c57a50d580aed8a2de3e",
+        "b977e268fbe73cb5637c4413647a7dea",
+        "cd98c36db6857ed174757c6010a36494",
+        "e7c90e78f45f7e6b9c90ddd7a238b566"
+      ],
+      "/system/app/HKMC_DiPO.apk": [
+        "00447fe4ec7b0f6c3cab38c0d7a944bf",
+        "3911c5530259799fee39b61b11129392",
+        "8eca77be91712cbd9c4cdf1603d4153e",
+        "fc86ee3c9a530274e63c059e70fb5451"
+      ],
+      "/system/app/HKMC_GPM.apk": [
+        "429a1205e0d7430a04c9b08d1c64c78b",
+        "5bef43633d18f77223e4c7e0396c04e0"
+      ],
+      "/system/app/HKMC_Navi_ExSL.apk": [
+        "11a58afc6ebd937d69fa174f565e5e34",
+        "b1fc88d42954c41e7944e9247647e9ad"
+      ],
+      "/system/app/Iap2ServerApp.apk": [
+        "75d7fea4d2009be6aa5c840118f58c94",
+        "7e90fa7d8a161ade71e11dc15e56c410"
+      ],
+      "/system/lib/libautoreceiver_infobank.so": [
+        "c08410a8d32a615b1aa805cd8a243d52"
+      ]
+    }
+  }
+}
