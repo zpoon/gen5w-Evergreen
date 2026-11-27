@@ -9,6 +9,7 @@ package installs on it (from patches/<set>/manifest and patches/common/optional;
 so the page can tell a unit that already runs Leafia from one with unknown files.
 The cars table (patches/cars) maps the car's product prefix to its patch set.
 With --check nothing is written; it exits 1 if compat.json is out of date (CI).
+At a release: compat-built.py --release v<package-version> (adds it to released.json).
 """
 import json, os, sys
 
@@ -62,7 +63,74 @@ def universal():
             'files': {k: sorted(v) for k, v in sorted(files.items())}}
 
 
+# ---- builds from releases: docs/data/released.json ----
+# The page counts a file as ours if it is on "built" (what this commit installs) or
+# on the car's released.json list (what any tagged release installed on it), so a
+# car that hasn't updated yet isn't told it needs a build. Written only by
+# --release <tag>, from that tag's own cars table and manifests (git show); normal
+# runs and --check never touch it, so CI needs no tags.
+RELEASED = os.path.join(ROOT, 'docs', 'data', 'released.json')
+
+
+def git_show(tag, path):
+    import subprocess
+    r = subprocess.run(['git', '-C', ROOT, 'show', '%s:%s' % (tag, path)],
+                       capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else ''
+
+
+def tag_lines(tag, path):
+    return [p for p in (l.split() for l in git_show(tag, path).splitlines())
+            if len(p) == 5 and not p[0].startswith('#')]
+
+
+def released_for(tag, patch_set):
+    """{file: [md5...]} our package installed on a car of <patch_set> in <tag>"""
+    out = {}
+    lines = tag_lines(tag, 'patches/%s/manifest' % patch_set) + tag_lines(tag, 'patches/common/optional')
+    for _part, kind, name, _patch, md5 in lines:
+        if kind not in ('app', 'file'):
+            continue  # "code" lines: the result depends on the car's own stock APK
+        f = '/system/app/%s.apk' % name if kind == 'app' else '/system/lib/%s' % name
+        out.setdefault(f, set()).add(md5)
+    return out
+
+
+def add_release(tag):
+    if not git_show(tag, 'patches/cars'):
+        sys.exit('%s: no patches/cars at that tag (fetch the tags?)' % tag)
+    sets = {}
+    for l in git_show(tag, 'patches/cars').splitlines():
+        p = l.split()
+        if len(p) >= 2 and not p[0].startswith('#'):
+            sets[p[0]] = p[1]
+    db = json.load(open(COMPAT, encoding='utf-8'))
+    rel = json.load(open(RELEASED, encoding='utf-8')) if os.path.exists(RELEASED) else {}
+    rel.setdefault('releases', [])
+    cars = rel.setdefault('cars', {})
+    for v in db['variants']:
+        prefixes = v['product_prefix'] if isinstance(v['product_prefix'], list) else [v['product_prefix']]
+        found = set()
+        for p in prefixes:
+            within = [c for c in sets if p.startswith(c)]
+            found |= {sets[max(within, key=len)]} if within else {sets[c] for c in sets if c.startswith(p)}
+        if len(found) != 1:
+            continue  # not in that release, or ambiguous there
+        mine = cars.setdefault(v['id'], {})
+        for f, md5s in released_for(tag, found.pop()).items():
+            mine[f] = sorted(set(mine.get(f, [])) | md5s)
+    if tag not in rel['releases']:
+        rel['releases'].append(tag)
+    rel['cars'] = {k: dict(sorted(cars[k].items())) for k in sorted(cars) if cars[k]}
+    open(RELEASED, 'w', encoding='utf-8').write(json.dumps(rel, indent=2, ensure_ascii=False) + '\n')
+    print('docs/data/released.json: added %s' % tag)
+
+
 def main():
+    if sys.argv[1:2] == ['--release']:
+        for tag in sys.argv[2:]:
+            add_release(tag)
+        return
     check = '--check' in sys.argv[1:]
     sets = {}
     for l in open(os.path.join(PATCHES, 'cars')):

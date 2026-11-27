@@ -17,7 +17,8 @@ Evergreen installs from a USB drive through [NEMESIS](https://github.com/xwtk/hm
 
 ### Directions on the cluster and HUD
 - **Turn-by-turn arrows and distances** from Apple Maps, Google Maps, Waze and other navigation apps, on the instrument cluster and the head-up display (on cars that have one).
-- **Lane guidance** with CarPlay: the lanes you should be in, shown as you approach the turn. *Not working in 1.3.0; a fix is in testing for 1.3.1.*
+- **Roundabouts, highway exits and the start of a route** show the right arrow with CarPlay, and distances of 1,000 ft and more read correctly.
+- **Lane guidance isn't supported with CarPlay yet.** The head unit's own software drops the lanes the phone sends, and fixing that crashes it, so this needs more work.
 - **Speed limits and camera warnings keep working.** Signs from the car's own map stay on the cluster while your phone is guiding you.
 - **The car's own navigation stays out of the way.** Its lanes and turns don't mix with your phone's while the phone is guiding.
 - **Switching apps is clean.** Going from Apple Maps to Waze (or back) clears the old route from the cluster before the new one appears.
@@ -38,14 +39,15 @@ Don't want the EV features (Android Auto and CarPlay)? Put an empty file named `
 - **USB drives no longer block wireless Android Auto.** On stock software, plugging in a USB drive can lock out wireless Android Auto until the head unit restarts.
 - **No more CarPlay crash when the phone reconnects** after a dropped connection.
 - **Opens the ports wireless projection needs** on cars whose firmware blocks them on the hotspot (Ioniq 6).
-- **The CarPlay picture recovers on its own** if it freezes.
+- **The CarPlay picture recovers on its own** if it freezes, and a short Wi-Fi hiccup no longer ends it.
+- **Directions don't get stuck** when a navigation app goes quiet: the last arrow is cleared and the phone is asked for the route again.
 - **The "first connection" CarPlay notice** only shows the first time, not on every drive.
 - **Faster first start** after installing.
 - **A warning when the head unit's Wi-Fi is on,** since that can make CarPlay and Android Auto drop (see below).
 
 ### Safe to try
 - **Checks before it changes anything.** If your car's software isn't one Evergreen knows, it doesn't patch it.
-- **Full uninstall.** Removing Evergreen restores every file to the factory version.
+- **Full uninstall.** Removing Evergreen restores every file to the factory version, and puts your Phone Projection settings back as they were.
 - **Works on more cars than it was built for.** If your car runs the same software as a supported car, Evergreen recognises it and installs the full version. Otherwise it installs **basic mode** (wireless Android Auto only) and saves a report so support for your car can be added.
 
 ## Supported cars

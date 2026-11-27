@@ -285,6 +285,8 @@ jobs:
 
       # kits/leafia is published byte for byte as the website's downloads (tools/check-downloads.sh),
       # so its findings are reported here and fixed when the kit next changes.
+      # Findings show as a warning, not an error, so a passing run has no red line.
       - name: ShellCheck (kits/leafia, report only)
-        continue-on-error: true
-        run: git ls-files -z 'kits/leafia/*.sh' | xargs -0 shellcheck -S warning -s ksh
+        run: |
+          git ls-files -z 'kits/leafia/*.sh' | xargs -0 shellcheck -S warning -s ksh \
+            || echo "::warning title=ShellCheck (kits/leafia)::findings in the USB kit, listed above; fix them when the kit next changes"

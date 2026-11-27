@@ -3,6 +3,7 @@
 
 const $ = (id) => document.getElementById(id);
 let DB = null;
+let RELEASED = {};
 let lastReport = "";  // the report as a block ready to paste into an issue
 
 const STATUS = {
@@ -48,7 +49,13 @@ function findVariant(r) {
 
 // a file matches when it is the stock one, or what our package installs on this car
 // (an app we rebuilt gets its .odex written on the unit, so then any .odex goes)
-function isBuilt(r, v, f) { return !!(v && v.built && v.built[f] && v.built[f].includes(r.files[f])); }
+// (released.json: what each tagged release installed, so a unit on an older release counts too)
+function isBuilt(r, v, f) {
+  if (!v) return false;
+  const rel = RELEASED.cars && RELEASED.cars[v.id];
+  return !!((v.built && v.built[f] && v.built[f].includes(r.files[f]))
+    || (rel && rel[f] && rel[f].includes(r.files[f])));
+}
 function filesMatch(r, v, list) {
   if (!v) return false;
   return list.every((f) => (v.stock[f] && r.files[f] === v.stock[f]) || isBuilt(r, v, f)
@@ -62,7 +69,11 @@ function universalMatch(r) {
   return Object.entries(u.code).every(([f, list]) => list.includes(r.code[f]))
     && Object.entries(u.files).every(([f, list]) => list.includes(r.files[f]));
 }
-function leafiaInstalled(r, v) { return !!(v && v.built && Object.keys(v.built).some((f) => isBuilt(r, v, f))); }
+function leafiaInstalled(r, v) {
+  if (!v) return false;
+  const files = new Set(Object.keys(v.built || {}).concat(Object.keys((RELEASED.cars && RELEASED.cars[v.id]) || {})));
+  return [...files].some((f) => isBuilt(r, v, f));
+}
 
 function recipeState(r, id) {
   const res = r.results[id];
@@ -226,6 +237,7 @@ function readFile(f) { const fr = new FileReader(); fr.onload = () => render(Str
 
 async function init() {
   DB = await (await fetch("data/compat.json")).json();
+  try { RELEASED = await (await fetch("data/released.json")).json(); } catch (e) { /* optional */ }
   let wanted = null;
   try { wanted = await (await fetch("data/wanted.json")).json(); } catch (e) { /* the wanted list is optional */ }
   renderCars(wanted);
