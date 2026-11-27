@@ -132,6 +132,8 @@ find "$X/pkg" -name '*.sh' | while read -r f; do
 done
 [ "$MOCK_WIFI_CLIENT" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/LEAFIA-WIFI-CLIENT"
 [ "$MOCK_NO_EV" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/EVERGREEN-NO-EV"
+# MOCK_OPT="EVERGREEN-TRACE EVERGREEN-SCREEN-RECOVER": opt-in markers on the install drive
+for _o in $MOCK_OPT; do MOCK_USB_DESCRIPTOR=1; : > "$R/storage/usb0/$_o"; done
 [ "$MOCK_USB_DESCRIPTOR" = 1 ] && printf '[nemesis]\nversion=1.0\ntype=install\npath=packages/wireless.carplay.aa.zip\n' > "$R/storage/usb0/NEMESIS.data"
 
 (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/before.md5"
@@ -173,6 +175,15 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         cmp -s "$_c" "$R/system/app/$_n.odex" || { echo "dalvik cache for $_n differs from its odex"; ok=0; }
     done
     echo "dalvik cache after install:${_dc:- none}"
+    # CarPlay EV routing: the EV session library and our two libraries, all or none
+    _cs=$(md5sum "$R/system/lib/libiap2session.so" 2>/dev/null | cut -c1-8)
+    _cl=0; for _c in libcarplayev.so libcarplayidentity.so; do [ -e "$R/system/lib/$_c" ] && _cl=$((_cl + 1)); done
+    echo "carplay ev after install: libiap2session ${_cs:-missing}, our libraries $_cl"
+    case "$_cs:$_cl" in
+        b32703e6:2) [ "$MOCK_NO_EV" = 1 ] && { echo "EVERGREEN-NO-EV but CarPlay EV installed"; ok=0; } ;;
+        *:0) ;;
+        *) echo "CarPlay EV half installed"; ok=0 ;;
+    esac
     if [ "$MOCK_OWNER_WIFI" = 1 ]; then
         # what Tilepad / NEMESIS's WiFi button / stock settings leave after turning the client on
         cp "$X/pkg/comp/1_projection/files/permissions/android.hardware.wifi.xml" "$R/system/etc/permissions/" 2>/dev/null \

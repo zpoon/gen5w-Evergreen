@@ -24,12 +24,15 @@ Evergreen installs from a USB drive through [NEMESIS](https://github.com/xwtk/hm
 - **The car's own navigation comes back normally** once you stop using phone directions.
 
 ### For EV drivers (Android Auto with Google Maps)
-On supported EVs (so far the Hyundai Ioniq 5, US and Canada, on 260507 and 260903), Evergreen includes the EV features from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat):
+On supported EVs (so far the Hyundai Ioniq 5, US and Canada, on 260507 and 260903, and the Kia EV6, US on 260507 and Canada on 260206, *in testing*), Evergreen includes the EV features from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat):
 - **Charging stops planned from your real battery level.** Google Maps uses the car's live battery data to plan charging stops and show your arrival percentage.
 - **Battery preconditioning on the way to a fast charger**, when the car's own *battery conditioning* setting is on.
 - **EV drive logs** that you can copy to a USB drive (create a folder named `egmp-aa-ev-logs` on the drive).
 
-Don't want the EV features? Put an empty file named `EVERGREEN-NO-EV` next to `NEMESIS.data` on the install drive.
+### For EV drivers (CarPlay with Apple Maps) *(in testing)*
+On the same cars, Evergreen includes [egmp-carplay-ev-routing](https://github.com/isaacwisdom/egmp-carplay-ev-routing): the head unit tells the iPhone the car is electric, with its charging connectors, and keeps sending the live battery level and range, so **Apple Maps can plan charging stops and show your battery level on arrival**. If Apple Maps doesn't offer EV routing after installing, remove the car under CarPlay on the iPhone (Settings > General > CarPlay) and connect again.
+
+Don't want the EV features (Android Auto and CarPlay)? Put an empty file named `EVERGREEN-NO-EV` next to `NEMESIS.data` on the install drive.
 
 ### Fixes for problems in the stock software
 - **USB drives no longer block wireless Android Auto.** On stock software, plugging in a USB drive can lock out wireless Android Auto until the head unit restarts.
@@ -134,6 +137,7 @@ The most useful help is **reports from new cars**, **test results from real cars
 - Evergreen is maintained by [zpoon](https://github.com/zpoon). It started as a fork of [HMG Leafia Plus](https://github.com/VysseCodes/HMG-Leafia-Plus) by [VysseCodes](https://github.com/VysseCodes) (now archived). If that work helped you, you can support its author through [GitHub Sponsors](https://github.com/sponsors/VysseCodes) or [Ko-fi](https://ko-fi.com/vyssecodes).
 - Hyundai Ioniq 5 US 260903 support by [gdonaldson1676](https://github.com/gdonaldson1676).
 - EV features: [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat) by [willemcvu](https://github.com/willemcvu), included with their permission (see `NOTICE.md`).
+- CarPlay EV routing: [egmp-carplay-ev-routing](https://github.com/isaacwisdom/egmp-carplay-ev-routing) by [Isaac Wisdom](https://github.com/isaacwisdom) (GPL-3.0-or-later), with the identification code from HMG-API's wireless mod (see `NOTICE.md`).
 - Runs through [NEMESIS](https://github.com/xwtk/hmg_nemesis) by xwtk (AGPL-3.0). Parts derived from NEMESIS packages are listed in `NOTICE.md` and keep their original licence.
 - Thanks to [W-Floyd](https://github.com/W-Floyd) for their help with this project.
 - Evergreen is GPL-3.0 (see `LICENSE`).

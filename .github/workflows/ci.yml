@@ -68,7 +68,7 @@ jobs:
           hit() { [ $all = true ] || grep -q -E "$always|$1" changed.txt; }
           out() { if hit "$2"; then v=true; else v=false; fi; echo "$1=$v" | tee -a "$GITHUB_OUTPUT"; }
           out lpatch  '^(tools/lpatch/|recipes/|tools/mkdelta\.py|tools/mkrecipe\.py)'
-          out ev6aac  '^(src/ev6aac/|packages/wireless-carplay-aa/comp/4_audio/files/libev6aac\.so)'
+          out ev6aac  '^(src/ev6aac/|packages/wireless-carplay-aa/comp/4_audio/files/libev6aac\.so|ev/carplay/native/|ev/carplay/build\.sh|packages/wireless-carplay-aa/comp/2_tbt/files/)'
           out kits    '^(kits/|docs/downloads/|recipes/|tools/build-kit\.sh|tools/check-downloads\.sh|tools/lpatch/lpatch$)'
           out package '^(packages/|patches/|recipes/|tools/build-package\.sh|tools/lpatch/lpatch$|tools/lpatch/lpatch\.c|tools/compat-built\.py|docs/data/compat\.json|tools/test-universal\.sh|tools/test-cars\.sh|tools/mkuniversal\.py)'
           out ev      '^(ev/|packages/wireless-carplay-aa/(scripts/build\.sh|svc/)|tools/test-ev-select\.sh|tools/test-evlog-offload\.sh|tools/test-wifi-client-warn\.sh|tools/test-hotspot-firewall\.sh|tools/ev-check\.py|tools/test-ev-check\.sh|ev/car-reference)'
@@ -103,7 +103,7 @@ jobs:
           path: ./tools/lpatch/
 
   verify-ev6aac:
-    name: Verify libev6aac.so
+    name: Verify libev6aac.so and the CarPlay EV libraries
     needs: changes
     if: needs.changes.outputs.ev6aac == 'true'
     runs-on: ubuntu-24.04
@@ -133,6 +133,14 @@ jobs:
             clang-18 --version | head -1
             exit 1
           fi
+
+      - name: CarPlay EV libraries rebuild byte for byte from ev/carplay
+        run: |
+          CLANG=clang-18 ./ev/carplay/build.sh "$RUNNER_TEMP/carplay"
+          for f in libcarplayev.so libcarplayidentity.so; do
+            cmp "$RUNNER_TEMP/carplay/$f" "packages/wireless-carplay-aa/comp/2_tbt/files/$f" || { clang-18 --version | head -1; exit 1; }
+          done
+          echo "CarPlay EV libraries match their source"
 
   build-kit:
     name: Build Kit

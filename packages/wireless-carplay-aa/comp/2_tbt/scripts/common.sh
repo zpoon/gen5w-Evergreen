@@ -221,6 +221,133 @@ restore_lib() {
     return 0
 }
 
+# ---- libiap2session.so and CarPlay EV routing. With the EV features (a "2_tbt+ev file
+# libiap2session.so" line, built by scripts/build.sh into $FILES) the stock library is
+# swapped for its EV build (recipes/carplay-ev-identification.recipe, applied off-car by
+# tools/elf-addseg.py: a new segment that lets libcarplayidentity.so add the car's energy
+# and charging data to the iPhone's identification), and libcarplayev.so and
+# libcarplayidentity.so go into /system/lib. Iap2ServerApp's LeafiaCarPlayEv uses them only
+# when all three are there and the session library is exactly that EV build.
+# Without the EV build the library stays stock.
+# An earlier test build (test5) patched one byte for lane guidance with
+# recipes/iap2-lane-guidance.recipe; that crashed Iap2ServerApp, so it is no longer applied,
+# but an install that has it gets the stock library back here as well.
+. "${LP_ROOT:-../..}/scripts/lpatch.sh"
+IAP2LIB=/system/lib/libiap2session.so
+IAP2LIB_STOCK=fc7cb675b46a44bd893a1edc054c5e71
+IAP2LIB_EV=b32703e6d702009da1cca02f4088ad58
+IAP2LIB_RECIPE=iap2-lane-guidance
+CPEV_LIBS="libcarplayev.so libcarplayidentity.so"
+
+# STOCK, EV (our EV build), LANE (test5's lane patch), MISSING or OTHER
+iap2lib_state() {
+    local _s
+    [ -s "$IAP2LIB" ] || { echo MISSING; return 0; }
+    _s=$(file_md5 "$IAP2LIB")
+    case "$_s" in
+        "$IAP2LIB_STOCK") echo STOCK; return 0 ;;
+        "$IAP2LIB_EV") echo EV; return 0 ;;
+    esac
+    if [ "$(lp_state "$IAP2LIB_RECIPE" "$IAP2LIB")" = APPLIED ]; then
+        echo LANE
+    else
+        echo OTHER
+    fi
+}
+
+snapshot_iap2lib() {
+    local _st
+    if [ -s "$BACKUP_DIR/libiap2session.so" ]; then
+        log "snapshot exists for libiap2session.so - keeping original"
+        return 0
+    fi
+    _st=$(iap2lib_state)
+    if [ "$_st" != STOCK ]; then
+        log "libiap2session.so is $_st, not the known stock file - no snapshot"
+        return 0
+    fi
+    cp -f "$IAP2LIB" "$BACKUP_DIR/libiap2session.so" || return 1
+    if ! cmp "$IAP2LIB" "$BACKUP_DIR/libiap2session.so" >/dev/null 2>&1; then
+        log "FAIL: snapshot of libiap2session.so mismatch"
+        return 1
+    fi
+    chmod 644 "$BACKUP_DIR/libiap2session.so" 2>/dev/null || true
+    log "backed up $IAP2LIB"
+    return 0
+}
+
+remove_cpev_libs() {
+    local _n
+    for _n in $CPEV_LIBS; do
+        [ -e "/system/lib/$_n" ] || continue
+        rm -f "/system/lib/$_n" 2>/dev/null || true
+        if [ -e "/system/lib/$_n" ]; then
+            log "FAIL: could not remove /system/lib/$_n"
+            return 1
+        fi
+        log "removed /system/lib/$_n"
+    done
+    return 0
+}
+
+# the EV build when scripts/build.sh made one, else the library stays (or goes back to) stock
+apply_iap2lib() {
+    local _st _n
+    _st=$(iap2lib_state)
+    if [ ! -s "$FILES/libiap2session.so" ]; then
+        remove_cpev_libs || return 1
+        case "$_st" in
+            EV|LANE) restore_iap2lib || return 1 ;;
+        esac
+        log "CarPlay EV routing not in this build: libiap2session.so stays stock"
+        return 0
+    fi
+    case "$_st" in
+        STOCK|EV) ;;
+        *) log "WARN: libiap2session.so is $_st - CarPlay EV routing left out, library left as it is"; remove_cpev_libs; return 0 ;;
+    esac
+    [ -s "$BACKUP_DIR/libiap2session.so" ] || { log "WARN: no libiap2session.so snapshot - CarPlay EV routing left out"; remove_cpev_libs; return 0; }
+    for _n in $CPEV_LIBS; do
+        if [ ! -s "files/$_n" ]; then
+            log "FAIL: missing files/$_n"
+            return 1
+        fi
+    done
+    if [ "$_st" = STOCK ]; then
+        if ! put_lib "$FILES/libiap2session.so" "$IAP2LIB"; then
+            log "FAIL: could not write $IAP2LIB"
+            return 1
+        fi
+        if [ "$(iap2lib_state)" != EV ]; then
+            log "FAIL: $IAP2LIB did not verify after writing"
+            return 1
+        fi
+    fi
+    for _n in $CPEV_LIBS; do
+        put_lib "files/$_n" "/system/lib/$_n" || { log "FAIL: could not write /system/lib/$_n"; return 1; }
+    done
+    log "OK: CarPlay EV routing: $IAP2LIB EV build and $CPEV_LIBS installed"
+    return 0
+}
+
+restore_iap2lib() {
+    local _st
+    remove_cpev_libs || return 1
+    if [ ! -s "$BACKUP_DIR/libiap2session.so" ]; then
+        log "no libiap2session.so snapshot - nothing to restore"
+        return 0
+    fi
+    _st=$(iap2lib_state)
+    case "$_st" in
+        STOCK) log "libiap2session.so already stock"; return 0 ;;
+        EV|LANE) ;;
+        *) log "WARN: live libiap2session.so ($_st) is not this package's - leaving it alone"; return 0 ;;
+    esac
+    put_lib "$BACKUP_DIR/libiap2session.so" "$IAP2LIB" || { log "FAIL: restore $IAP2LIB"; return 1; }
+    log "restored stock $IAP2LIB"
+    return 0
+}
+
 wipe_dalvik() {
     rm -f /data/dalvik-cache/*HKMC_GPM* 2>/dev/null || true
     rm -f /data/dalvik-cache/*HKMC_DiPO* 2>/dev/null || true
@@ -272,6 +399,7 @@ snapshot_all() {
         fi
     done
     snapshot_lib || return 1
+    snapshot_iap2lib || return 1
     return 0
 }
 
@@ -366,6 +494,7 @@ apply_all() {
         fi
     done
     apply_lib || return 1
+    apply_iap2lib || return 1
     wipe_dalvik
     for _name in HKMC_GPM HKMC_DiPO Iap2ServerApp HKMC_Navi_ExSL; do
         prefill_dalvik "$APP_DIR/${_name}.odex" "$APP_DIR/${_name}.apk"
@@ -392,6 +521,10 @@ restore_all() {
         return 1
     fi
     if ! restore_lib; then
+        sys_ro
+        return 1
+    fi
+    if ! restore_iap2lib; then
         sys_ro
         return 1
     fi
