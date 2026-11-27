@@ -7,6 +7,10 @@
 #                                so the iPhone asks for the hotspot SSID/passphrase
 #   persist.iap2.iden.wireless=t WirelessCarPlayTransportComponent (the feature XML
 #                                forces this on already; set so the prop agrees)
+#   persist.sys.iap2.btconnection=t  Iap2Server declares the Bluetooth Connection
+#                                feature in its identification (stock default: off),
+#                                so the iPhone gets the car's Bluetooth connection
+#                                updates; NEMESIS's enhanced.projection sets it too
 # Uninstall writes the snapshot and the original prop values back.
 
 # shellcheck disable=SC2034 # the scripts that source this file read its variables
@@ -19,7 +23,7 @@ APP_DIR=/system/app
 CP_XML=/system/etc/permissions/com.hkmc.software.connectivity.carplay_wireless.xml
 PROP_FILE=$BACKUP_DIR/props
 # Iap2Server reads these as "t"/"T" = on, "f"/"F" = off, anything else = default (off)
-PROPS="persist.sys.iap2.wifi persist.iap2.iden.wireless"
+PROPS="persist.sys.iap2.wifi persist.iap2.iden.wireless persist.sys.iap2.btconnection"
 PROP_ON=t
 PROP_OFF=f
 # the bridge builds, rebuilt on the unit by scripts/build.sh
@@ -178,11 +182,27 @@ wipe_dalvik() {
     rm -f /cache/dalvik-cache/*Iap2ServerApp* 2>/dev/null || true
 }
 
+# prop_saved <prop>: the prop snapshot has a line for it
+prop_saved() {
+    local _p _v
+    while IFS='=' read -r _p _v; do
+        [ "$_p" = "$1" ] && return 0
+    done < "$PROP_FILE"
+    return 1
+}
+
 snapshot_props() {
     local _prop
     mkdir -p "$BACKUP_DIR" 2>/dev/null || true
     if [ -f "$PROP_FILE" ]; then
         log "snapshot exists for props - keeping original"
+        # a prop this version added isn't in an older install's snapshot: save it now,
+        # before apply_props, so uninstall still puts it back
+        for _prop in $PROPS; do
+            prop_saved "$_prop" && continue
+            echo "${_prop}=$(getprop "$_prop" 2>/dev/null)" >> "$PROP_FILE" || return 1
+            log "backed up ${_prop}='$(getprop "$_prop" 2>/dev/null)' (added to the snapshot)"
+        done
         return 0
     fi
     : > "$PROP_FILE" || return 1
