@@ -1,7 +1,7 @@
 2_tbt app HKMC_GPM nq5/HKMC_GPM.tbt.lpd 5bef43633d18f77223e4c7e0396c04e0
-2_tbt app HKMC_DiPO nq5/HKMC_DiPO.tbt.lpd 922f78eaaaf62d5219e17798e3d6ec23
+2_tbt app HKMC_DiPO nq5/HKMC_DiPO.tbt.lpd 87277f4c4d15ed52d8be892f8f833874
 2_tbt app Iap2ServerApp nq5/Iap2ServerApp.tbt.lpd 7e90fa7d8a161ade71e11dc15e56c410
 2_tbt app HKMC_Navi_ExSL nq5/HKMC_Navi_ExSL.tbt.lpd 11a58afc6ebd937d69fa174f565e5e34
 3_bridge app Iap2ServerApp nq5/Iap2ServerApp.bridge.lpd 75d7fea4d2009be6aa5c840118f58c94
-3_bridge app HKMC_DiPO nq5/HKMC_DiPO.bridge.lpd 44c6b42717fd0dbdb8aa6c35a6145d11
+3_bridge app HKMC_DiPO nq5/HKMC_DiPO.bridge.lpd eb760488177200a97e7aa4bf18a3f690
 2_tbt file libautoreceiver_infobank.so common/libautoreceiver_infobank.tbt.lpd c08410a8d32a615b1aa805cd8a243d52

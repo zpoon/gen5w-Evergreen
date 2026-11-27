@@ -137,6 +137,8 @@ find "$X/pkg" -name '*.sh' | while read -r f; do
 done
 [ "$MOCK_WIFI_CLIENT" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/LEAFIA-WIFI-CLIENT"
 [ "$MOCK_NO_EV" = 1 ] && MOCK_USB_DESCRIPTOR=1 && : > "$R/storage/usb0/EVERGREEN-NO-EV"
+# MOCK_OPT="EVERGREEN-TRACE EVERGREEN-SCREEN-RECOVER": opt-in markers on the install drive
+for _o in $MOCK_OPT; do MOCK_USB_DESCRIPTOR=1; : > "$R/storage/usb0/$_o"; done
 [ "$MOCK_USB_DESCRIPTOR" = 1 ] && printf '[nemesis]\nversion=1.0\ntype=install\npath=packages/wireless.carplay.aa.zip\n' > "$R/storage/usb0/NEMESIS.data"
 
 (cd "$R" && find system -type f -exec md5sum {} \; | sort -k2) > "$X/before.md5"

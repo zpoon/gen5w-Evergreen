@@ -132,28 +132,42 @@ log_wifi_client() {
     return 0
 }
 
-# Trace build (opt-in, for diagnosing turn-by-turn): EVERGREEN-TRACE on the install
-# drive sets TRACE_FLAG; then DiPO logs the raw CarPlay route guidance messages
-# (numbers only, e/LeafiaTrace) and svc/tbt-trace.sh writes the Leafia log lines to
-# TRACE_DIR, which the kit copies to its private logs. Installing without the marker
-# turns it off again; so does uninstalling.
+# Opt-in markers on the install drive, next to our NEMESIS.data, each turning a
+# flag file on for as long as this install lasts (installing without the marker, or
+# uninstalling, removes it):
+#  EVERGREEN-TRACE: DiPO logs the raw CarPlay route guidance messages (numbers only,
+#    e/LeafiaTrace) and svc/tbt-trace.sh writes the Leafia log lines to TRACE_DIR,
+#    which the kit copies to its private logs.
+#  EVERGREEN-SCREEN-RECOVER: a frozen CarPlay picture that a key frame didn't bring
+#    back in 4 s gets the screen borrowed and given back (telechips/LeafiaScreen).
 TRACE_FLAG=/data/nemesis/wireless.carplay.aa.trace
 TRACE_DIR=/data/nemesis/logs/evergreen-trace
+SCREEN_FLAG=/data/nemesis/wireless.carplay.aa.screenrecover
 
-trace_setup() {
+# drive_has <marker>: the marker is on our install drive
+drive_has() {
     local _d
     for _d in /storage/usb0 /storage/usb1 /storage/usb2 /mnt/media_rw/usb0 /mnt/media_rw/usb1 /mnt/media_rw/usb2; do
-        [ -f "$_d/EVERGREEN-TRACE" ] || continue
-        grep -q 'wireless\.carplay\.aa\.zip' "$_d/NEMESIS.data" 2>/dev/null || continue
-        if : > "$TRACE_FLAG"; then
-            log "EVERGREEN-TRACE on the install drive: turn-by-turn trace on (logs in $TRACE_DIR)"
-        else
-            log "WARN: could not turn the turn-by-turn trace on"
-        fi
-        return 0
+        [ -f "$_d/$1" ] || continue
+        grep -q 'wireless\.carplay\.aa\.zip' "$_d/NEMESIS.data" 2>/dev/null && return 0
     done
-    [ -f "$TRACE_FLAG" ] && log "turn-by-turn trace off (no EVERGREEN-TRACE on the install drive)"
-    rm -f "$TRACE_FLAG"
+    return 1
+}
+
+# opt_flag <marker> <flag file> <what>
+opt_flag() {
+    if drive_has "$1"; then
+        if : > "$2"; then log "$1 on the install drive: $3 on"; else log "WARN: could not turn $3 on"; fi
+        return 0
+    fi
+    [ -f "$2" ] && log "$3 off (no $1 on the install drive)"
+    rm -f "$2"
+    return 0
+}
+
+trace_setup() {
+    opt_flag EVERGREEN-TRACE "$TRACE_FLAG" "turn-by-turn trace (logs in $TRACE_DIR)"
+    opt_flag EVERGREEN-SCREEN-RECOVER "$SCREEN_FLAG" "CarPlay frozen-picture screen recovery"
     return 0
 }
 

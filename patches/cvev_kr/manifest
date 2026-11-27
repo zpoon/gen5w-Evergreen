@@ -1,6 +1,6 @@
 2_tbt app HKMC_GPM cvev_kr/HKMC_GPM.tbt.lpd 8c3acd57362292a74f207829e0e5b5f3
-2_tbt app HKMC_DiPO cvev_kr/HKMC_DiPO.tbt.lpd 49a2dcc890b5bab279459a88c2b93e20
+2_tbt app HKMC_DiPO cvev_kr/HKMC_DiPO.tbt.lpd 9c3018e0e267cda1cb3bbd64edea9f29
 2_tbt app Iap2ServerApp cvev_kr/Iap2ServerApp.tbt.lpd 7e90fa7d8a161ade71e11dc15e56c410
 2_tbt app HKMC_Navi_ExSL cvev_kr/HKMC_Navi_ExSL.tbt.lpd 7c7c4037e2b0d2528ddb0ba0a3ddb435
 3_bridge app Iap2ServerApp cvev_kr/Iap2ServerApp.bridge.lpd 75d7fea4d2009be6aa5c840118f58c94
-3_bridge app HKMC_DiPO cvev_kr/HKMC_DiPO.bridge.lpd 5307144b820d73fad3182898712f0c4d
+3_bridge app HKMC_DiPO cvev_kr/HKMC_DiPO.bridge.lpd 9ac39f640aa3839f8e2c9b670538017c
