@@ -24,7 +24,7 @@ Evergreen installs from a USB drive through [NEMESIS](https://github.com/xwtk/hm
 - **The car's own navigation comes back normally** once you stop using phone directions.
 
 ### For EV drivers (Android Auto with Google Maps)
-On supported EVs (so far the Hyundai Ioniq 5, US and Canada, on 260507 and 260903), Evergreen includes the EV features from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat):
+On supported EVs (so far the Hyundai Ioniq 5, US and Canada, on 260507 and 260903, and the Kia EV6, US on 260507 and Canada on 260206, *in testing*), Evergreen includes the EV features from [egmp-aa-ev-feat](https://github.com/willemcvu/egmp-aa-ev-feat):
 - **Charging stops planned from your real battery level.** Google Maps uses the car's live battery data to plan charging stops and show your arrival percentage.
 - **Battery preconditioning on the way to a fast charger**, when the car's own *battery conditioning* setting is on.
 - **EV drive logs** that you can copy to a USB drive (create a folder named `egmp-aa-ev-logs` on the drive).

@@ -24,7 +24,7 @@ One folder per car, plus `common/`. The head unit rebuilds the modified projecti
 - `<App>.tbt.lpd`: rebuilds the turn-by-turn version of the app's code from the stock `<App>.odex`.
 - `<App>.bridge.lpd`: rebuilds the CarPlay-bridge version (turn-by-turn included).
 - `stock`: md5 of each stock file this car must have (`<file name> <md5>`).
-- `manifest`: one line per output: `<part> <app|file> <name> <patch> <md5 of the result>`.
+- `manifest`: one line per output: `<part> <app|file> <name> <patch> <md5 of the result>`. A `code` line (`<part> code <App> <patch> <md5 of the result dex>`) builds the app from the dex inside the car's own stock `.odex` (`lpatch odexdex`, as the universal build does), so a set can use a patch made from another car with the same app code without that car's stock APK here; the part's `stock` check still pins the exact `.odex` and APK. If the code doesn't match, the installer tries the next line for the same file, so a `code` line is always followed by a plain one. The EV6 sets use them for GPM (`universal/HKMC_GPM.{tbt,ev}.fcd92857.lpd`, the Ioniq 5 US 260507's code).
 
 An `.lpd` holds the md5 of the exact stock file it needs and of the result. `lpatch delta` writes nothing unless both match.
 

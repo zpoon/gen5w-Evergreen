@@ -4,7 +4,8 @@
 usage: compat-built.py [--check]
 
 For each car on the compatibility page, "built" lists the md5 of every file our
-package installs on it (from patches/<set>/manifest and patches/common/optional),
+package installs on it (from patches/<set>/manifest and patches/common/optional;
+"code" lines are left out, as their result APK depends on the car's own stock APK),
 so the page can tell a unit that already runs Leafia from one with unknown files.
 The cars table (patches/cars) maps the car's product prefix to its patch set.
 With --check nothing is written; it exits 1 if compat.json is out of date (CI).
@@ -32,6 +33,10 @@ def built_for(patch_set):
     lines = manifest_lines(os.path.join(PATCHES, patch_set, 'manifest'))
     lines += manifest_lines(os.path.join(PATCHES, 'common', 'optional'))
     for part, kind, name, _patch, md5 in lines:
+        if kind == 'code':
+            # built from the car's own .odex: the md5 is of the dex, not of the APK
+            # the car ends up with (that depends on its stock APK)
+            continue
         f = '/system/app/%s.apk' % name if kind == 'app' else '/system/lib/%s' % name
         if md5 not in built.setdefault(f, []):
             built[f].append(md5)
