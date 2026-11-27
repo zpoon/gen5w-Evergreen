@@ -143,6 +143,8 @@ fi
 stopped_left() { ls "$X" | grep '^pm_disabled_' | sed 's/^pm_disabled_//' | tr '\n' ' '; }
 [ "$MOCK_ADB_TCP" = 1 ] && echo 1 > "$X/prop_persist.service.adb.tcp.enable"
 adb_props() { echo "enable=$(cat "$X/prop_persist.service.adb.tcp.enable" 2>/dev/null) port=$(cat "$X/prop_persist.adb.tcp.port" 2>/dev/null)"; }
+# part 3's iAP2 identification props (3_bridge/scripts/common.sh PROPS): on while installed, off after
+iap2_props() { for _p in persist.sys.iap2.wifi persist.iap2.iden.wireless persist.sys.iap2.btconnection; do printf '%s ' "$(cat "$X/prop_$_p" 2>/dev/null)"; done; }
 # NEMESIS unpacks the package here first and removes it after the postinstall hook,
 # unless the hook rebooted the head unit (post.sh does): then nothing removes it
 STAGE=$R/data/local/tmp/nemesis/stage/wireless.carplay.aa
@@ -163,6 +165,9 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         _a=$(adb_props); echo "adb after install: $_a"; [ "$_a" = "enable=0 port=5555" ] || ok=0
     fi
     [ "$MOCK_USB_DESCRIPTOR" = 1 ] && echo "usb drive after install: $(ls "$R/storage/usb0" | tr '\n' ' ')"
+    if grep -q '3_bridge' "$X/post.log"; then
+        _i=$(iap2_props); echo "iAP2 props after install: $_i"; [ "$_i" = "t t t " ] || ok=0
+    fi
     _n=$(grep -c '^disable ' "$X/pm.calls" 2>/dev/null || true); echo "apps stopped for the swap: ${_n:-0}"
     _l=$(stopped_left); [ -z "$_l" ] || if [ "$MOCK_ANDROID_DOWN" = 1 ]; then echo "apps still stopped after install (Android down: started on the next run with Android up): $_l"; else echo "apps left stopped after install: $_l"; ok=0; fi
     # each Dalvik cache entry the install left must be the odex beside its APK
@@ -199,6 +204,9 @@ if "$SH" scripts/pre.sh > "$X/pre.log" 2>&1; then
         else
             echo "adb after uninstall: $_a"; [ "$_a" = "enable=1 port=" ] || ok=0
         fi
+    fi
+    if grep -q '3_bridge' "$X/post.log" && [ "$MOCK_UPDATE" != 1 ]; then
+        _i=$(iap2_props); echo "iAP2 props after uninstall: $_i"; [ "$_i" = "f f f " ] || ok=0
     fi
     _l=$(stopped_left); [ -z "$_l" ] || if [ "$MOCK_ANDROID_DOWN" = 1 ]; then echo "apps still stopped after uninstall (Android down: started on the next run with Android up): $_l"; else echo "apps left stopped after uninstall: $_l"; ok=0; fi
     # shellcheck disable=SC2010 # file names the mock made
