@@ -1,0 +1,11 @@
+# libiap2session: a gate at iAP2SessionPacketMakePacketUsingParamListNew's entry, so the CarPlay EV code can
+# build the identification message with the car's EV facts (engine type, charging connectors). Unarmed (handler 0)
+# the gate runs the stock prologue and carries on as stock. From Open-HMG/hmgapi-wireless-cp-aa's
+# carplay-identification-fc7 recipe (native/identity/recipe_gate.s, GPL-3.0-or-later); its separate
+# 'group13' patch at 0x129c6 is left out. Applied to the file by tools/elf-addseg.py (new PT_LOAD).
+id carplay-ev-identification
+file /system/lib/libiap2session.so
+verify 0x1aa04 4 92f20d7715dc751e34cfb9ae51a4a65b -
+segment 0x500000 dff818c0bcf1000f00f00a8060470000314756450100000021000000000000002de9f04fdff804c0fc44604700000000
+rel32 0x2c 0x2c 0x1aa09
+branch 0x1aa04 0x0

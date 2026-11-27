@@ -1,10 +1,11 @@
 2_tbt code HKMC_GPM universal/HKMC_GPM.tbt.fcd92857.lpd 02486cf01d86dd019ffa77805b580335
 2_tbt app HKMC_GPM ev6/HKMC_GPM.tbt.lpd 1929356d4d7126b28ffd3a6f13392fcf
 2_tbt app HKMC_DiPO ev6/HKMC_DiPO.tbt.lpd cd8581e0b11490b4733dbb3299b9f9e1
-2_tbt app Iap2ServerApp ev6/Iap2ServerApp.tbt.lpd 4fc06e6c75fd52aa8134b43c0eeb3945
+2_tbt code Iap2ServerApp universal/Iap2ServerApp.tbt.30a34f83.lpd cc19aeb69f2946520c368d4dff1c571c
 2_tbt app HKMC_Navi_ExSL ev6/HKMC_Navi_ExSL.tbt.lpd 11a58afc6ebd937d69fa174f565e5e34
-3_bridge app Iap2ServerApp ev6/Iap2ServerApp.bridge.lpd 36c366ca0ddbc733fec44b2b0232834a
+3_bridge code Iap2ServerApp universal/Iap2ServerApp.bridge.30a34f83.lpd 3f8b093bb34b50156ddf51e5bbaa241d
 3_bridge app HKMC_DiPO ev6/HKMC_DiPO.bridge.lpd 83482d5aec90573af95d3bc4e310151f
 2_tbt file libautoreceiver_infobank.so common/libautoreceiver_infobank.tbt.lpd c08410a8d32a615b1aa805cd8a243d52
 2_tbt+ev code HKMC_GPM universal/HKMC_GPM.ev.fcd92857.lpd 38f95434745a7d3a313769f294f24c54
 2_tbt+ev file libautoreceiver_infobank.so common/libautoreceiver_infobank.ev.lpd 37cbe6bfe7462444ca1f6d88013383d9
+2_tbt+ev file libiap2session.so common/libiap2session.ev.lpd b32703e6d702009da1cca02f4088ad58

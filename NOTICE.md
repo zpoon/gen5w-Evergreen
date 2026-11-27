@@ -14,6 +14,12 @@ Message link (visible to members of that server): https://discord.com/channels/1
 
 On that basis, code taken from egmp-aa-ev-feat into Evergreen is distributed under Evergreen's licence, GPL-3.0, with credit to willemcvu. Its bundled `lpatch` came from HMG Leafia Plus and is GPL-3.0 already.
 
+## egmp-carplay-ev-routing (CarPlay EV routing, GPL-3.0-or-later)
+
+egmp-carplay-ev-routing by Isaac Wisdom (https://github.com/isaacwisdom/egmp-carplay-ev-routing, GPL-3.0-or-later): Apple Maps EV routing for E-GMP cars, an HMG-API mod. Evergreen carries its native vehicle-status extension (`ev/carplay/native/ev/`, unchanged, from commit 1bf5b03), its Java app side (`ev/carplay/java/org/egmp/`; `VehicleSource` adapted to look the car's services up by name) and its car profiles (`ev/carplay/profiles/`), under GPL-3.0-or-later; its licence is in `ev/carplay/LICENSE-egmp-carplay-ev-routing`.
+
+The identification side (`ev/carplay/native/identity/`, GPL-3.0-or-later) is from the HMG-API wireless mod, Open-HMG/hmgapi-wireless-cp-aa (commit 23c564f): the gate in `libiap2session.so` that adds the car's engine type and charging connectors to the iPhone's identification. Evergreen applies that gate to the file (`recipes/carplay-ev-identification.recipe`, `tools/elf-addseg.py`) instead of in memory.
+
 ## NEMESIS
 
 HMG Leafia Plus packages install and run through **NEMESIS** by xwtk:

@@ -35,11 +35,23 @@ stock_sum() {
 }
 
 # built_sum <part> <name>: md5 of the file scripts/build.sh builds for that part
+# A "code" line's md5 is of the dex it builds, not of the APK (that depends on the car's own
+# stock APK): there, the APK scripts/build.sh built for the part is the answer.
 built_sum() {
-    local _p _k _n _x _s
+    local _p _k _n _x _s _f _l
     [ -s "$CARS_DIR/$VARIANT/manifest" ] || return 1
     while read -r _p _k _n _x _s; do
-        [ "$_p" = "$1" ] && [ "$_n" = "$2" ] && { echo "$_s"; return 0; }
+        [ "$_p" = "$1" ] && [ "$_n" = "$2" ] || continue
+        if [ "$_k" = code ]; then
+            _f=/data/nemesis/build/wireless.carplay.aa/$1/$2.apk
+            [ -s "$_f" ] || return 1
+            _l=$(md5 "$_f" 2>/dev/null) || return 1
+            set -- $_l
+            echo "$1"
+            return 0
+        fi
+        echo "$_s"
+        return 0
     done < "$CARS_DIR/$VARIANT/manifest"
     return 1
 }
