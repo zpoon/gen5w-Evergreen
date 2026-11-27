@@ -10,8 +10,8 @@ apps_hold "$_rev"
 uninstall_parts "$_rev" || exit 1
 apps_release
 rm -f "$PARTS_FILE"
-# the opt-in flags (EVERGREEN-TRACE, EVERGREEN-SCREEN-RECOVER): the new version decides again on an update
-rm -f "$TRACE_FLAG" "$SCREEN_FLAG"
+# the opt-in flags (EVERGREEN-TRACE, EVERGREEN-SCREEN-RECOVER, EVERGREEN-LANES-ID): the new version decides again on an update
+rm -f "$TRACE_FLAG" "$SCREEN_FLAG" "$LANEID_FLAG"
 # the hotspot firewall rules (memory only; on an update the new version's service
 # puts them back within seconds)
 sh ./svc/hotspot-firewall.sh remove && log "hotspot firewall rules taken out (if there were any)"
