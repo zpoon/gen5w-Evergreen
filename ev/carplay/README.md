@@ -14,7 +14,10 @@ Apple Maps EV routing for Evergreen, from Isaac Wisdom's
   identification to `libcarplayidentity.so` (VehicleInformation: engine electric,
   CCS and AC connectors with their power). The wireless mod's other gate ("group13") isn't
   used. Shipped as `patches/common/libiap2session.ev.lpd`, a `2_tbt+ev file` line in the
-  EV sets (neev, neev23_260903, ev6, ev6_ca).
+  EV sets (neev, neev23_260903, ev6, ev6_ca). The plain build has no line for this
+  library, so on a car whose library isn't that stock file (or is missing) `scripts/build.sh`
+  leaves it stock and builds the rest, the Android Auto EV features included. The other way
+  round, a car whose GPM doesn't fit the EV build keeps CarPlay EV routing.
 - `libcarplayev.so` (Isaac's `ev_extension.c`, `bridge_core.c`, `bridge_jni.c`, unchanged)
   and `libcarplayidentity.so` (`identity.c`, `recipe_gate.s`), our builds, in
   `packages/wireless-carplay-aa/comp/2_tbt/files/`; part 2 puts them in `/system/lib` with

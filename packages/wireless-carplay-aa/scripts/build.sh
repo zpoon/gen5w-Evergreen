@@ -11,9 +11,15 @@
 # plus egmp-aa-ev-feat's EV routing, preconditioning and logging). It replaces the
 # plain line for the same part and file, unless an empty EVERGREEN-NO-EV file sits
 # next to our NEMESIS.data on the install drive. A car with no +ev lines builds as
-# before. $BUILD_DIR/ev records which way it went (1 or 0) for the install log.
-# EV is all or nothing: if a +ev line can't be built (a "code" line whose code
-# doesn't match), every EV file is dropped and the car gets the plain build.
+# before. $BUILD_DIR/ev records whether any EV build went in (1 or 0) for the install log.
+# The EV features fall back on their own, so one that doesn't fit this car's files never
+# takes out the other or drops the car to basic mode:
+# - the EV builds of files that also have a plain line (GPM and the Android Auto library:
+#   the Android Auto EV features) go in all together or not at all; if one can't be built,
+#   those files get their plain build;
+# - a file with only a +ev line (libiap2session.so, for CarPlay EV routing: the plain
+#   build leaves it stock) is built if it fits, and otherwise stays stock.
+# Only a plain line that doesn't fit stops the build, as before.
 #
 # Code lines: "<part> code <App> <patch> <md5 of the result dex>" build an app from
 # the dex inside the car's own stock .odex (`lpatch odexdex`, as the universal build
@@ -136,18 +142,29 @@ ev_wanted() {
     return 0
 }
 
-# ev_complete <manifest> <done list>: every file with a +ev line got an EV build
+# plain_line <manifest> <part> <name>: the manifest has a plain (not +ev) line for that file
+plain_line() {
+    local _p _k _n _x _s
+    while read -r _p _k _n _x _s; do
+        [ "$_p" = "$2" ] && [ "$_n" = "$3" ] && return 0
+    done < "$1"
+    return 1
+}
+
+# ev_complete <manifest> <done list>: every file with both a +ev line and a plain line
+# got an EV build
 ev_complete() {
     local _p _k _n _x _s
     while read -r _p _k _n _x _s; do
         case "$_p" in *+ev) ;; *) continue ;; esac
+        plain_line "$1" "${_p%+ev}" "$_n" || continue
         case "$2" in *" ${_p%+ev}/$_n "*) ;; *) return 1 ;; esac
     done < "$1"
     return 0
 }
 
 build_payloads() {
-    local _v _m _part _kind _name _patch _want _l _ev=0 _evn=0 _done=" "
+    local _v _m _part _kind _name _patch _want _l _ev=0 _evn=0 _done=" " _keep _evl
     _v=$(car_variant) || { log "FAIL: no patch set for this car"; return 1; }
     if [ "$_v" = auto ]; then   # the universal build (scripts/universal.sh)
         universal_rebuilt || universal_build || return 1
@@ -167,27 +184,35 @@ build_payloads() {
             log "EVERGREEN-NO-EV on the install drive: turn-by-turn build without the EV features"
         fi
     fi
-    # the EV lines first: all of them or none
+    # the EV lines first: one that doesn't fit is left out (see the top), never an error
     if [ $_ev = 1 ]; then
         while read -r _part _kind _name _patch _want; do
             case "$_part" in *+ev) ;; *) continue ;; esac
             _part=${_part%+ev}
             case "$_done" in *" $_part/$_name "*) continue ;; esac
-            if build_one "$_part" "$_kind" "$_name" "$_patch" "$_want"; then
+            if build_one "$_part" "$_kind" "$_name" "$_patch" "$_want" optional; then
                 _done="$_done$_part/$_name "
                 _evn=$((_evn + 1))
-            elif [ "$_kind" != code ]; then
-                return 1
+            elif ! plain_line "$_m" "$_part" "$_name"; then
+                log "EV build without $_part/$_name: it doesn't fit this car's files, so the stock $_name stays"
             fi
         done < "$_m"
         if ! ev_complete "$_m" "$_done"; then
-            log "the EV build doesn't fit this car's files: building without the EV features"
+            log "the EV build doesn't fit this car's files: building without the EV features for the files that have a plain build"
+            _keep=" "
             for _l in $_done; do
-                rm -f "$BUILD_DIR/$_l.apk" "$BUILD_DIR/$_l" 2>/dev/null
+                if plain_line "$_m" "${_l%%/*}" "${_l#*/}"; then
+                    rm -f "$BUILD_DIR/$_l.apk" "$BUILD_DIR/$_l" 2>/dev/null
+                    _evn=$((_evn - 1))
+                else
+                    _keep="$_keep$_l "
+                fi
             done
-            _ev=0 _evn=0 _done=" "
+            _done=$_keep
         fi
+        [ $_evn -gt 0 ] || _ev=0
     fi
+    _evl=$_done
     # then the plain lines, for each file the first one that fits
     while read -r _part _kind _name _patch _want; do
         [ -n "$_part" ] || continue
@@ -207,7 +232,7 @@ build_payloads() {
         : > "$BUILD_DIR/2_tbt/no-lib" || return 1
         log "no Android Auto library patch for this car yet: the library stays stock (Android Auto turn-by-turn on the cluster isn't in this build)"
     fi
-    [ $_ev = 1 ] && log "EV features: $_evn file(s) built with EV routing, preconditioning and logging"
+    [ $_ev = 1 ] && log "EV features: $_evn file(s) built with them:${_evl% }"
     build_optional
     return 0
 }
