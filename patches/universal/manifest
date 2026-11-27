@@ -3,13 +3,13 @@
 # file lines: <part> file <library> <md5 of the stock library> <patch> <md5 of the result>
 # A car gets the full build only if every app and the library match a line here.
 2_tbt app HKMC_GPM fcd9285700d766d4a75ef9b089dba1e3 universal/HKMC_GPM.tbt.fcd92857.lpd 02486cf01d86dd019ffa77805b580335
-2_tbt app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.tbt.77a5160a.lpd 2c1717edd1ba0056cd52ce227926da41
+2_tbt app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.tbt.77a5160a.lpd 612454709778c57fdd83e24f585ebe73
 2_tbt app HKMC_Navi_ExSL 7dc811232a9171a18c53c337672a4e9c universal/HKMC_Navi_ExSL.tbt.7dc81123.lpd 1c8af28607def8f4db5b46c75b44b799
-3_bridge app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.bridge.77a5160a.lpd 3a238d4af8ee2dc1ed1c1a8e9da489eb
+3_bridge app HKMC_DiPO 77a5160a52ab0f93ab2b14db884b3343 universal/HKMC_DiPO.bridge.77a5160a.lpd 09d652f2e5109a054b90d911b9de6f03
 2_tbt app HKMC_GPM b0a8811e819ffa2cdb87a2dbc54905ec universal/HKMC_GPM.tbt.b0a8811e.lpd de1267a5c9dbd634ee4936e84f5465fc
-2_tbt app HKMC_DiPO 8a71b8287cdc9683495ff19dab6c932b universal/HKMC_DiPO.tbt.8a71b828.lpd e4b69d44ef2dd2864939e8b986cf16c5
+2_tbt app HKMC_DiPO 8a71b8287cdc9683495ff19dab6c932b universal/HKMC_DiPO.tbt.8a71b828.lpd 16c4ee35ff7ce86e194bd93f45182cf4
 2_tbt app Iap2ServerApp 30a34f8331e3c74a18c0241a28a036ea universal/Iap2ServerApp.tbt.30a34f83.lpd 02368c2553da339abccf22e312d00fce
 2_tbt app HKMC_Navi_ExSL 16e7883de1f5382e086cadca85f73800 universal/HKMC_Navi_ExSL.tbt.16e7883d.lpd 668e53833f81ef72f98bbc6fe7b237be
 3_bridge app Iap2ServerApp 30a34f8331e3c74a18c0241a28a036ea universal/Iap2ServerApp.bridge.30a34f83.lpd a4974bf76ad77c4954815ec94704ec5e
-3_bridge app HKMC_DiPO 8a71b8287cdc9683495ff19dab6c932b universal/HKMC_DiPO.bridge.8a71b828.lpd f2802a62076116c9dcaa34617e5d0a67
+3_bridge app HKMC_DiPO 8a71b8287cdc9683495ff19dab6c932b universal/HKMC_DiPO.bridge.8a71b828.lpd 7573fb5481ca43a5e53f11a3cd43133c
 2_tbt file libautoreceiver_infobank.so 48ee793af8b86052503b8c952b034731 common/libautoreceiver_infobank.tbt.lpd c08410a8d32a615b1aa805cd8a243d52
