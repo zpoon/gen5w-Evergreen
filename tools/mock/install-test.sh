@@ -36,6 +36,8 @@
 #                           staged the new version, here the same package again): ADB over
 #                           network stays as the install left it, for the new version (#17)
 #
+# The hooks' mv is the head unit's toolbox mv, which takes no options: "mv -f a b" fails there.
+#
 # Needs: qemu-arm-static (runs the ARM lpatch), unzip, md5sum.
 set -e
 if [ $# -ne 4 ] || [ "$1" = -h ] || [ "$1" = --help ]; then
@@ -119,6 +121,14 @@ if [ "$MOCK_ANDROID_DOWN" = 1 ]; then
     cp "$X/stub/am" "$X/stub/pm"
 fi
 printf '#!/bin/sh\nexec qemu-arm-static %s/pkg/tools/lpatch "$@"\n' "$X" > "$X/stub/lpatch_q"
+# toolbox mv: "mv <source...> <destination>", no options; it renames "-f" as a source and fails
+cat > "$X/stub/mv" <<E
+#!/bin/sh
+for _a in "\$@"; do
+    case "\$_a" in -*) echo "failed on '\$_a' - No such file or directory" >&2; exit 255 ;; esac
+done
+exec $(command -v mv) "\$@"
+E
 chmod 755 "$X"/stub/*
 
 # unpack the package and point its scripts at the sandbox instead of the real paths

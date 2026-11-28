@@ -579,7 +579,7 @@ apply_core() {
             log "FAIL: lpatch could not apply $_r to $_p"
             return 1
         fi
-        mv -f "$_w.next" "$_w" || return 1
+        mv "$_w.next" "$_w" || return 1
         _done="$_done $_r"
     done
     if ! put_lib "$_w" "$_p"; then
